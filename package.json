@@ -1,0 +1,31 @@
+{
+  "name": "mmbn-web",
+  "version": "0.1.0",
+  "description": "Mega Man Battle Network 3-inspired web game",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/shared",
+    "packages/client",
+    "packages/server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=packages/client\" \"npm run dev --workspace=packages/server\"",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "test:shared": "npm run test --workspace=packages/shared",
+    "test:client": "npm run test --workspace=packages/client",
+    "test:server": "npm run test --workspace=packages/server",
+    "lint": "eslint . --ext .ts,.tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  }
+}
