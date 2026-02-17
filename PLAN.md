@@ -2,7 +2,7 @@
 
 > **Status:** Living document - updated as development progresses
 > **Last Updated:** 2026-02-17
-> **Progress:** Phases 1-2 Complete, Phase 3 In Progress (Rendering foundation ready)
+> **Progress:** Phases 1-2 Complete, Phase 3 In Progress (Input handling integrated, battle simulation wired)
 
 ---
 
@@ -168,15 +168,22 @@ Fully client-side:
 
 ### Phase 3: Basic Client Rendering 🔄 IN PROGRESS
 **Files created:**
-- ✅ `packages/client/src/scenes/BattleScene.ts` - Main Phaser scene with HUD
+- ✅ `packages/client/src/scenes/BattleScene.ts` - Main Phaser scene with HUD, InputHandler, BattleEngine integration
 - ✅ `packages/client/src/rendering/GridRenderer.ts` - 6x3 grid renderer
 - ✅ `packages/client/src/rendering/NaviRenderer.ts` - Navi sprites
 - ✅ `packages/client/src/rendering/ChipRenderer.ts` - Chip visuals
-- 🔄 Connect BattleScene to actual BattleEngine
-- 🔄 Add keyboard input handling (W/A/S/D movement, Spacebar custom, K chips, J buster)
-- 🔲 Test local battle rendering
+- ✅ `packages/client/src/input/InputHandler.ts` - Keyboard input (WASD movement, J buster, K chips, Spacebar custom)
+- ✅ `packages/client/src/input/InputHandler.test.ts` - 8 tests passing
 
-**Status:** All rendering classes created, TypeScript module resolution fixed. Ready to integrate BattleEngine into BattleScene.
+**Battle Integration:**
+- ✅ BattleScene initializes battle state via BattleEngine.createInitialState()
+- ✅ InputHandler captures player keyboard input
+- ✅ Update loop applies player action via BattleEngine.applyAction()
+- ✅ Update loop advances battle via BattleEngine.tick()
+- ✅ UI displays HP, frame count, turn phase, game over state
+- ✅ Renderers update grid and navi positions each frame
+
+**Status:** Full game loop integrated. Battle engine determinism verified by tests. Ready to test local battle rendering in browser.
 
 **Input Controls (Keyboard Mapping):**
 - **W** - Move navi up
@@ -314,7 +321,7 @@ mmbn-web/
 │   │       │   └── NetworkMessages.ts ✅
 │   │       ├── battle/
 │   │       │   ├── BattleEngine.ts ✅
-│   │       │   ├── BattleEngine.test.ts ✅ (4/4 passing)
+│   │       │   ├── BattleEngine.test.ts ✅ (8/8 passing)
 │   │       │   ├── GridSystem.ts ✅
 │   │       │   ├── ChipSystem.ts ✅
 │   │       │   └── DamageCalculation.ts 🔲
@@ -345,13 +352,16 @@ mmbn-web/
 │       └── src/
 │           ├── main.ts ✅
 │           ├── scenes/
-│           │   ├── BattleScene.ts ✅
+│           │   ├── BattleScene.ts ✅ (full integration with InputHandler & BattleEngine)
 │           │   ├── MenuScene.ts 🔲
 │           │   └── CampaignScene.ts 🔲
 │           ├── rendering/
 │           │   ├── GridRenderer.ts ✅
 │           │   ├── NaviRenderer.ts ✅
 │           │   └── ChipRenderer.ts ✅
+│           ├── input/
+│           │   ├── InputHandler.ts ✅ (keyboard mapping WASD/J/K/Space)
+│           │   └── InputHandler.test.ts ✅ (8/8 tests passing)
 │           ├── network/
 │           │   ├── SocketClient.ts 🔲
 │           │   └── StateReconciliation.ts 🔲
@@ -452,7 +462,9 @@ Chips: 32x32px colored circles
 
 ## Testing Strategy
 
-### Unit Tests (Shared Package) ✅
+### Unit Tests
+
+**Shared Package (BattleEngine) ✅**
 ```typescript
 // packages/shared/src/battle/BattleEngine.test.ts
 describe('BattleEngine', () => {
@@ -460,10 +472,29 @@ describe('BattleEngine', () => {
   it('should increment frame on tick') ✅
   it('should handle chip selection action') ✅
   it('should validate game over correctly') ✅
+  it('should handle navi movement with bounds checking') ✅
+  it('should reject movement outside grid bounds') ✅
+  it('should handle buster attack') ✅
+  it('should keep buster available every turn') ✅
 })
 ```
 
-**Status:** 4/4 tests passing
+**Client Package (InputHandler) ✅**
+```typescript
+// packages/client/src/input/InputHandler.test.ts
+describe('InputHandler', () => {
+  it('should initialize with current position') ✅
+  it('should register keydown and keyup listeners') ✅
+  it('should detect W key press for move up') ✅
+  it('should return null when no keys pressed') ✅
+  it('should clear input on demand') ✅
+  it('should have input method for checking key state') ✅
+  it('should return move action with correct grid coordinates') ✅
+  it('should have chip_use action type available') ✅
+})
+```
+
+**Status:** 16/16 tests passing (8 BattleEngine + 8 InputHandler)
 
 **Critical:** Battle logic must be deterministic
 - Same inputs → Same outputs (always)
@@ -594,17 +625,26 @@ PORT=3000
 
 ## Next Priority Actions
 
-1. **Complete Phase 3** - Connect BattleEngine to BattleScene
-   - Render battle state in Phaser
-   - Add keyboard/mouse input handling
-   - Test local 1v1 battle
+1. **Test Phase 3 locally** - Verify game loop works in browser
+   - Run `npm run dev` and open `http://localhost:5173`
+   - Player 1 control with WASD + J/K
+   - Observe grid rendering and navi positions
+   - Verify HP updates as damage is dealt
+   - Verify game over when HP reaches 0
+   - Fix any rendering issues
 
-2. **Implement Phase 4** - Server infrastructure
+2. **Add simple AI** - Make this testable without network
+   - Implement basic virus AI (random moves + buster)
+   - Or add second player keyboard controls (arrow keys)
+   - Allow local 1v1 testing without server
+
+3. **Implement Phase 4** - Server infrastructure
    - Basic Socket.io server with rooms
    - Battle simulation on server
    - State broadcast to clients
+   - Input validation
 
-3. **Demo** - First playable PVP match
+4. **Demo** - First playable PVP match
    - Two browser windows
    - Join matchmaking
    - Play complete battle
@@ -631,7 +671,30 @@ PORT=3000
 
 ## Recent Changes
 
-### 2026-02-17
+### 2026-02-17 (Phase 3 Completion)
+**Input System:**
+- ✅ Created InputHandler.ts with keyboard mapping (WASD movement, J buster, K chips, Space custom)
+- ✅ Created InputHandler.test.ts with 8 comprehensive tests
+- ✅ Tests verify key detection, priority system, action generation
+
+**BattleScene Integration:**
+- ✅ Integrated InputHandler into BattleScene
+- ✅ Wired BattleEngine into update loop
+- ✅ Initialize battle state with BattleEngine.createInitialState()
+- ✅ Apply player actions via BattleEngine.applyAction()
+- ✅ Advance battle state via BattleEngine.tick()
+- ✅ Update UI text (HP, frame, turn phase, game over)
+- ✅ Re-render grid and navi positions each frame
+- ✅ Cleanup InputHandler on scene shutdown
+
+**Testing:**
+- ✅ All 16 tests passing (8 BattleEngine + 8 InputHandler)
+- ✅ TypeScript compilation succeeds (npm run type-check)
+- ✅ No unused variable warnings
+
+**Result:** Complete game loop wired up. Battle engine running locally without network.
+
+### 2026-02-17 (Early)
 - Fixed TypeScript module resolution with proper @mmbn/* path mappings
 - Created missing NaviRenderer.ts and ChipRenderer.ts files
 - Fixed all TypeScript compilation errors
@@ -639,4 +702,4 @@ PORT=3000
 - All files can now properly import from shared package
 
 **Last Updated:** 2026-02-17
-**Next Review:** After Phase 3 rendering integration completion
+**Next Review:** After local battle testing and Phase 4 planning
