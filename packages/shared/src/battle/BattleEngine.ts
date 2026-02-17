@@ -68,6 +68,7 @@ export class BattleEngine {
       selectedChipIndex: 0,
       position: { x: playerId === 'player1' ? 0 : 2, y: 2 }, // Middle of each side
       isStunned: false,
+      busterCooldown: 0, // Buster available immediately
       buffedDamage: 0,
       debuffedDefense: 0,
     };
@@ -148,6 +149,7 @@ export class BattleEngine {
     const events: BattleEvent[] = [];
 
     const player = playerId === 'player1' ? newState.player1 : newState.player2;
+    const opponent = playerId === 'player1' ? newState.player2 : newState.player1;
 
     if (action.type === 'chip_select' && action.chipId) {
       // Select a chip from hand for custom screen
@@ -169,11 +171,13 @@ export class BattleEngine {
       const newX = action.gridX;
       const newY = action.gridY;
 
-      // Validate move (simple distance check)
+      // Validate move: adjacent grid position, within bounds
       const distance =
         Math.abs(newX - player.position.x) + Math.abs(newY - player.position.y);
-      if (distance === 1) {
-        // Adjacent move
+      const isInBounds = newX >= 0 && newX < 3 && newY >= 0 && newY < 6;
+
+      if (distance === 1 && isInBounds) {
+        // Adjacent move, in bounds
         player.position.x = newX;
         player.position.y = newY;
         events.push({
@@ -182,6 +186,22 @@ export class BattleEngine {
           playerId,
           data: { x: newX, y: newY },
         });
+      }
+    } else if (action.type === 'buster') {
+      // Use buster attack (basic attack, always available)
+      if (player.busterCooldown === 0) {
+        const busterDamage = 10;
+        opponent.hp = Math.max(0, opponent.hp - busterDamage);
+
+        events.push({
+          frame: newState.frame,
+          type: 'buster_used',
+          playerId,
+          data: { damage: busterDamage, opponentHp: opponent.hp },
+        });
+
+        // Set buster cooldown (available every turn, so no actual cooldown)
+        player.busterCooldown = 0;
       }
     }
 

@@ -77,4 +77,82 @@ describe('BattleEngine', () => {
     expect(BattleEngine.isGameOver(state)).toBe(true);
     expect(BattleEngine.getWinner(state)).toBe('player2');
   });
+
+  it('should handle navi movement with bounds checking', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    // Player1 starts at (0, 2), move to (0, 3)
+    const { state: newState, events } = BattleEngine.applyAction(state, 'player1', {
+      type: 'move',
+      gridX: 0,
+      gridY: 3,
+    });
+
+    expect(newState.player1.position.y).toBe(3);
+    expect(events.some((e) => e.type === 'navi_moved')).toBe(true);
+  });
+
+  it('should reject movement outside grid bounds', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    // Try to move outside bounds
+    const { state: newState } = BattleEngine.applyAction(state, 'player1', {
+      type: 'move',
+      gridX: -1,
+      gridY: 2,
+    });
+
+    expect(newState.player1.position.x).toBe(0); // Should not move
+  });
+
+  it('should handle buster attack', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    const initialHp = state.player2.hp;
+    const { state: newState, events } = BattleEngine.applyAction(state, 'player1', {
+      type: 'buster',
+    });
+
+    expect(newState.player2.hp).toBe(initialHp - 10);
+    expect(events.some((e) => e.type === 'buster_used')).toBe(true);
+  });
+
+  it('should keep buster available every turn', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    // Use buster
+    const { state: state1 } = BattleEngine.applyAction(state, 'player1', {
+      type: 'buster',
+    });
+
+    expect(state1.player1.busterCooldown).toBe(0); // Should be ready immediately
+  });
 });
