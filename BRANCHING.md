@@ -705,6 +705,69 @@ git log main..HEAD  # Show commits in current branch
 
 ---
 
+## Tagging & Versioning Strategy
+
+### Version Format
+
+```
+v0.<phase>.<patch>
+```
+
+- **Major (`0`):** Stays at `0` until first public release (v1.0.0)
+- **Minor:** Maps to the completed phase number
+- **Patch:** Increments for hotfixes or follow-up fixes within a phase
+
+### Existing Tags
+
+| Tag | Description |
+|-----|-------------|
+| `v0.1.0` | Phases 1+2: Project setup, monorepo, shared battle core |
+| `v0.3.0` | Phase 3: Client rendering, input handling, real-time battle loop |
+| `v0.4.0` | Phase 4: Server infrastructure - matchmaking, battle rooms |
+
+### When to Tag
+
+Tag main after a phase is **complete and merged**:
+1. All phase work merged to main
+2. All tests passing (`npm run test`)
+3. TypeScript compiling (`npm run type-check`)
+4. Tested locally (browser or server as applicable)
+
+### How to Tag
+
+```bash
+# After merging phase work to main
+git checkout main
+git pull origin main
+git tag -a v0.<phase>.0 -m "Phase <N>: <short description>"
+git push origin v0.<phase>.0
+```
+
+### Patch Tags
+
+For hotfixes or follow-up fixes after a phase tag:
+
+```bash
+# e.g., fixing a bug discovered after Phase 3 was tagged
+git tag -a v0.3.1 -m "Phase 3: Fix InputHandler test environment"
+git push origin v0.3.1
+```
+
+### v1.0.0 Milestone
+
+The project graduates to `v1.0.0` when:
+- Campaign mode is playable (Phase 6)
+- PVP matchmaking works end-to-end (Phases 4-5)
+- Core content exists (Phase 7 minimum viable)
+- UI is polished enough for public use (Phase 8)
+
+After v1.0.0, follow standard [semver](https://semver.org/):
+- **Major:** Breaking changes to network protocol or save format
+- **Minor:** New features (chips, modes, mechanics)
+- **Patch:** Bug fixes
+
+---
+
 ## Integration with CI/CD
 
 When implemented, CI/CD will:
@@ -728,7 +791,7 @@ This ensures main is always stable and deployable.
 | **Merge strategy** | Squash and merge to main |
 | **Iteration speed** | Daily or multiple times daily |
 | **Team scalability** | Good for 1-10 developers |
-| **Release process** | Tag main when ready to deploy |
+| **Release process** | Tag main per phase (see Tagging Strategy) |
 | **Hotfix handling** | Direct branch from main, urgent merge |
 
 ---
