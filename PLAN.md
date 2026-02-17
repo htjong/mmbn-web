@@ -355,7 +355,7 @@ Browser → DigitalOcean Droplet ($6/mo)
 - `DO_SSH_KEY` — private SSH key for deploy user
 - `DO_USERNAME` — SSH username (e.g., `deploy`)
 
-**Deploy flow:** Push to main → GitHub Actions builds + tests → SSH to Droplet → git pull → build → pm2 restart
+**Deploy flow:** Push to main → GitHub Actions builds + tests → rsync artifacts to Droplet → npm ci --omit=dev → pm2 restart
 
 **Future scaling:**
 - Cloudflare free CDN in front of nginx (DNS change only)

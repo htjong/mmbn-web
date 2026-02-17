@@ -15,7 +15,7 @@ set -euo pipefail
 
 APP_DIR="/app"
 DEPLOY_USER="deploy"
-NODE_VERSION="20"
+NODE_VERSION="22"
 
 echo "==> Creating deploy user"
 if ! id "$DEPLOY_USER" &>/dev/null; then
@@ -38,16 +38,21 @@ npm install -g pm2
 echo "==> Installing nginx"
 apt-get install -y nginx
 
-echo "==> Cloning repo to $APP_DIR"
-if [ ! -d "$APP_DIR" ]; then
-  git clone https://github.com/htjong/mmbn-web.git "$APP_DIR"
+echo "==> Setting up swap (1GB)"
+if [ ! -f /swapfile ]; then
+  fallocate -l 1G /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo '/swapfile none swap sw 0 0' >> /etc/fstab
 fi
+
+echo "==> Creating app directory"
+mkdir -p "$APP_DIR"
 chown -R $DEPLOY_USER:$DEPLOY_USER "$APP_DIR"
 
-echo "==> Building application"
-cd "$APP_DIR"
-sudo -u $DEPLOY_USER npm ci
-sudo -u $DEPLOY_USER npm run build
+# Note: GitHub Actions builds the app and rsyncs artifacts to /app.
+# No git clone or npm build needed on the Droplet.
 
 echo "==> Configuring nginx"
 cp scripts/nginx.conf /etc/nginx/sites-available/mmbn
