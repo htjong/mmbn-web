@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Quick Links
+- **[PLAN.md](./PLAN.md)** - Implementation roadmap and current progress
+- **[BRANCHING.md](./BRANCHING.md)** - Git workflow and branch strategy
+- **[CLAUDE.md](./CLAUDE.md)** - You are here - architecture and patterns guide
+
 ## Project Overview
 
 A Mega Man Battle Network 3-inspired web game with two modes:
@@ -27,6 +32,21 @@ packages/
 - Campaign mode (purely client-side using same battle logic)
 
 Import shared code in client/server using: `import { ... } from '@mmbn/shared'`
+
+## Git Workflow
+
+Follow the [BRANCHING.md](./BRANCHING.md) strategy:
+- Create feature branches: `git checkout -b feature/phase-name main`
+- Commit with conventional messages: `feat(scope): description`
+- Push and create PRs: `git push origin feature/...`
+- Merge to main when complete
+
+**Branch types:**
+- `phase/*` - Main development for each phase
+- `feature/*` - Individual features within a phase
+- `fix/*` - Bug fixes
+- `experiment/*` - Exploratory work
+- `hotfix/*` - Critical fixes to main
 
 ## Development Commands
 
