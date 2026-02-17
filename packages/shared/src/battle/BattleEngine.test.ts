@@ -21,8 +21,8 @@ describe('BattleEngine', () => {
     expect(state.player2.hp).toBe(200);
     expect(state.currentTurn).toBe('player1');
     expect(state.isGameOver).toBe(false);
-    expect(state.grid.length).toBe(6);
-    expect(state.grid[0].length).toBe(3);
+    expect(state.grid.length).toBe(3);
+    expect(state.grid[0].length).toBe(6);
   });
 
   it('should increment frame on tick', () => {
@@ -88,15 +88,42 @@ describe('BattleEngine', () => {
       'Bob'
     );
 
-    // Player1 starts at (0, 2), move to (0, 3)
+    // Player1 starts at (1, 1), move to (2, 1)
     const { state: newState, events } = BattleEngine.applyAction(state, 'player1', {
       type: 'move',
-      gridX: 0,
-      gridY: 3,
+      gridX: 2,
+      gridY: 1,
     });
 
-    expect(newState.player1.position.y).toBe(3);
+    expect(newState.player1.position.x).toBe(2);
     expect(events.some((e) => e.type === 'navi_moved')).toBe(true);
+  });
+
+  it('should reject movement onto opponent panels', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    // Move P1 to (2,1) first (own territory)
+    const { state: state1 } = BattleEngine.applyAction(state, 'player1', {
+      type: 'move',
+      gridX: 2,
+      gridY: 1,
+    });
+    expect(state1.player1.position.x).toBe(2);
+
+    // Try to move P1 to (3,1) — Player 2's territory
+    const { state: state2 } = BattleEngine.applyAction(state1, 'player1', {
+      type: 'move',
+      gridX: 3,
+      gridY: 1,
+    });
+    expect(state2.player1.position.x).toBe(2); // Should not move
   });
 
   it('should reject movement outside grid bounds', () => {
@@ -109,14 +136,14 @@ describe('BattleEngine', () => {
       'Bob'
     );
 
-    // Try to move outside bounds
+    // Try to move outside bounds (not adjacent to starting pos (1,1))
     const { state: newState } = BattleEngine.applyAction(state, 'player1', {
       type: 'move',
       gridX: -1,
-      gridY: 2,
+      gridY: 1,
     });
 
-    expect(newState.player1.position.x).toBe(0); // Should not move
+    expect(newState.player1.position.x).toBe(1); // Should not move
   });
 
   it('should handle buster attack', () => {

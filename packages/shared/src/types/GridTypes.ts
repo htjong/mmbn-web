@@ -14,5 +14,5 @@ export interface GridPosition {
   y: number;
 }
 
-export const GRID_WIDTH = 3;
-export const GRID_HEIGHT = 6;
+export const GRID_WIDTH = 6;
+export const GRID_HEIGHT = 3;

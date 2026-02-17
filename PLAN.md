@@ -61,7 +61,7 @@ mmbn-web/
 #### Shared (`packages/shared/`)
 - Battle mechanics (deterministic state machine)
 - Chip definitions and effects
-- Battle grid logic (6x3 grid, panel ownership)
+- Battle grid logic (6 columns x 3 rows grid, panel ownership)
 - Game constants and types
 - Network message schemas (using Zod for validation)
 
@@ -90,6 +90,15 @@ class BattleEngine {
 - `GridSystem`: Panel ownership, movement, area effects
 - `CustomProgram`: NaviCust-style customization
 - `TimingSystem`: Custom gauge, chip selection timing
+
+**Grid Layout (6 columns x 3 rows, horizontal):**
+```
+OOOXXX      O = Player 1 panels (columns 0-2)
+O1OX2X      X = Player 2 panels (columns 3-5)
+OOOXXX      1 = P1 start (1,1), 2 = P2 start (4,1)
+```
+- Access: `grid[y][x]` (row-major order)
+- Bounds: x=[0,5], y=[0,2]
 
 ### 2. Network Architecture
 
@@ -155,7 +164,7 @@ Fully client-side:
 **Files created:**
 - ✅ `packages/shared/src/types/BattleState.ts` - Full battle state type
 - ✅ `packages/shared/src/types/Chip.ts` - Chip definitions
-- ✅ `packages/shared/src/types/GridTypes.ts` - 6x3 grid system
+- ✅ `packages/shared/src/types/GridTypes.ts` - 6-column x 3-row grid system
 - ✅ `packages/shared/src/types/NetworkMessages.ts` - Zod schemas
 - ✅ `packages/shared/src/battle/BattleEngine.ts` - Core state machine
 - ✅ `packages/shared/src/battle/GridSystem.ts` - Panel management
@@ -169,7 +178,7 @@ Fully client-side:
 ### Phase 3: Basic Client Rendering 🔄 IN PROGRESS
 **Files created:**
 - ✅ `packages/client/src/scenes/BattleScene.ts` - Main Phaser scene with HUD, InputHandler, BattleEngine integration
-- ✅ `packages/client/src/rendering/GridRenderer.ts` - 6x3 grid renderer
+- ✅ `packages/client/src/rendering/GridRenderer.ts` - 6-column x 3-row grid renderer
 - ✅ `packages/client/src/rendering/NaviRenderer.ts` - Navi sprites
 - ✅ `packages/client/src/rendering/ChipRenderer.ts` - Chip visuals
 - ✅ `packages/client/src/input/InputHandler.ts` - Keyboard input (WASD movement, J buster, K chips, Spacebar custom)
@@ -194,11 +203,20 @@ Fully client-side:
 - **K** - Activate selected chip
 - **J** - Use buster attack (basic attack, no chip required)
 
+**Movement Rules:**
+- Each key press moves exactly one tile (no hold-to-repeat)
+- Keys must be released and pressed again for consecutive moves
+- All action keys (J, K, Spacebar) also require fresh presses
+- Players can only move within their own panels:
+  - Player 1 restricted to columns 0-2
+  - Player 2 restricted to columns 3-5
+- Movement validated: must be adjacent (Manhattan distance = 1), in bounds, and on own panel
+
 **New Mechanic: Buster**
 - Basic attack that doesn't require chips
 - Always available (no custom gauge cost)
 - Fixed damage (10 HP)
-- Can be used every turn
+- Can be used every turn (requires fresh key press)
 - Provides fallback when out of chips
 - Useful for learning game without chip management
 
@@ -438,15 +456,15 @@ Legend: ✅ Complete, 🔲 Todo, 🔄 In Progress
 
 ### Placeholder Graphics
 ```
-Grid panel: 48x48px colored rectangles
-  - Blue: Player owned
-  - Red: Enemy owned
-  - Gray: Neutral
-  - Broken: X pattern
+Grid panel: 50x50px colored rectangles (6 columns x 3 rows)
+  - Blue: Player 1 owned (left 3 columns)
+  - Red: Player 2 owned (right 3 columns)
+  - Dark gray: Broken panel
+  - Light gray: Cracked panel
 
-Navi: 64x64px
-  - Player: Green square
-  - Enemy: Red square
+Navi: 40x40px colored squares
+  - Player 1: Green square (starts at column 1, row 1)
+  - Player 2: Pink/magenta square (starts at column 4, row 1)
 
 Chips: 32x32px colored circles
   - Color = element type
@@ -473,6 +491,7 @@ describe('BattleEngine', () => {
   it('should handle chip selection action') ✅
   it('should validate game over correctly') ✅
   it('should handle navi movement with bounds checking') ✅
+  it('should reject movement onto opponent panels') ✅
   it('should reject movement outside grid bounds') ✅
   it('should handle buster attack') ✅
   it('should keep buster available every turn') ✅
@@ -494,7 +513,7 @@ describe('InputHandler', () => {
 })
 ```
 
-**Status:** 16/16 tests passing (8 BattleEngine + 8 InputHandler)
+**Status:** 17/17 tests passing (9 BattleEngine + 8 InputHandler)
 
 **Critical:** Battle logic must be deterministic
 - Same inputs → Same outputs (always)
@@ -671,7 +690,29 @@ PORT=3000
 
 ## Recent Changes
 
+### 2026-02-17 (Movement & Input Refinement)
+**Movement Cooldown:**
+- ✅ Changed InputHandler to use "just pressed" key tracking instead of held state
+- ✅ Each key press produces exactly one action (no hold-to-repeat)
+- ✅ All action keys (WASD, J, K, Space) require fresh presses
+
+**Panel Ownership Restriction:**
+- ✅ Players can only move onto panels they own
+- ✅ Player 1 restricted to columns 0-2, Player 2 to columns 3-5
+- ✅ BattleEngine validates target panel ownership before allowing move
+- ✅ Added test: 'should reject movement onto opponent panels' (9 tests total)
+
 ### 2026-02-17 (Phase 3 Completion)
+**Grid Layout Fix:**
+- ✅ Changed from 3-column x 6-row (vertical) to 6-column x 3-row (horizontal)
+- ✅ GRID_WIDTH=6, GRID_HEIGHT=3 (was inverted)
+- ✅ Player 1 owns columns 0-2, Player 2 owns columns 3-5 (no neutral)
+- ✅ Player 1 starts at (1,1), Player 2 starts at (4,1)
+- ✅ Updated movement bounds checking to match new dimensions
+- ✅ Updated all tests to match new positions and grid size
+- ✅ Updated Vite config to resolve @mmbn/shared from source
+- ✅ Connected BattleScene to Phaser game in main.ts
+
 **Input System:**
 - ✅ Created InputHandler.ts with keyboard mapping (WASD movement, J buster, K chips, Space custom)
 - ✅ Created InputHandler.test.ts with 8 comprehensive tests

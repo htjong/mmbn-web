@@ -1,9 +1,14 @@
 import { GridPanel, GRID_WIDTH, GRID_HEIGHT } from '../types/GridTypes';
 
 /**
- * 6x3 grid logic (6 rows, 3 columns)
- * Player 1 controls left column (x=0)
- * Player 2 controls right column (x=2)
+ * 6x3 grid logic (6 columns, 3 rows)
+ * Grid layout:
+ *   OOOXXX
+ *   O1OX2X
+ *   OOOXXX
+ * Player 1 controls left 3 columns (x=0,1,2)
+ * Player 2 controls right 3 columns (x=3,4,5)
+ * Player 1 starts at (1,1), Player 2 starts at (4,1)
  */
 export class GridSystem {
   static createInitialGrid(): GridPanel[][] {
@@ -15,7 +20,7 @@ export class GridSystem {
         grid[y][x] = {
           x,
           y,
-          owner: x === 0 ? 'player1' : x === 2 ? 'player2' : 'neutral',
+          owner: x < 3 ? 'player1' : 'player2',
           state: 'normal',
           damageCounter: 0,
         };

@@ -119,6 +119,19 @@ Built with TypeScript, targeting web browsers with 2D pixel art style.
 - **K** - Activate selected chip
 - **J** - Use buster attack (basic attack, always available)
 
+**Input Behavior:**
+- All keys use "press-to-act" — each press produces exactly one action
+- Holding a key does NOT repeat the action; must release and press again
+- Implemented via `keysJustPressed` tracking in InputHandler
+
+**Movement Rules:**
+- Adjacent moves only (Manhattan distance = 1)
+- Players can only move onto panels they own:
+  - Player 1: columns 0-2
+  - Player 2: columns 3-5
+- Cannot cross into opponent territory
+- Validated in `BattleEngine.applyAction()` by checking `grid[y][x].owner`
+
 **Note:** Keep these consistent across all input implementations (client scenes, tests, documentation).
 
 ## Monorepo Architecture
@@ -220,12 +233,19 @@ Implement in `BattleEngine.applyAction()` as action type `'buster'`.
 
 ### Grid System
 
-6x3 grid (6 rows, 3 columns):
-- Player 1 starts on left column (x=0)
-- Player 2 starts on right column (x=2)
-- Middle column (x=1) is neutral territory
+6x3 grid (6 columns, 3 rows) — horizontal layout:
+```
+OOOXXX
+O1OX2X
+OOOXXX
+```
+- **O** = Player 1 panels (columns 0-2)
+- **X** = Player 2 panels (columns 3-5)
+- Player 1 starts at position (1, 1)
+- Player 2 starts at position (4, 1)
 - Panel states: `normal | cracked | broken | locked`
-- Panel ownership: `player1 | player2 | neutral`
+- Panel ownership: `player1 | player2`
+- Bounds: x=[0,5], y=[0,2]
 
 Access: `grid[y][x]` (row-major order)
 
@@ -270,7 +290,7 @@ Phaser handles game grid/sprites, React handles UI overlays.
 ## Key Files
 
 - `packages/shared/src/battle/BattleEngine.ts` - Core battle logic
-- `packages/shared/src/battle/GridSystem.ts` - 6x3 grid operations
+- `packages/shared/src/battle/GridSystem.ts` - 6-column x 3-row grid operations
 - `packages/shared/src/battle/ChipSystem.ts` - Chip execution & damage
 - `packages/shared/src/types/BattleState.ts` - Complete battle state type
 - `packages/shared/src/data/chips.ts` - All chip definitions

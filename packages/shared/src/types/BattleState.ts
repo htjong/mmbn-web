@@ -12,7 +12,7 @@ export interface PlayerState {
   folder: Chip[]; // All chips in folder (deck)
   selectedChips: Chip[]; // Chips selected for current turn
   selectedChipIndex: number; // Which chip in selectedChips is active (0-2)
-  position: { x: number; y: number }; // Navi position on grid (0-2 x, 0-5 y)
+  position: { x: number; y: number }; // Navi position on grid (0-5 x, 0-2 y)
   isStunned: boolean;
   busterCooldown: number; // Frames until buster can be used again (0 = ready)
   buffedDamage: number; // 0-100%, damage multiplier

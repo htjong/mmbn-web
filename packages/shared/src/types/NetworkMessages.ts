@@ -17,7 +17,7 @@ export type QueueLeave = z.infer<typeof QueueLeaveSchema>;
 export const BattleInputSchema = z.object({
   frame: z.number(),
   action: z.object({
-    type: z.enum(['move', 'chip_select', 'confirm']),
+    type: z.enum(['move', 'chip_select', 'chip_use', 'buster', 'confirm']),
     chipId: z.string().optional(),
     gridX: z.number().optional(),
     gridY: z.number().optional(),

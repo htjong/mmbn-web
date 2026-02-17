@@ -14,6 +14,7 @@ import { PlayerAction } from '@mmbn/shared';
  */
 export class InputHandler {
   private keysPressed: Set<string> = new Set();
+  private keysJustPressed: Set<string> = new Set();
 
   constructor(_initialPosition: { x: number; y: number }) {
     this.setupKeyListeners();
@@ -26,6 +27,9 @@ export class InputHandler {
 
   private handleKeyDown(event: KeyboardEvent) {
     const key = event.key.toLowerCase();
+    if (!this.keysPressed.has(key)) {
+      this.keysJustPressed.add(key);
+    }
     this.keysPressed.add(key);
   }
 
@@ -37,35 +41,43 @@ export class InputHandler {
   /**
    * Get the next action from current keyboard input
    * Priority: Movement > Buster > Chip > Custom (only one per frame)
+   * Movement keys require a fresh press (no hold-to-repeat)
    */
   getNextAction(currentGridPosition: { x: number; y: number }): PlayerAction | null {
 
-    // Movement takes priority
-    if (this.keysPressed.has('w')) {
+    // Movement requires a fresh key press (consumed after use)
+    if (this.keysJustPressed.has('w')) {
+      this.keysJustPressed.delete('w');
       return { type: 'move', gridX: currentGridPosition.x, gridY: currentGridPosition.y - 1 };
     }
-    if (this.keysPressed.has('a')) {
+    if (this.keysJustPressed.has('a')) {
+      this.keysJustPressed.delete('a');
       return { type: 'move', gridX: currentGridPosition.x - 1, gridY: currentGridPosition.y };
     }
-    if (this.keysPressed.has('s')) {
+    if (this.keysJustPressed.has('s')) {
+      this.keysJustPressed.delete('s');
       return { type: 'move', gridX: currentGridPosition.x, gridY: currentGridPosition.y + 1 };
     }
-    if (this.keysPressed.has('d')) {
+    if (this.keysJustPressed.has('d')) {
+      this.keysJustPressed.delete('d');
       return { type: 'move', gridX: currentGridPosition.x + 1, gridY: currentGridPosition.y };
     }
 
-    // Buster attack
-    if (this.keysPressed.has('j')) {
+    // Buster attack (also consume to prevent repeat)
+    if (this.keysJustPressed.has('j')) {
+      this.keysJustPressed.delete('j');
       return { type: 'buster' };
     }
 
-    // Chip activation
-    if (this.keysPressed.has('k')) {
+    // Chip activation (also consume)
+    if (this.keysJustPressed.has('k')) {
+      this.keysJustPressed.delete('k');
       return { type: 'chip_use' };
     }
 
-    // Custom bar (spacebar)
-    if (this.keysPressed.has(' ')) {
+    // Custom bar (spacebar, also consume)
+    if (this.keysJustPressed.has(' ')) {
+      this.keysJustPressed.delete(' ');
       return { type: 'confirm' };
     }
 
@@ -84,14 +96,14 @@ export class InputHandler {
    */
   clearInput() {
     this.keysPressed.clear();
+    this.keysJustPressed.clear();
   }
 
   /**
    * Cleanup: remove event listeners
    */
   destroy() {
-    // Note: In real implementation, would store and remove specific listeners
-    // This is a simplified version
     this.keysPressed.clear();
+    this.keysJustPressed.clear();
   }
 }

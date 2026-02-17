@@ -1,5 +1,5 @@
 import { BattleState, PlayerState, BattleEvent, PlayerAction } from '../types/BattleState';
-import { GridPanel } from '../types/GridTypes';
+import { GridPanel, GRID_WIDTH, GRID_HEIGHT } from '../types/GridTypes';
 import { Chip } from '../types/Chip';
 import { GridSystem } from './GridSystem';
 import { ChipSystem } from './ChipSystem';
@@ -66,7 +66,7 @@ export class BattleEngine {
       folder: [...folder],
       selectedChips: [],
       selectedChipIndex: 0,
-      position: { x: playerId === 'player1' ? 0 : 2, y: 2 }, // Middle of each side
+      position: { x: playerId === 'player1' ? 1 : 4, y: 1 }, // Middle of each side
       isStunned: false,
       busterCooldown: 0, // Buster available immediately
       buffedDamage: 0,
@@ -171,13 +171,14 @@ export class BattleEngine {
       const newX = action.gridX;
       const newY = action.gridY;
 
-      // Validate move: adjacent grid position, within bounds
+      // Validate move: adjacent, within bounds, and on own panels
       const distance =
         Math.abs(newX - player.position.x) + Math.abs(newY - player.position.y);
-      const isInBounds = newX >= 0 && newX < 3 && newY >= 0 && newY < 6;
+      const isInBounds = newX >= 0 && newX < GRID_WIDTH && newY >= 0 && newY < GRID_HEIGHT;
+      const playerSide = playerId === 'player1' ? 'player1' : 'player2';
+      const targetPanelOwned = isInBounds && newState.grid[newY][newX].owner === playerSide;
 
-      if (distance === 1 && isInBounds) {
-        // Adjacent move, in bounds
+      if (distance === 1 && isInBounds && targetPanelOwned) {
         player.position.x = newX;
         player.position.y = newY;
         events.push({

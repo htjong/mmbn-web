@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
+      '@mmbn/shared': path.resolve(__dirname, '../shared/src'),
       '@shared': path.resolve(__dirname, '../shared/src'),
       '@client': path.resolve(__dirname, './src'),
     },
