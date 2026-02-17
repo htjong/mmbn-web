@@ -108,6 +108,19 @@ A Mega Man Battle Network 3-inspired web game with two modes:
 
 Built with TypeScript, targeting web browsers with 2D pixel art style.
 
+## Input Controls
+
+**Keyboard Mapping (WASD + Special Keys):**
+- **W** - Move navi up
+- **A** - Move navi left
+- **S** - Move navi down
+- **D** - Move navi right
+- **Spacebar** - Open Custom bar (chip selection screen)
+- **K** - Activate selected chip
+- **J** - Use buster attack (basic attack, always available)
+
+**Note:** Keep these consistent across all input implementations (client scenes, tests, documentation).
+
 ## Monorepo Architecture
 
 This is an npm workspaces monorepo with three packages:
@@ -194,6 +207,16 @@ BattleEngine.applyAction(state, playerId, action) → { state: BattleState, even
 - **Output:** New state + events (side-effect free)
 - **Determinism:** Same inputs always produce same outputs
 - **JSON serialization:** State is plain objects (no classes with methods)
+
+#### Buster Mechanic
+A basic attack system independent of chips:
+- **Always available** - No custom gauge cost, always usable
+- **Fixed damage** - 10 HP per hit
+- **No cooldown** - Can be used every turn
+- **Fallback** - Provides a move when player has no chips
+- **Learning tool** - Helps new players learn the game without chip complexity
+
+Implement in `BattleEngine.applyAction()` as action type `'buster'`.
 
 ### Grid System
 

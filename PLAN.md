@@ -173,10 +173,27 @@ Fully client-side:
 - ✅ `packages/client/src/rendering/NaviRenderer.ts` - Navi sprites
 - ✅ `packages/client/src/rendering/ChipRenderer.ts` - Chip visuals
 - 🔄 Connect BattleScene to actual BattleEngine
-- 🔲 Add keyboard/mouse input handling
+- 🔄 Add keyboard input handling (W/A/S/D movement, Spacebar custom, K chips, J buster)
 - 🔲 Test local battle rendering
 
 **Status:** All rendering classes created, TypeScript module resolution fixed. Ready to integrate BattleEngine into BattleScene.
+
+**Input Controls (Keyboard Mapping):**
+- **W** - Move navi up
+- **A** - Move navi left
+- **S** - Move navi down
+- **D** - Move navi right
+- **Spacebar** - Open Custom bar (chip selection screen)
+- **K** - Activate selected chip
+- **J** - Use buster attack (basic attack, no chip required)
+
+**New Mechanic: Buster**
+- Basic attack that doesn't require chips
+- Always available (no custom gauge cost)
+- Fixed damage (10 HP)
+- Can be used every turn
+- Provides fallback when out of chips
+- Useful for learning game without chip management
 
 ### Phase 4: Server Infrastructure 🔲 PENDING
 **Files to create:**
