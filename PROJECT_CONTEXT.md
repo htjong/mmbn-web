@@ -1,6 +1,6 @@
 # Current Goal
 
-Complete First Playable — a playable single-player battle against AI in the browser. Deployment infrastructure is now live on DigitalOcean.
+Complete First Playable — a playable single-player battle against AI in the browser. Deployment infrastructure is live and verified on DigitalOcean.
 
 # Architecture
 
@@ -23,20 +23,23 @@ Complete First Playable — a playable single-player battle against AI in the br
 - Same-origin deployment (nginx proxy) eliminates CORS complexity
 - Dedicated `deploy` SSH user with separate key pair for CI/CD
 - Node 22 aligned across local, CI, and Droplet
+- ESM `.js` extensions required on all relative imports (Node ESM strict resolution in production)
+- Server dist output at `dist/server/src/` due to cross-package tsc compilation
 
 # What Changed Recently
 
-- **Deployment infrastructure live**: GitHub Actions CI/CD pipeline deploying to DigitalOcean Droplet
-- **Health endpoint added** to server (`/health` returns JSON status)
-- **CORS restricted** to `CLIENT_ORIGIN` env var (defaults to `localhost:5173` for dev)
-- **Build ordering fixed**: Root `npm run build` now runs shared → client → server (was alphabetical, broke builds)
-- **Git author fixed**: All commits rewritten from `MMBN Dev` to `htjong` with correct GitHub email
-- **Server tests**: Added `--passWithNoTests` flag so CI doesn't fail when no server test files exist
+- **Deployment fully live and verified**: Game accessible at Droplet IP, `/health` endpoint working
+- **ESM import fix**: Added `.js` extensions to all relative imports across shared and server packages — required for Node ESM strict resolution in production (ts-node-dev handles this in dev but `node` does not)
+- **Server dist path corrected**: tsc outputs to `dist/server/src/` (not `dist/`) due to cross-package compilation with shared. All start scripts and PM2 commands updated.
+- **Root tsconfig `rootDir` removed**: Was causing nested dist output in shared package. Shared now outputs flat to `dist/`.
+- **nginx config manually installed** on Droplet (setup script's OOM failure during initial run skipped the nginx section)
+- **PM2 first-deploy handling**: Deploy workflow uses `pm2 describe || pm2 start` to handle both first deploy and subsequent restarts
 
 # Known Issues / Open Questions
 
 - **First Playable remaining work**: chip_use action, SimpleAI, ChipSelectOverlay, browser testing
 - **No AI opponent yet**: Can't easily test battle without second player or simple AI
+- **Stale build artifacts**: If tsc previously output into `src/` (e.g., `.js`, `.d.ts`, `.map` files), delete them manually. The `.gitignore` excludes `dist` but not source-dir artifacts.
 
 # Next Steps
 
@@ -44,7 +47,6 @@ Complete First Playable — a playable single-player battle against AI in the br
 2. Create SimpleAI for single-player testing
 3. Create ChipSelectOverlay UI
 4. Browser testing & tuning — verify full game loop end-to-end
-5. Verify deployment serves the game correctly at Droplet IP
 
 # How to Resume
 
@@ -55,6 +57,11 @@ npm run test                # All tests pass (9 shared + 9 client input)
 
 # Start dev server for browser testing
 npm run dev                 # Client on :5173, Server on :3000
+
+# Production build + local test
+npm run build
+node packages/server/dist/server/src/index.js   # Should start on :3000
+curl http://localhost:3000/health                # Should return {"status":"ok"}
 
 # Key files
 .github/workflows/deploy.yml              # CI/CD pipeline

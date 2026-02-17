@@ -361,3 +361,25 @@ import { ... } from '@client/...';             // Within client
 ```
 
 Configured in `tsconfig.json` and `vite.config.ts`
+
+## ESM Import Rules
+
+**All relative imports in `packages/shared/` and `packages/server/` MUST use `.js` extensions:**
+
+```typescript
+// Correct
+import { SocketManager } from './SocketManager.js';
+import { Chip } from '../types/Chip.js';
+
+// Wrong — will fail in production
+import { SocketManager } from './SocketManager';
+import { Chip } from '../types/Chip';
+```
+
+**Why:** The project uses `"type": "module"` (ESM). `ts-node-dev` resolves imports without extensions in dev, but `node` in production requires explicit `.js` extensions. TypeScript understands `.js` extensions pointing to `.ts` files.
+
+**Note:** `packages/client/` does NOT need this — Vite bundles everything and handles resolution internally.
+
+## Server Build Output
+
+The server's compiled output lives at `packages/server/dist/server/src/` (not `dist/`). This is because `tsc` compiles both server and shared source (cross-package imports) and preserves the relative directory structure. The `start` script and PM2 commands reference this path.

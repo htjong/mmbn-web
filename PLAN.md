@@ -291,6 +291,8 @@ How the current architecture supports each milestone:
 - Same-origin deployment eliminates CORS complexity
 - Dedicated `deploy` SSH user with dedicated key pair (not personal key)
 - Node 22 aligned across local, CI, and Droplet
+- ESM `.js` extensions required on all relative imports (Node ESM strict resolution)
+- Server dist output at `dist/server/src/` (due to cross-package tsc compilation with shared)
 
 ---
 
