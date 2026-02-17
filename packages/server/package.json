@@ -2,11 +2,11 @@
   "name": "@mmbn/server",
   "version": "0.1.0",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/server/src/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/server/src/index.js",
     "test": "vitest --passWithNoTests",
     "type-check": "tsc --noEmit"
   },

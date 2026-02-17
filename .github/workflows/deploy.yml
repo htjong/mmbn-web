@@ -18,7 +18,7 @@ jobs:
       - name: Deploy built artifacts to Droplet
         uses: burnett01/rsync-deployments@7.0.1
         with:
-          switches: -avz --delete
+          switches: -avz --delete --exclude='node_modules'
           path: ./
           remote_path: /app/
           remote_host: ${{ secrets.DO_HOST }}
@@ -33,5 +33,5 @@ jobs:
           script: |
             cd /app
             npm ci --omit=dev
-            pm2 describe mmbn-server > /dev/null 2>&1 && pm2 restart mmbn-server || pm2 start packages/server/dist/index.js --name mmbn-server
+            pm2 describe mmbn-server > /dev/null 2>&1 && pm2 restart mmbn-server || pm2 start packages/server/dist/server/src/index.js --name mmbn-server
             pm2 save
