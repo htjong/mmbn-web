@@ -33,4 +33,5 @@ jobs:
           script: |
             cd /app
             npm ci --omit=dev
-            pm2 restart mmbn-server
+            pm2 describe mmbn-server > /dev/null 2>&1 && pm2 restart mmbn-server || pm2 start packages/server/dist/index.js --name mmbn-server
+            pm2 save
