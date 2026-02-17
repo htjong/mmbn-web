@@ -1,7 +1,7 @@
 # PLAN.md — MMBN Web Game
 
 > **Status:** Living document — updated as development progresses
-> **Last Updated:** 2026-02-17
+> **Last Updated:** 2026-02-18
 > **Methodology:** Agile/iterative — First Playable → iterate → MVP
 
 ---
@@ -274,6 +274,24 @@ How the current architecture supports each milestone:
 - Buster as always-available basic attack (10 HP, no cooldown)
 - Real-time simultaneous model (not turn-based)
 
+### Deployment Infrastructure (Complete)
+**Deliverables:**
+- `.github/workflows/deploy.yml` — GitHub Actions CI/CD (build + test in CI, rsync to Droplet)
+- `scripts/nginx.conf` — nginx config (static files + WebSocket proxy, same-origin)
+- `scripts/setup-droplet.sh` — one-time Droplet provisioning (Node.js 22, PM2, nginx, UFW, swap)
+- `.env.example` — environment variables reference
+- `packages/server/src/index.ts` — `/health` endpoint, CORS restricted to env var
+- `package.json` — fixed build ordering (shared → client → server), added `start` and `build:server` scripts
+- `packages/server/package.json` — added `start` script, `--passWithNoTests` flag
+
+**Key decisions made:**
+- Single $6/mo DigitalOcean Droplet (nginx + Node.js + PM2)
+- Build in GitHub Actions (7GB RAM), not on Droplet (512MB) — avoids OOM
+- rsync built artifacts instead of git pull + build on server
+- Same-origin deployment eliminates CORS complexity
+- Dedicated `deploy` SSH user with dedicated key pair (not personal key)
+- Node 22 aligned across local, CI, and Droplet
+
 ---
 
 ## Reference
@@ -387,5 +405,5 @@ Browser → DigitalOcean Droplet ($6/mo)
 
 ---
 
-**Last Updated:** 2026-02-17
+**Last Updated:** 2026-02-18
 **Next Review:** After First Playable is achieved
