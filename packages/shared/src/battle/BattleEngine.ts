@@ -1,9 +1,8 @@
-import { BattleState, PlayerState, PlayerAction, BattleEvent } from '../types/BattleState';
+import { BattleState, PlayerState, BattleEvent, PlayerAction } from '../types/BattleState';
 import { GridPanel } from '../types/GridTypes';
 import { Chip } from '../types/Chip';
 import { GridSystem } from './GridSystem';
 import { ChipSystem } from './ChipSystem';
-import { CHIPS } from '../data/chips';
 
 const STARTING_HP = 200;
 const STARTING_CUSTOM_GAUGE_MAX = 100;
@@ -25,7 +24,6 @@ export class BattleEngine {
     player1Name: string = 'Player 1',
     player2Name: string = 'Player 2'
   ): BattleState {
-    const events: BattleEvent[] = [];
     const grid = GridSystem.createInitialGrid();
 
     // Create initial player states
@@ -52,7 +50,7 @@ export class BattleEngine {
   private static createPlayerState(
     playerId: string,
     playerName: string,
-    grid: GridPanel[][],
+    _grid: GridPanel[][],
     folder: Chip[]
   ): PlayerState {
     const hand = this.drawChips(folder, HAND_SIZE);
@@ -150,7 +148,6 @@ export class BattleEngine {
     const events: BattleEvent[] = [];
 
     const player = playerId === 'player1' ? newState.player1 : newState.player2;
-    const opponent = playerId === 'player1' ? newState.player2 : newState.player1;
 
     if (action.type === 'chip_select' && action.chipId) {
       // Select a chip from hand for custom screen

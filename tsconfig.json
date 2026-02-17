@@ -11,6 +11,8 @@
     "rootDir": "./packages",
     "baseUrl": ".",
     "paths": {
+      "@mmbn/shared": ["packages/shared/src/index.ts"],
+      "@mmbn/shared/*": ["packages/shared/src/*"],
       "@shared/*": ["packages/shared/src/*"],
       "@client/*": ["packages/client/src/*"],
       "@server/*": ["packages/server/src/*"]

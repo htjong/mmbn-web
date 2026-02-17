@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BattleState, PlayerAction } from './BattleState';
+import { BattleState } from './BattleState';
 
 // Queue events
 export const QueueJoinSchema = z.object({
