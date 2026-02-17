@@ -8,8 +8,6 @@ const STARTING_HP = 200;
 const STARTING_CUSTOM_GAUGE_MAX = 100;
 const HAND_SIZE = 5;
 const SELECTED_CHIPS_SIZE = 3;
-const FRAMES_PER_TURN = 120; // 2 seconds at 60 FPS
-
 /**
  * Deterministic battle engine
  * Runs identically on client and server
@@ -33,12 +31,9 @@ export class BattleEngine {
     const state: BattleState = {
       id: `battle_${player1Id}_${player2Id}_${Date.now()}`,
       frame: 0,
-      turnPhase: 'custom_select',
-      customSelectFrame: FRAMES_PER_TURN,
       player1,
       player2,
       grid,
-      currentTurn: 'player1',
       winner: null,
       battleLog: [],
       isGameOver: false,
@@ -89,40 +84,11 @@ export class BattleEngine {
 
     newState.frame += 1;
 
-    // Handle turn phase transitions
-    if (newState.turnPhase === 'custom_select') {
-      newState.customSelectFrame -= 1;
-
-      // Automatically increment custom gauge during select phase
-      const currentPlayer = newState.currentTurn === 'player1' ? newState.player1 : newState.player2;
-      if (currentPlayer.customGauge < currentPlayer.maxCustomGauge) {
-        currentPlayer.customGauge = Math.min(
-          currentPlayer.customGauge + 1,
-          currentPlayer.maxCustomGauge
-        );
+    // Fill both players' custom gauges simultaneously (real-time)
+    for (const player of [newState.player1, newState.player2]) {
+      if (player.customGauge < player.maxCustomGauge) {
+        player.customGauge = Math.min(player.customGauge + 1, player.maxCustomGauge);
       }
-
-      if (newState.customSelectFrame <= 0) {
-        // Auto-proceed to next phase if custom select times out
-        newState.turnPhase = 'chip_use';
-        events.push({
-          frame: newState.frame,
-          type: 'turn_changed',
-          playerId: newState.currentTurn,
-          data: { newPhase: 'chip_use' },
-        });
-      }
-    } else if (newState.turnPhase === 'chip_use') {
-      // Chip effects would be applied here
-      newState.turnPhase = 'movement';
-    } else if (newState.turnPhase === 'movement') {
-      // Movement logic would happen here
-      newState.turnPhase = 'end';
-    } else if (newState.turnPhase === 'end') {
-      // End turn, switch to opponent
-      newState.currentTurn = newState.currentTurn === 'player1' ? 'player2' : 'player1';
-      newState.turnPhase = 'custom_select';
-      newState.customSelectFrame = FRAMES_PER_TURN;
     }
 
     // Check for game over

@@ -19,7 +19,6 @@ describe('BattleEngine', () => {
     expect(state.player2.id).toBe('player2');
     expect(state.player1.hp).toBe(200);
     expect(state.player2.hp).toBe(200);
-    expect(state.currentTurn).toBe('player1');
     expect(state.isGameOver).toBe(false);
     expect(state.grid.length).toBe(3);
     expect(state.grid[0].length).toBe(6);

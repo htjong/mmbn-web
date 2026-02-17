@@ -189,7 +189,7 @@ Fully client-side:
 - ✅ InputHandler captures player keyboard input
 - ✅ Update loop applies player action via BattleEngine.applyAction()
 - ✅ Update loop advances battle via BattleEngine.tick()
-- ✅ UI displays HP, frame count, turn phase, game over state
+- ✅ UI displays HP, frame count, custom gauge, game over state
 - ✅ Renderers update grid and navi positions each frame
 
 **Status:** Full game loop integrated. Battle engine determinism verified by tests. Ready to test local battle rendering in browser.
@@ -216,7 +216,7 @@ Fully client-side:
 - Basic attack that doesn't require chips
 - Always available (no custom gauge cost)
 - Fixed damage (10 HP)
-- Can be used every turn (requires fresh key press)
+- Can be used any time (requires fresh key press)
 - Provides fallback when out of chips
 - Useful for learning game without chip management
 
@@ -724,7 +724,7 @@ PORT=3000
 - ✅ Initialize battle state with BattleEngine.createInitialState()
 - ✅ Apply player actions via BattleEngine.applyAction()
 - ✅ Advance battle state via BattleEngine.tick()
-- ✅ Update UI text (HP, frame, turn phase, game over)
+- ✅ Update UI text (HP, frame, custom gauge, game over)
 - ✅ Re-render grid and navi positions each frame
 - ✅ Cleanup InputHandler on scene shutdown
 

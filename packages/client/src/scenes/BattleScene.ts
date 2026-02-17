@@ -104,9 +104,10 @@ export class BattleScene extends Phaser.Scene {
       `P1: ${this.battleState.player1.hp}/${this.battleState.player1.maxHp} | P2: ${this.battleState.player2.hp}/${this.battleState.player2.maxHp}`
     );
 
-    // Update status text based on turn phase
-    const turnPlayer = this.battleState.currentTurn === 'player1' ? 'Player 1' : 'Player 2';
-    this.statusText?.setText(`${turnPlayer}'s turn - ${this.battleState.turnPhase}`);
+    // Update status text with custom gauge info
+    const p1Gauge = this.battleState.player1.customGauge;
+    const p2Gauge = this.battleState.player2.customGauge;
+    this.statusText?.setText(`Battle! | Custom: P1 ${p1Gauge}% P2 ${p2Gauge}%`);
 
     // Update renderers
     this.gridRenderer?.update(this.battleState.grid);

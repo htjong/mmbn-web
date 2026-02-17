@@ -22,12 +22,9 @@ export interface PlayerState {
 export interface BattleState {
   id: string;
   frame: number;
-  turnPhase: 'custom_select' | 'chip_use' | 'movement' | 'enemy_turn' | 'end';
-  customSelectFrame: number; // Frames remaining for custom selection
   player1: PlayerState;
   player2: PlayerState;
   grid: GridPanel[][];
-  currentTurn: 'player1' | 'player2';
   winner: 'player1' | 'player2' | null;
   battleLog: BattleEvent[];
   isGameOver: boolean;
@@ -45,7 +42,6 @@ export interface BattleEvent {
     | 'navi_moved'
     | 'navi_stunned'
     | 'custom_charged'
-    | 'turn_changed'
     | 'battle_end';
   playerId: string;
   data: Record<string, unknown>;
