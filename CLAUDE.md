@@ -7,6 +7,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **[BRANCHING.md](./BRANCHING.md)** - Git workflow and branch strategy
 - **[CLAUDE.md](./CLAUDE.md)** - You are here - architecture and patterns guide
 
+## Context System
+
+This project uses PROJECT_CONTEXT.md as persistent memory across sessions.
+
+- At the start of a session, read PROJECT_CONTEXT.md to get up to speed.
+- When the user says they're stopping, switching devices, or wrapping up, offer to run: /handoff
+- After major milestones (feature complete, big refactor, PR ready), offer to run: /handoff
+
 ## Claude's Role
 
 As Claude Code working on this project, I ensure these responsibilities:
