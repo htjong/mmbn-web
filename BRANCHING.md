@@ -367,6 +367,142 @@ Fixes #123 (if applicable)
 
 ---
 
+## Code Review Process
+
+Before committing or pushing, perform a **three-tier code review** based on the scope of changes:
+
+### Tier 1: Automated Checks (Always Required)
+Run these before every commit:
+
+```bash
+npm run type-check    # TypeScript compilation - no errors
+npm run test          # All tests passing
+npm run lint          # ESLint checks
+npm run build         # Production build succeeds
+```
+
+**Time:** ~30 seconds
+**Must pass:** Yes, always
+**Blocks commit:** Yes
+
+**Checklist:**
+- ✅ No TypeScript errors
+- ✅ All tests passing (especially `npm run test:shared` for battle logic)
+- ✅ No linting warnings
+- ✅ Production build works
+
+---
+
+### Tier 2: Architecture Checkpoints (For All Changes)
+After automated checks pass, manually verify:
+
+**Import & Module Integrity:**
+- ✅ Cross-package imports use `@mmbn/shared` (not relative paths)
+- ✅ No circular dependencies
+- ✅ Client doesn't import from server or vice versa
+
+**Type Safety:**
+- ✅ No `any` types used (unless absolutely necessary with comment)
+- ✅ Proper TypeScript interfaces/types defined
+- ✅ Imports properly typed from shared
+
+**Shared Logic Purity:**
+- ✅ Battle engine functions are deterministic (same input = same output)
+- ✅ No side effects in shared logic
+- ✅ No browser APIs in shared code
+- ✅ No server-only code in shared
+
+**Pattern Consistency:**
+- ✅ Code style matches existing implementations
+- ✅ Naming conventions followed
+- ✅ Error handling at system boundaries only
+
+**Breaking Changes:**
+- ✅ Changes don't break other packages' tests
+- ✅ Public APIs documented
+- ✅ Backward compatible (or intentional breaking change noted)
+
+**Time:** ~5 minutes
+**Must pass:** Yes, for all commits
+**Blocks commit:** Yes
+
+---
+
+### Tier 3: Design Review (For Major Architectural Changes)
+
+**Use this for:**
+- Major features affecting battle system
+- New systems (camera, input, effects)
+- Significant refactoring
+- Anything that would "vastly change the architecture"
+- Features spanning multiple phases
+
+**Before implementation, ask:**
+
+1. **Does this fit our architecture?**
+   - Will it work with deterministic battle engine?
+   - Compatible with client-server model?
+   - Won't create tight coupling?
+
+2. **Is this the simplest approach?**
+   - Could we achieve the same with less code?
+   - Are we over-engineering?
+   - Does it follow existing patterns?
+
+3. **Will it scale to production?**
+   - Performance impact (60 FPS target)?
+   - Memory impact (server handling 100+ battles)?
+   - Network bandwidth implications?
+
+4. **What are the edge cases?**
+   - What if grid size changes?
+   - What if chip effects overlap?
+   - What if network latency spikes?
+   - What if user disconnects?
+
+5. **How does it integrate with existing code?**
+   - Any refactoring needed?
+   - Test coverage required?
+   - Documentation needed?
+
+**Time:** ~15-30 minutes (before coding)
+**Must pass:** Yes, for major changes
+**How to execute:** Think through, discuss with yourself, document assumptions
+
+**Examples of when to do Tier 3:**
+- ✅ Phase 3: Adding input handling to battle system
+- ✅ Phase 4: Designing server battle simulation
+- ✅ Phase 5: Implementing client-server state sync
+- ❌ Phase 7: Adding new chip to data file (skip, it's data)
+- ❌ Phase 8: Tweaking UI colors (skip, cosmetic)
+
+---
+
+## Review Workflow Summary
+
+```
+┌─ Every Commit ─────────────────────────────────────┐
+│ 1. Make changes                                    │
+│ 2. Run Tier 1: Automated checks (30 sec)          │
+│    → If fails: Fix and retry                       │
+│    → If passes: Continue                           │
+│ 3. Do Tier 2: Architecture checkpoints (5 min)    │
+│    → If fails: Fix and retry                       │
+│    → If passes: Continue                           │
+│ 4. Commit with conventional message                │
+└────────────────────────────────────────────────────┘
+
+┌─ Major Changes Only ───────────────────────────────┐
+│ Before Implementation (save hours of rework):      │
+│ 1. Do Tier 3: Design review (15-30 min)          │
+│ 2. Document assumptions                           │
+│ 3. Then proceed with implementation                │
+│ 4. Then do Tiers 1 & 2 before committing          │
+└────────────────────────────────────────────────────┘
+```
+
+---
+
 ## Branch Protection Rules for Main
 
 Recommended GitHub/GitLab settings for `main` branch:

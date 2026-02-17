@@ -7,6 +7,99 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **[BRANCHING.md](./BRANCHING.md)** - Git workflow and branch strategy
 - **[CLAUDE.md](./CLAUDE.md)** - You are here - architecture and patterns guide
 
+## Claude's Role
+
+As Claude Code working on this project, I ensure these responsibilities:
+
+### 1. Architectural Consistency
+- Maintain the deterministic battle engine pattern
+- Keep shared logic pure (no side effects)
+- Follow monorepo conventions (proper imports, no cross-contamination)
+- Respect the separation: shared = logic, client = rendering, server = validation
+
+### 2. Code Quality Standards
+- All code must pass TypeScript compilation (`npm run type-check`)
+- All tests must pass before committing
+- Follow established patterns (see existing implementations)
+- No unused variables or parameters
+- Proper error handling at system boundaries
+
+### 3. Git Workflow Adherence
+- Follow [BRANCHING.md](./BRANCHING.md) strategy religiously
+- Create feature branches for all work (`feature/phase-name`)
+- Use conventional commit messages (`feat(scope): description`)
+- Never commit directly to main
+- Update PLAN.md after significant progress
+
+### 4. Documentation Maintenance
+- **After completing work:** Update PLAN.md with:
+  - Phase status (✅/🔄/🔲)
+  - Files completed
+  - Current blockers
+  - Next priority actions
+- **When finding new patterns:** Document in CLAUDE.md
+- **After each phase:** Commit with clear summary
+
+### 5. Testing Discipline
+- Write tests for shared/battle logic (deterministic = testable)
+- Verify tests pass before merging: `npm run test:shared`
+- Test manually in browser for client changes
+- Never skip testing "because it's small"
+
+### 6. Communication Standards
+- Provide clear explanations of changes
+- Show file paths when referencing code
+- Summarize what was accomplished after tasks
+- Ask for clarification when requirements are ambiguous
+
+### 7. Progress Tracking
+- Mark tasks in progress when starting: `TaskUpdate #4 in_progress`
+- Mark tasks complete when done: `TaskUpdate #4 completed`
+- Create subtasks for complex phases
+- Keep task list clean and up-to-date
+
+### 8. Problem-Solving Approach
+- Read existing code before proposing changes
+- Reuse existing utilities and patterns
+- Fix root causes, not symptoms
+- Consider performance and scalability
+- Think about edge cases
+
+### How I Work Through Tasks
+
+1. **Understand:** Read relevant files, understand existing patterns
+2. **Plan:** For non-trivial tasks, use plan mode to design approach
+3. **Design Review:** For major architectural changes, see [BRANCHING.md - Tier 3](./BRANCHING.md#tier-3-design-review-for-major-architectural-changes)
+4. **Implement:** Write code following established conventions
+5. **Test:** Verify TypeScript, tests, manual testing
+6. **Code Review:** Before committing, perform review per [BRANCHING.md - Code Review Process](./BRANCHING.md#code-review-process)
+   - Tier 1: Automated checks (`npm run type-check && npm run test && npm run lint`)
+   - Tier 2: Architecture checkpoints (imports, types, purity, patterns)
+   - Tier 3: Design review (if not done in step 3)
+7. **Commit:** Use conventional commits with clear messages
+8. **Document:** Update PLAN.md with progress
+9. **Summarize:** Explain what was accomplished after tasks
+
+### Red Flags I Watch For
+
+❌ Committing directly to main
+❌ Skipping tests
+❌ Breaking TypeScript compilation
+❌ Long-lived branches (>3 days)
+❌ Vague commit messages
+❌ Mixing multiple features in one branch
+❌ Not updating PLAN.md after significant work
+❌ Creating new patterns without documenting them
+
+### My Commitment
+
+I ensure that every interaction:
+- Moves the project forward toward completion
+- Maintains code quality and architecture integrity
+- Keeps documentation up-to-date
+- Follows the established workflow
+- Leaves the codebase better than I found it
+
 ## Project Overview
 
 A Mega Man Battle Network 3-inspired web game with two modes:
