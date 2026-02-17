@@ -1,5 +1,6 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { SocketManager } from './SocketManager';
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -10,13 +11,8 @@ const io = new Server(httpServer, {
 
 const PORT = process.env.PORT || 3000;
 
-io.on('connection', (socket) => {
-  console.log(`Client connected: ${socket.id}`);
-
-  socket.on('disconnect', () => {
-    console.log(`Client disconnected: ${socket.id}`);
-  });
-});
+const socketManager = new SocketManager(io);
+socketManager.initialize();
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
