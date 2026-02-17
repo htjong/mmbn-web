@@ -1,746 +1,391 @@
-# Implementation Plan - MMBN3 Web Game
+# PLAN.md — MMBN Web Game
 
-> **Status:** Living document - updated as development progresses
+> **Status:** Living document — updated as development progresses
 > **Last Updated:** 2026-02-17
-> **Progress:** Phases 1-2 Complete, Phase 3 In Progress (Input handling integrated, battle simulation wired)
+> **Methodology:** Agile/iterative — First Playable → iterate → MVP
 
 ---
 
-# MMBN3-Inspired Web Game - Implementation Plan
+## Project Methodology
 
-## Context
+This project follows an **agile, iterative approach** with two key milestones:
 
-Building a Mega Man Battle Network 3-inspired game for web browsers with two modes:
-- **Campaign Mode:** Offline single-player against viruses
-- **PVP Mode:** Real-time 1v1 matchmaking with low latency
+### First Playable (Current Target)
+The **First Playable** is the earliest state where the core gameplay loop works end-to-end in the browser. It's not feature-complete or polished — it's the foundation we iterate on. Once reached, we can playtest, gather feedback, and make informed decisions about what to build next.
 
-**Technology Choices:**
-- Platform: Web browsers
-- Language: TypeScript
-- Visual Style: 2D pixel art (like MMBN3)
-- PVP Backend: Custom WebSocket server (Node.js + Socket.io)
+**First Playable = a complete single-player battle against AI in the browser.**
 
-**Goal:** Optimal developer experience for rapid iteration from scratch.
+### MVP (Minimum Viable Product)
+The **MVP** is the full shippable product — all major features implemented, tested, and polished enough for real users. It includes PVP multiplayer, campaign mode, content, and UI polish.
 
----
+**MVP = all Product Backlog milestones complete.**
 
-## Architecture Overview
-
-### Monorepo Structure
-```
-mmbn-web/
-├── packages/
-│   ├── client/          # Game client (Vite + Phaser)
-│   ├── server/          # WebSocket server (Node.js + Socket.io)
-│   └── shared/          # Shared game logic & types
-├── package.json         # Root package manager
-└── turbo.json          # Turborepo config (optional but recommended)
-```
-
-**Why monorepo?**
-- Share game logic between client and server (deterministic battle system)
-- Share TypeScript types (chips, battle state, network messages)
-- Single command to run both client and server
-- Type-safe end-to-end
-
-### Technology Stack
-
-#### Client (`packages/client/`)
-- **Bundler:** Vite (fastest HMR, optimized for development speed)
-- **Game Engine:** Phaser 3 (battle-tested, extensive 2D support, scene management)
-- **State Management:** Zustand (lightweight, TypeScript-first)
-- **Networking:** Socket.io-client
-- **UI Framework:** React (for menus, HUD) + Phaser (for battle grid)
-
-#### Server (`packages/server/`)
-- **Runtime:** Node.js with TypeScript
-- **WebSocket:** Socket.io
-- **Matchmaking:** Simple queue-based system
-- **Battle Validation:** Shared game logic from `packages/shared`
-
-#### Shared (`packages/shared/`)
-- Battle mechanics (deterministic state machine)
-- Chip definitions and effects
-- Battle grid logic (6 columns x 3 rows grid, panel ownership)
-- Game constants and types
-- Network message schemas (using Zod for validation)
+### How We Work
+- Work is organized into **sprints** (short focused bursts of implementation)
+- Features are tracked in the **Product Backlog** as milestones
+- Each milestone has **acceptance criteria** defining "done"
+- We ship incrementally: First Playable → iterate → MVP
 
 ---
 
-## Core Systems Design
+## Current Sprint: First Playable
 
-### 1. Battle System (Shared Logic)
+**Status:** IN PROGRESS
+**Goal:** Playable single-player battle against AI in the browser
 
-**File:** `packages/shared/src/battle/BattleEngine.ts`
+### Completed (Retroactive)
 
+#### Sprint 0: Project Scaffolding
+- Monorepo setup with npm workspaces (`packages/shared`, `packages/client`, `packages/server`)
+- TypeScript configuration with `@mmbn/*` path aliases
+- Vite + Phaser 3 + React client stack
+- Node.js + Socket.io server skeleton
+- ESLint + Prettier + Vitest tooling
+- 345 dependencies installed and building
+
+#### Sprint 1: Battle Engine
+- `BattleEngine` — deterministic state machine (pure function: state + action → new state + events)
+- `GridSystem` — 6x3 grid with panel ownership (P1: cols 0-2, P2: cols 3-5)
+- `ChipSystem` — chip execution and damage calculations
+- `BattleState` type — complete battle state definition
+- `NetworkMessages` — Zod-validated message schemas
+- 5 core chips defined (Cannon, Sword, etc.)
+- 3 viruses defined
+- 9 unit tests passing (determinism verified)
+
+#### Sprint 2: Client Rendering & Input
+- `BattleScene` — main Phaser scene with full game loop integration
+- `GridRenderer` — 6x3 grid rendering with panel colors
+- `NaviRenderer` — navi sprite rendering
+- `ChipRenderer` — chip visual effects
+- `InputHandler` — keyboard input (WASD movement, J buster, K chips, Space custom)
+- Press-to-act input (no hold-to-repeat)
+- Panel ownership movement restriction
+- BattleEngine wired into update loop (createInitialState → applyAction → tick)
+- HUD displaying HP, frame count, custom gauge, game over state
+- 8 InputHandler tests passing
+- TypeScript compilation clean
+
+### Remaining Work
+
+1. **Implement `chip_use` action in BattleEngine** — Wire chip execution through `applyAction()` so selected chips deal damage with visual feedback
+2. **Create SimpleAI** — Basic enemy AI (random movement + buster + chip use) so single-player is testable without networking
+3. **Create ChipSelectOverlay** — UI for selecting chips from folder when custom gauge is full (Spacebar opens, select chips, confirm)
+4. **Browser testing & tuning** — Run `npm run dev`, verify full game loop works end-to-end, fix rendering/timing issues
+
+### Acceptance Criteria
+
+- [ ] Can play a complete battle against AI in the browser
+- [ ] Win/lose condition triggers correctly (HP reaches 0)
+- [ ] Chips deal damage when used (chip_use action works)
+- [ ] Custom gauge fills and enables chip selection
+- [ ] AI opponent moves, attacks, and uses chips
+- [ ] All tests pass (`npm run test`)
+- [ ] TypeScript compiles clean (`npm run type-check`)
+
+---
+
+## Product Backlog (Road to MVP)
+
+Everything below is ordered by priority. Each milestone builds on the previous ones.
+
+### Milestone 1: PVP Multiplayer
+
+**Goal:** Two players can find each other and battle in real-time over the network.
+
+**Scope:**
+- Server infrastructure (`SocketManager`, `BattleRoom`, `BattleSimulator`)
+- Matchmaking queue (simple FIFO — join queue, match first 2 players)
+- Battle rooms with state synchronization (60 tick/second)
+- Input validation (server authoritative — never trust client)
+- Client networking (`SocketClient`, state reconciliation)
+- Zustand battle store for client state management
+- Disconnect handling (10s grace period → forfeit)
+
+**Files:**
+- `packages/server/src/SocketManager.ts`
+- `packages/server/src/matchmaking/Queue.ts`
+- `packages/server/src/battle/BattleRoom.ts`
+- `packages/server/src/battle/BattleSimulator.ts`
+- `packages/client/src/network/SocketClient.ts`
+- `packages/client/src/network/StateReconciliation.ts`
+- `packages/client/src/stores/battleStore.ts`
+
+**Acceptance Criteria:**
+- [ ] Two browser windows can join matchmaking and get matched
+- [ ] Complete PVP battle plays out with real-time state sync
+- [ ] Server validates all inputs (rejects invalid actions)
+- [ ] Disconnected player forfeits after timeout
+- [ ] Input lag < 100ms (feels responsive)
+
+### Milestone 2: Campaign Mode
+
+**Goal:** Offline single-player experience with progression — fight viruses, collect chips, manage folder.
+
+**Scope:**
+- Campaign manager (mission select, progression)
+- Virus AI (pattern-based behavior trees, more sophisticated than SimpleAI)
+- Save system (localStorage persistence)
+- Chip collection and folder management
+- Mission select screen
+
+**Files:**
+- `packages/client/src/campaign/CampaignManager.ts`
+- `packages/client/src/campaign/VirusAI.ts`
+- `packages/client/src/campaign/SaveSystem.ts`
+
+**Acceptance Criteria:**
+- [ ] Player can select and complete missions against virus enemies
+- [ ] Defeated viruses drop chips that add to collection
+- [ ] Chip folder can be edited between battles
+- [ ] Progress persists across browser sessions
+- [ ] Multiple virus types with distinct AI behaviors
+
+### Milestone 3: Content Expansion
+
+**Goal:** Enough chips, viruses, and variety for engaging gameplay.
+
+**Scope:**
+- Expand chip library (~200 chips with diverse elements and effects)
+- Expand virus roster (~20 types with unique behaviors)
+- NaviCust/CustomProgram system
+- Element effectiveness depth
+
+**Files:**
+- `packages/shared/src/data/chips.ts` (expand from 5 → ~200)
+- `packages/shared/src/data/viruses.ts` (expand from 3 → ~20)
+- `packages/shared/src/data/customPrograms.ts`
+- `packages/shared/src/battle/DamageCalculation.ts`
+
+**Acceptance Criteria:**
+- [ ] 50+ unique chips implemented with distinct effects (stretch: 200)
+- [ ] 20+ virus types with unique AI patterns
+- [ ] CustomProgram system functional
+- [ ] Element system creates strategic depth
+
+### Milestone 4: Polish & UX
+
+**Goal:** The game feels good to play — smooth animations, audio, and professional UI.
+
+**Scope:**
+- Main menu, matchmaking screen, battle HUD
+- Chip selection UI (folder edit screen)
+- Smooth animations (attack, hit, delete, movement)
+- Sound effects (royalty-free)
+- Particle effects
+- Screen transitions
+- Pixel art sprites (replace placeholder rectangles)
+
+**Files:**
+- `packages/client/src/ui/MainMenu.tsx`
+- `packages/client/src/ui/ChipSelect.tsx`
+- `packages/client/src/ui/FolderEdit.tsx`
+- `packages/client/src/ui/MatchmakingScreen.tsx`
+- `packages/client/src/ui/BattleHUD.tsx`
+
+**Acceptance Criteria:**
+- [ ] All placeholder graphics replaced with pixel art sprites
+- [ ] Attack and movement animations play smoothly
+- [ ] Sound effects for key actions (attack, damage, chip select)
+- [ ] UI is intuitive and responsive
+- [ ] 60 FPS maintained during battle
+
+### Milestone 5: Competitive Features
+
+**Goal:** Features that drive long-term engagement and competitive play.
+
+**Scope:**
+- ELO ranking system
+- Replay system (record inputs, replay battles)
+- Spectator mode
+- Tournament brackets
+- Leaderboards
+
+**Acceptance Criteria:**
+- [ ] Players have visible rank that updates after matches
+- [ ] Battles can be saved and replayed
+- [ ] Spectators can watch live matches
+- [ ] Tournament bracket system functional
+
+### MVP Definition of Done
+
+All 5 milestones complete = shippable product. Specifically:
+- PVP multiplayer works reliably with low latency
+- Campaign mode provides single-player progression
+- Enough content for strategic depth (50+ chips, 20+ viruses)
+- Professional UI/UX with animations and audio
+- Competitive features drive engagement
+
+---
+
+## Architecture Scalability Notes
+
+How the current architecture supports each milestone:
+
+| Milestone | Architecture Support |
+|---|---|
+| **PVP Multiplayer** | Deterministic `BattleEngine` already runs on both client and server. Same logic validates on server and predicts on client. Socket.io skeleton exists. |
+| **Campaign Mode** | `BattleEngine` runs fully client-side — no server needed. AI just submits actions via `applyAction()` same as a human player. |
+| **Content Expansion** | Chips are plain data objects in `chips.ts`. Adding a chip = add data + implement effect in `ChipSystem`. No architectural changes needed. |
+| **Polish & UX** | Phaser handles game rendering, React handles UI overlays. Renderer classes (`GridRenderer`, `NaviRenderer`, `ChipRenderer`) are already separated for easy upgrade. |
+| **Competitive Features** | Replay system is natural: record all `applyAction()` inputs → replay by re-feeding them to `BattleEngine`. Determinism guarantees identical results. |
+
+---
+
+## Completed Work Log
+
+### Sprint 0 — Project Scaffolding (Complete)
+**Deliverables:**
+- Root `package.json` with npm workspaces
+- `packages/client/` — Vite + Phaser 3 + React
+- `packages/server/` — Node.js + Socket.io skeleton
+- `packages/shared/` — TypeScript library
+- TypeScript configs with `@mmbn/*` path aliases
+- ESLint + Prettier + Vitest
+- Dev scripts (`npm run dev`, `npm run test`, `npm run type-check`)
+
+### Sprint 1 — Battle Engine (Complete)
+**Deliverables:**
+- `packages/shared/src/types/BattleState.ts` — full battle state type
+- `packages/shared/src/types/Chip.ts` — chip type definitions
+- `packages/shared/src/types/GridTypes.ts` — 6x3 grid types
+- `packages/shared/src/types/NetworkMessages.ts` — Zod schemas
+- `packages/shared/src/battle/BattleEngine.ts` — deterministic state machine
+- `packages/shared/src/battle/GridSystem.ts` — panel management
+- `packages/shared/src/battle/ChipSystem.ts` — damage calculations
+- `packages/shared/src/data/chips.ts` — 5 core chips
+- `packages/shared/src/data/viruses.ts` — 3 viruses
+- `packages/shared/src/battle/BattleEngine.test.ts` — 9 tests passing
+
+### Sprint 2 — Client Rendering & Input (Complete)
+**Deliverables:**
+- `packages/client/src/scenes/BattleScene.ts` — main Phaser scene with full BattleEngine integration
+- `packages/client/src/rendering/GridRenderer.ts` — 6x3 grid renderer
+- `packages/client/src/rendering/NaviRenderer.ts` — navi sprites
+- `packages/client/src/rendering/ChipRenderer.ts` — chip visuals
+- `packages/client/src/input/InputHandler.ts` — keyboard input (WASD + J/K/Space)
+- `packages/client/src/input/InputHandler.test.ts` — 8 tests passing
+- Press-to-act input, panel ownership movement validation
+- HUD: HP, frame count, custom gauge, game over display
+
+**Key decisions made:**
+- 6x3 horizontal grid (not 3x6 vertical)
+- Press-to-act input (not hold-to-repeat)
+- Buster as always-available basic attack (10 HP, no cooldown)
+- Real-time simultaneous model (not turn-based)
+
+---
+
+## Reference
+
+### Core Systems Design
+
+#### Battle System
+`BattleEngine` is a pure state machine:
 ```typescript
-class BattleEngine {
-  // Deterministic state machine
-  // - Input: current state + player action
-  // - Output: new state + events
-
-  // Runs identically on client and server
-  // Client: Predicts next state for responsive feel
-  // Server: Authoritative validation
-}
+BattleEngine.createInitialState(player1Id, player2Id, folder) → BattleState
+BattleEngine.tick(state) → { state: BattleState, events: BattleEvent[] }
+BattleEngine.applyAction(state, playerId, action) → { state: BattleState, events: BattleEvent[] }
 ```
+- Deterministic: same inputs → same outputs (always)
+- JSON-serializable state (plain objects, no class instances)
+- Runs identically on client and server
 
-**Key subsystems:**
-- `ChipSystem`: Chip execution, damage calculation
-- `GridSystem`: Panel ownership, movement, area effects
-- `CustomProgram`: NaviCust-style customization
-- `TimingSystem`: Custom gauge, chip selection timing
-
-**Grid Layout (6 columns x 3 rows, horizontal):**
+#### Grid Layout
 ```
 OOOXXX      O = Player 1 panels (columns 0-2)
 O1OX2X      X = Player 2 panels (columns 3-5)
 OOOXXX      1 = P1 start (1,1), 2 = P2 start (4,1)
 ```
-- Access: `grid[y][x]` (row-major order)
-- Bounds: x=[0,5], y=[0,2]
+Access: `grid[y][x]` (row-major). Bounds: x=[0,5], y=[0,2].
 
-### 2. Network Architecture
+#### Input Controls
+| Key | Action |
+|-----|--------|
+| W/A/S/D | Move up/left/down/right |
+| J | Buster attack (always available, 10 HP) |
+| K | Use selected chip |
+| Space | Open chip selection |
 
-**Client-Server Model:**
-```
-Client A ←→ Server ←→ Client B
-          (Authoritative)
-```
+All keys: press-to-act (no hold-to-repeat).
 
-**Message Flow:**
-1. Client sends input (chip selection, movement)
-2. Server validates and simulates battle
-3. Server broadcasts state updates to both clients
-4. Clients reconcile with predicted state
+#### Network Protocol
+**Client → Server:** `queue:join`, `battle:input`
+**Server → Client:** `match:found`, `battle:start`, `battle:update`, `battle:end`
+All messages validated with Zod schemas.
 
-**Optimization: Client-Side Prediction**
-- Client immediately applies input locally (responsive feel)
-- Server sends authoritative state every frame
-- Client reconciles differences (smooth interpolation)
+### Performance Targets
+- **Client:** 60 FPS during battle, < 3s initial load
+- **Server:** 100+ concurrent battles, < 20ms tick processing
+- **Network:** ~50KB/s per player, < 100ms perceived input lag
 
-### 3. Matchmaking System
+### Testing
+- 17 tests passing (9 BattleEngine + 8 InputHandler)
+- Shared package tests are critical — verify determinism
+- Run: `npm run test:shared` after any battle logic changes
 
-**File:** `packages/server/src/matchmaking/Queue.ts`
+### Deployment — Single DigitalOcean Droplet
 
-Simple queue-based matchmaking:
-1. Player joins queue
-2. Server matches first 2 players
-3. Creates battle room
-4. Both clients connect to room
-5. Battle starts when both ready
-
-**Future enhancement:** ELO-based matching
-
-### 4. Campaign Mode
-
-**File:** `packages/client/src/campaign/CampaignManager.ts`
-
-Fully client-side:
-- Uses same `BattleEngine` from shared package
-- AI controlled viruses (simple behavior trees)
-- Progress saved to localStorage
-- No server connection required
-
----
-
-## Implementation Phases
-
-### Phase 1: Project Setup ✅ COMPLETE
-**Files created:**
-- ✅ Root `package.json` with workspace config
-- ✅ `packages/client/package.json` (Vite + Phaser)
-- ✅ `packages/server/package.json` (Node.js + Socket.io)
-- ✅ `packages/shared/package.json` (TypeScript)
-- ✅ TypeScript configs for each package
-- ✅ `vite.config.ts` for client
-- ✅ Development scripts (dev, build, test, lint)
-- ✅ ESLint + Prettier configured
-- ✅ 345 dependencies installed
-
-**Status:** All dependencies installed and building successfully
-
-### Phase 2: Shared Battle Core ✅ COMPLETE
-**Files created:**
-- ✅ `packages/shared/src/types/BattleState.ts` - Full battle state type
-- ✅ `packages/shared/src/types/Chip.ts` - Chip definitions
-- ✅ `packages/shared/src/types/GridTypes.ts` - 6-column x 3-row grid system
-- ✅ `packages/shared/src/types/NetworkMessages.ts` - Zod schemas
-- ✅ `packages/shared/src/battle/BattleEngine.ts` - Core state machine
-- ✅ `packages/shared/src/battle/GridSystem.ts` - Panel management
-- ✅ `packages/shared/src/battle/ChipSystem.ts` - Damage calculations
-- ✅ `packages/shared/src/data/chips.ts` - 5 core chips defined
-- ✅ `packages/shared/src/data/viruses.ts` - 3 viruses defined
-- ✅ `packages/shared/src/battle/BattleEngine.test.ts` - 4 tests passing
-
-**Status:** Battle engine is deterministic and fully tested
-
-### Phase 3: Basic Client Rendering 🔄 IN PROGRESS
-**Files created:**
-- ✅ `packages/client/src/scenes/BattleScene.ts` - Main Phaser scene with HUD, InputHandler, BattleEngine integration
-- ✅ `packages/client/src/rendering/GridRenderer.ts` - 6-column x 3-row grid renderer
-- ✅ `packages/client/src/rendering/NaviRenderer.ts` - Navi sprites
-- ✅ `packages/client/src/rendering/ChipRenderer.ts` - Chip visuals
-- ✅ `packages/client/src/input/InputHandler.ts` - Keyboard input (WASD movement, J buster, K chips, Spacebar custom)
-- ✅ `packages/client/src/input/InputHandler.test.ts` - 8 tests passing
-
-**Battle Integration:**
-- ✅ BattleScene initializes battle state via BattleEngine.createInitialState()
-- ✅ InputHandler captures player keyboard input
-- ✅ Update loop applies player action via BattleEngine.applyAction()
-- ✅ Update loop advances battle via BattleEngine.tick()
-- ✅ UI displays HP, frame count, custom gauge, game over state
-- ✅ Renderers update grid and navi positions each frame
-
-**Status:** Full game loop integrated. Battle engine determinism verified by tests. Ready to test local battle rendering in browser.
-
-**Input Controls (Keyboard Mapping):**
-- **W** - Move navi up
-- **A** - Move navi left
-- **S** - Move navi down
-- **D** - Move navi right
-- **Spacebar** - Open Custom bar (chip selection screen)
-- **K** - Activate selected chip
-- **J** - Use buster attack (basic attack, no chip required)
-
-**Movement Rules:**
-- Each key press moves exactly one tile (no hold-to-repeat)
-- Keys must be released and pressed again for consecutive moves
-- All action keys (J, K, Spacebar) also require fresh presses
-- Players can only move within their own panels:
-  - Player 1 restricted to columns 0-2
-  - Player 2 restricted to columns 3-5
-- Movement validated: must be adjacent (Manhattan distance = 1), in bounds, and on own panel
-
-**New Mechanic: Buster**
-- Basic attack that doesn't require chips
-- Always available (no custom gauge cost)
-- Fixed damage (10 HP)
-- Can be used any time (requires fresh key press)
-- Provides fallback when out of chips
-- Useful for learning game without chip management
-
-### Phase 4: Server Infrastructure 🔲 PENDING
-**Files to create:**
-- `packages/server/src/index.ts` - Server entry point (basic Socket.io setup exists)
-- `packages/server/src/SocketManager.ts` - Socket.io event handlers
-- `packages/server/src/matchmaking/Queue.ts` - Matchmaking queue
-- `packages/server/src/battle/BattleRoom.ts` - Room management
-- `packages/server/src/battle/BattleSimulator.ts` - Server-side battle instance
-
-**Key features:**
-- Room creation and cleanup
-- State synchronization (60 tick/second)
-- Input validation
-- Disconnect handling (forfeit or reconnect grace period)
-
-### Phase 5: Client-Server Integration 🔲 PENDING
-**Files to create:**
-- `packages/client/src/network/SocketClient.ts` - Socket.io client wrapper
-- `packages/client/src/network/StateReconciliation.ts` - Prediction/reconciliation
-- `packages/client/src/stores/battleStore.ts` - Zustand store for battle state
-
-**Features:**
-- Join matchmaking queue
-- Battle room connection
-- Input buffering and sending
-- State updates and reconciliation
-
-### Phase 6: Campaign Mode 🔲 PENDING
-**Files to create:**
-- `packages/client/src/campaign/CampaignManager.ts` - Mission progression
-- `packages/client/src/campaign/VirusAI.ts` - Enemy behavior
-- `packages/client/src/campaign/SaveSystem.ts` - localStorage wrapper
-
-**Features:**
-- Mission select screen
-- Virus battle AI (simple pattern-based)
-- Chip collection and folder management
-- Progress persistence
-
-### Phase 7: Game Content 🔲 PENDING
-**Files to create:**
-- Expand `packages/shared/src/data/chips.ts` - ~200 chip definitions
-- Expand `packages/shared/src/data/viruses.ts` - More virus types
-- `packages/shared/src/data/customPrograms.ts` - NaviCust parts
-
-**Content porting from MMBN3:**
-- ~200 battle chips
-- ~20 core virus types
-- Custom program library
-
-### Phase 8: Polish & UI 🔲 PENDING
-**Files to create:**
-- `packages/client/src/ui/MainMenu.tsx` - Main menu
-- `packages/client/src/ui/ChipSelect.tsx` - Custom screen UI
-- `packages/client/src/ui/FolderEdit.tsx` - Chip folder editing
-- `packages/client/src/ui/MatchmakingScreen.tsx` - Queue UI
-- `packages/client/src/ui/BattleHUD.tsx` - HP, Custom gauge display
-
-**Features:**
-- Smooth animations
-- Sound effects (royalty-free)
-- Particle effects
-- Screen transitions
-
----
-
-## Development Workflow
-
-### Running the game:
-```bash
-# Terminal 1: Install dependencies
-npm install
-
-# Terminal 2: Run everything
-npm run dev
-```
-
-This starts:
-- Client dev server (Vite) on `http://localhost:5173`
-- Server on `http://localhost:3000`
-- Shared package in watch mode
-
-### Hot reload:
-- Client: Instant HMR with Vite
-- Server: Auto-restart with ts-node-dev
-- Shared: Auto-rebuild triggers client/server reload
-
-### Testing:
-```bash
-npm run test           # All tests
-npm run test:shared    # Battle logic tests (critical!)
-npm run test:server    # Server tests
-npm run test:client    # Client tests
-```
-
----
-
-## File Structure Detail
+**Architecture:** One $6/mo Droplet serves everything. nginx handles static files + WebSocket proxy. Same origin = no CORS.
 
 ```
-mmbn-web/
-├── PLAN.md              # This file - working notes ✅
-├── CLAUDE.md            # Dev guide for Claude instances ✅
-├── package.json ✅
-├── tsconfig.json ✅ (fixed with @mmbn/* paths)
-│
-├── packages/
-│   ├── shared/
-│   │   ├── package.json ✅
-│   │   ├── tsconfig.json ✅
-│   │   ├── dist/ ✅ (compiled with type declarations)
-│   │   └── src/
-│   │       ├── index.ts ✅
-│   │       ├── types/
-│   │       │   ├── BattleState.ts ✅
-│   │       │   ├── Chip.ts ✅
-│   │       │   ├── GridTypes.ts ✅
-│   │       │   └── NetworkMessages.ts ✅
-│   │       ├── battle/
-│   │       │   ├── BattleEngine.ts ✅
-│   │       │   ├── BattleEngine.test.ts ✅ (8/8 passing)
-│   │       │   ├── GridSystem.ts ✅
-│   │       │   ├── ChipSystem.ts ✅
-│   │       │   └── DamageCalculation.ts 🔲
-│   │       ├── data/
-│   │       │   ├── chips.ts ✅ (5 core chips)
-│   │       │   ├── viruses.ts ✅ (3 viruses)
-│   │       │   └── customPrograms.ts 🔲
-│   │       └── utils/
-│   │           └── validation.ts ✅
-│   │
-│   ├── server/
-│   │   ├── package.json ✅
-│   │   ├── tsconfig.json ✅
-│   │   └── src/
-│   │       ├── index.ts ✅ (basic Socket.io setup)
-│   │       ├── SocketManager.ts 🔲
-│   │       ├── matchmaking/
-│   │       │   └── Queue.ts 🔲
-│   │       └── battle/
-│   │           ├── BattleRoom.ts 🔲
-│   │           └── BattleSimulator.ts 🔲
-│   │
-│   └── client/
-│       ├── package.json ✅
-│       ├── tsconfig.json ✅
-│       ├── vite.config.ts ✅
-│       ├── index.html ✅
-│       └── src/
-│           ├── main.ts ✅
-│           ├── scenes/
-│           │   ├── BattleScene.ts ✅ (full integration with InputHandler & BattleEngine)
-│           │   ├── MenuScene.ts 🔲
-│           │   └── CampaignScene.ts 🔲
-│           ├── rendering/
-│           │   ├── GridRenderer.ts ✅
-│           │   ├── NaviRenderer.ts ✅
-│           │   └── ChipRenderer.ts ✅
-│           ├── input/
-│           │   ├── InputHandler.ts ✅ (keyboard mapping WASD/J/K/Space)
-│           │   └── InputHandler.test.ts ✅ (8/8 tests passing)
-│           ├── network/
-│           │   ├── SocketClient.ts 🔲
-│           │   └── StateReconciliation.ts 🔲
-│           ├── campaign/
-│           │   ├── CampaignManager.ts 🔲
-│           │   ├── VirusAI.ts 🔲
-│           │   └── SaveSystem.ts 🔲
-│           ├── stores/
-│           │   └── battleStore.ts 🔲
-│           └── ui/
-│               ├── MainMenu.tsx 🔲
-│               ├── ChipSelect.tsx 🔲
-│               └── BattleHUD.tsx 🔲
-
-Legend: ✅ Complete, 🔲 Todo, 🔄 In Progress
+Browser → DigitalOcean Droplet ($6/mo)
+            ├── nginx (:80)
+            │   ├── /              → packages/client/dist/ (static)
+            │   ├── /socket.io     → proxy to Node.js :3000
+            │   └── /health        → proxy to Node.js :3000
+            └── Node.js + PM2 (:3000)
+                └── Socket.io server (game logic)
 ```
 
----
-
-## Network Protocol Design
-
-### Message Types (Socket.io events)
-
-**Client → Server:**
-```typescript
-// Matchmaking
-'queue:join' → { playerId: string }
-'queue:leave' → { playerId: string }
-
-// Battle
-'battle:ready' → { roomId: string }
-'battle:input' → {
-  frame: number,
-  action: PlayerAction // chip use, movement, etc.
-}
-'battle:leave' → { roomId: string }
-```
-
-**Server → Client:**
-```typescript
-// Matchmaking
-'queue:joined' → { position: number }
-'match:found' → { roomId: string, opponent: PlayerInfo }
-
-// Battle
-'battle:start' → { initialState: BattleState }
-'battle:update' → {
-  frame: number,
-  state: BattleState,
-  events: GameEvent[] // damage dealt, chips used, etc.
-}
-'battle:end' → { winner: 'player1' | 'player2', stats: BattleStats }
-```
-
-### State Synchronization
-
-**Server tick rate:** 60Hz (every ~16ms)
-- Server runs BattleEngine.tick()
-- Broadcasts state to both clients
-
-**Client prediction:**
-- Client runs same BattleEngine.tick() locally
-- Displays predicted state immediately (no input lag)
-- When server state arrives, reconcile differences
-
-**Reconciliation strategy:**
-- Server state is authoritative
-- If prediction differs, smoothly interpolate to server state
-- Re-simulate inputs after correction (rollback)
-
----
-
-## Asset Pipeline (Initial)
-
-### Placeholder Graphics
-```
-Grid panel: 50x50px colored rectangles (6 columns x 3 rows)
-  - Blue: Player 1 owned (left 3 columns)
-  - Red: Player 2 owned (right 3 columns)
-  - Dark gray: Broken panel
-  - Light gray: Cracked panel
-
-Navi: 40x40px colored squares
-  - Player 1: Green square (starts at column 1, row 1)
-  - Player 2: Pink/magenta square (starts at column 4, row 1)
-
-Chips: 32x32px colored circles
-  - Color = element type
-```
-
-### Upgrade Path (Post-MVP)
-- Extract sprites from MMBN3 ROM (for reference only)
-- Commission pixel artist or create custom sprites
-- Use sprite sheets + Phaser texture atlas
-- Add animations (idle, attack, hit, delete)
-
----
-
-## Testing Strategy
-
-### Unit Tests
-
-**Shared Package (BattleEngine) ✅**
-```typescript
-// packages/shared/src/battle/BattleEngine.test.ts
-describe('BattleEngine', () => {
-  it('should create initial battle state') ✅
-  it('should increment frame on tick') ✅
-  it('should handle chip selection action') ✅
-  it('should validate game over correctly') ✅
-  it('should handle navi movement with bounds checking') ✅
-  it('should reject movement onto opponent panels') ✅
-  it('should reject movement outside grid bounds') ✅
-  it('should handle buster attack') ✅
-  it('should keep buster available every turn') ✅
-})
-```
-
-**Client Package (InputHandler) ✅**
-```typescript
-// packages/client/src/input/InputHandler.test.ts
-describe('InputHandler', () => {
-  it('should initialize with current position') ✅
-  it('should register keydown and keyup listeners') ✅
-  it('should detect W key press for move up') ✅
-  it('should return null when no keys pressed') ✅
-  it('should clear input on demand') ✅
-  it('should have input method for checking key state') ✅
-  it('should return move action with correct grid coordinates') ✅
-  it('should have chip_use action type available') ✅
-})
-```
-
-**Status:** 17/17 tests passing (9 BattleEngine + 8 InputHandler)
-
-**Critical:** Battle logic must be deterministic
-- Same inputs → Same outputs (always)
-- Test edge cases (simultaneous attacks, panel break, etc.)
-
-### Integration Tests (Server) 🔲
-```typescript
-// packages/server/tests/matchmaking.test.ts
-describe('Matchmaking', () => {
-  it('should match two players')
-  it('should handle queue disconnect')
-})
-```
-
-### E2E Tests (Optional) 🔲
-- Playwright to test full game flow
-- Two browser instances simulate PVP match
-
----
-
-## Deployment
-
-### Development
-- Local: `npm run dev`
-- Client: Vite dev server (HMR) on port 5173
-- Server: ts-node-dev (auto-restart) on port 3000
-
-### Production Build
-```bash
-npm run build
-```
-
-**Client output:** `packages/client/dist/` (static files)
-- Deploy to: Vercel, Netlify, Cloudflare Pages
-- Free tier sufficient initially
-
-**Server output:** `packages/server/dist/` (compiled JS)
-- Deploy to: Railway, Render, DigitalOcean
-- $5-10/month for small instance
-
-### Production Architecture
-```
-[Static CDN] ← Client files (HTML/JS/CSS)
-     ↓
-[WebSocket Server] ← Socket.io connections
-```
+**Key files:**
+- `.github/workflows/deploy.yml` — GitHub Actions auto-deploy on push to main
+- `scripts/nginx.conf` — nginx config (static files + WebSocket proxy)
+- `scripts/setup-droplet.sh` — one-time Droplet provisioning script
+- `.env.example` — environment variables reference
 
 **Environment variables:**
-```
-CLIENT_URL=https://yourgame.com
-SERVER_URL=wss://server.yourgame.com
-PORT=3000
-```
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `PORT` | `3000` | Node.js server port |
+| `CLIENT_ORIGIN` | `http://localhost:5173` | CORS origin (dev only — same-origin in prod) |
+
+**GitHub Secrets required:**
+- `DO_HOST` — Droplet IP address
+- `DO_SSH_KEY` — private SSH key for deploy user
+- `DO_USERNAME` — SSH username (e.g., `deploy`)
+
+**Deploy flow:** Push to main → GitHub Actions builds + tests → SSH to Droplet → git pull → build → pm2 restart
+
+**Future scaling:**
+- Cloudflare free CDN in front of nginx (DNS change only)
+- Upgrade Droplet ($12/mo, $24/mo) for more concurrent battles
+- Migrate to Cloudflare Workers + Durable Objects for PVP at scale
 
 ---
 
-## Performance Targets
+## Post-First-Playable: Activate Feature Pipeline
 
-### Client
-- 60 FPS during battle (monitor with Phaser built-in FPS counter)
-- < 3s initial load time
-- < 500ms scene transitions
-
-### Server
-- Support 100+ concurrent battles (= 200+ CCU)
-- < 20ms tick processing time
-- < 5MB memory per battle room
-
-### Network
-- Client sends input: 1 message per action (~10-50/second during combat)
-- Server sends state: 60 messages/second per player
-- Bandwidth: ~50KB/s per player (acceptable for modern connections)
+> **Reminder:** FEATURES.md defines a structured multi-agent workflow (Explorer → Formalizer → Architecture Review → PM Breakdown → Sprint) for managing feature development. It was evaluated on 2026-02-17 and deferred — the folder infrastructure doesn't exist yet, it conflicts with this PLAN.md, and the overhead isn't justified pre-First Playable.
+>
+> **When First Playable is complete, revisit FEATURES.md and decide:**
+> 1. Whether to activate it as a process layer on top of PLAN.md
+> 2. Create `/features/backlog|approved|in_sprint|completed/` folder structure
+> 3. Fix Agent 3's reference from `ARCHITECTURE.md` → `CLAUDE.md`
+> 4. Add a fast-track tier for trivial/small changes
+> 5. Integrate branch naming from BRANCHING.md into Agent 5's prompt
+> 6. Create `CHANGELOG.md`
 
 ---
 
-## Potential Challenges & Solutions
-
-### Challenge 1: State Synchronization Complexity
-**Problem:** Client prediction + server authority is complex
-**Solution:**
-- Phase 1: Server authoritative only (simpler, slight input lag)
-- Phase 2: Add client prediction after core works
-- Use existing libraries: `netcode.io` concepts, rollback netcode
-
-### Challenge 2: Cheating Prevention
-**Problem:** Client can send fake inputs
-**Solution:**
-- Server validates all inputs (chip in hand, valid grid position, etc.)
-- Server runs full battle simulation (never trust client)
-- Rate limiting on input messages
-
-### Challenge 3: Disconnection Handling
-**Problem:** Player disconnects mid-battle
-**Solution:**
-- 10-second grace period for reconnection
-- Reconnect resumes battle from last state
-- After timeout: forfeit and award win to opponent
-
-### Challenge 4: Asset Creation
-**Problem:** Creating 200+ chip sprites + animations is time-consuming
-**Solution:**
-- Start with 10-20 core chips (Cannon, Sword, AreaGrab)
-- Use placeholders for rest
-- Iterate on mechanics first, art later
-- Community contribution system for assets
+## Post-MVP Ideas
+- Custom chip creator
+- Mobile support (touch controls)
+- Progressive Web App
+- Community content sharing
+- Advanced animations (sprite sheets + texture atlases)
 
 ---
-
-## Success Metrics
-
-### Developer Experience (Your Priority) ✅
-- ✅ Change shared logic → Auto-reload client & server
-- ✅ Type errors caught before runtime
-- ✅ Add new chip in < 10 minutes (define data, implement effect)
-- ✅ Test battle locally without server
-
-### Gameplay (In Progress)
-- 🔄 Campaign battle runs at 60 FPS (rendering ready, needs engine integration)
-- 🔲 PVP input lag < 100ms (feels responsive)
-- 🔲 Match found in < 30s (with small player base)
-
-### Technical (In Progress)
-- 🔄 Server handles 50 concurrent battles (server infrastructure pending)
-- 🔄 Battle state stays synchronized (engine ready, network pending)
-- 🔲 Reconnection works reliably (pending implementation)
-
----
-
-## Next Priority Actions
-
-1. **Test Phase 3 locally** - Verify game loop works in browser
-   - Run `npm run dev` and open `http://localhost:5173`
-   - Player 1 control with WASD + J/K
-   - Observe grid rendering and navi positions
-   - Verify HP updates as damage is dealt
-   - Verify game over when HP reaches 0
-   - Fix any rendering issues
-
-2. **Add simple AI** - Make this testable without network
-   - Implement basic virus AI (random moves + buster)
-   - Or add second player keyboard controls (arrow keys)
-   - Allow local 1v1 testing without server
-
-3. **Implement Phase 4** - Server infrastructure
-   - Basic Socket.io server with rooms
-   - Battle simulation on server
-   - State broadcast to clients
-   - Input validation
-
-4. **Demo** - First playable PVP match
-   - Two browser windows
-   - Join matchmaking
-   - Play complete battle
-   - See state sync in action
-
----
-
-## Future Enhancements (Post-MVP)
-
-- **ELO ranking system**
-- **Replay system** (record inputs, replay battles)
-- **Spectator mode**
-- **Tournament brackets**
-- **Custom chip creator**
-- **Mobile support** (touch controls)
-- **Progressive Web App** (install as app)
-- **Audio** (background music, SFX)
-- **Animations** (chip attacks, panel breaking, navi movements)
-- **More content** (200+ chips, 20+ viruses, custom programs)
-
----
-
----
-
-## Recent Changes
-
-### 2026-02-17 (Movement & Input Refinement)
-**Movement Cooldown:**
-- ✅ Changed InputHandler to use "just pressed" key tracking instead of held state
-- ✅ Each key press produces exactly one action (no hold-to-repeat)
-- ✅ All action keys (WASD, J, K, Space) require fresh presses
-
-**Panel Ownership Restriction:**
-- ✅ Players can only move onto panels they own
-- ✅ Player 1 restricted to columns 0-2, Player 2 to columns 3-5
-- ✅ BattleEngine validates target panel ownership before allowing move
-- ✅ Added test: 'should reject movement onto opponent panels' (9 tests total)
-
-### 2026-02-17 (Phase 3 Completion)
-**Grid Layout Fix:**
-- ✅ Changed from 3-column x 6-row (vertical) to 6-column x 3-row (horizontal)
-- ✅ GRID_WIDTH=6, GRID_HEIGHT=3 (was inverted)
-- ✅ Player 1 owns columns 0-2, Player 2 owns columns 3-5 (no neutral)
-- ✅ Player 1 starts at (1,1), Player 2 starts at (4,1)
-- ✅ Updated movement bounds checking to match new dimensions
-- ✅ Updated all tests to match new positions and grid size
-- ✅ Updated Vite config to resolve @mmbn/shared from source
-- ✅ Connected BattleScene to Phaser game in main.ts
-
-**Input System:**
-- ✅ Created InputHandler.ts with keyboard mapping (WASD movement, J buster, K chips, Space custom)
-- ✅ Created InputHandler.test.ts with 8 comprehensive tests
-- ✅ Tests verify key detection, priority system, action generation
-
-**BattleScene Integration:**
-- ✅ Integrated InputHandler into BattleScene
-- ✅ Wired BattleEngine into update loop
-- ✅ Initialize battle state with BattleEngine.createInitialState()
-- ✅ Apply player actions via BattleEngine.applyAction()
-- ✅ Advance battle state via BattleEngine.tick()
-- ✅ Update UI text (HP, frame, custom gauge, game over)
-- ✅ Re-render grid and navi positions each frame
-- ✅ Cleanup InputHandler on scene shutdown
-
-**Testing:**
-- ✅ All 16 tests passing (8 BattleEngine + 8 InputHandler)
-- ✅ TypeScript compilation succeeds (npm run type-check)
-- ✅ No unused variable warnings
-
-**Result:** Complete game loop wired up. Battle engine running locally without network.
-
-### 2026-02-17 (Early)
-- Fixed TypeScript module resolution with proper @mmbn/* path mappings
-- Created missing NaviRenderer.ts and ChipRenderer.ts files
-- Fixed all TypeScript compilation errors
-- VSCode IntelliSense now works correctly for @mmbn/shared imports
-- All files can now properly import from shared package
 
 **Last Updated:** 2026-02-17
-**Next Review:** After local battle testing and Phase 4 planning
+**Next Review:** After First Playable is achieved

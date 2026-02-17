@@ -11,7 +11,9 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=packages/client\" \"npm run dev --workspace=packages/server\"",
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspace=packages/shared && npm run build --workspace=packages/client && npm run build --workspace=packages/server",
+    "build:server": "npm run build --workspace=packages/shared && npm run build --workspace=packages/server",
+    "start": "node packages/server/dist/index.js",
     "test": "npm run test --workspaces",
     "test:shared": "npm run test --workspace=packages/shared",
     "test:client": "npm run test --workspace=packages/client",
