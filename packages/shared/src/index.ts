@@ -1,17 +1,17 @@
 // Re-export types
-export * from './types/BattleState';
-export * from './types/Chip';
-export * from './types/GridTypes';
-export * from './types/NetworkMessages';
+export * from './types/BattleState.js';
+export * from './types/Chip.js';
+export * from './types/GridTypes.js';
+export * from './types/NetworkMessages.js';
 
 // Re-export battle systems
-export * from './battle/BattleEngine';
-export * from './battle/GridSystem';
-export * from './battle/ChipSystem';
+export * from './battle/BattleEngine.js';
+export * from './battle/GridSystem.js';
+export * from './battle/ChipSystem.js';
 
 // Re-export data
-export * from './data/chips';
-export * from './data/viruses';
+export * from './data/chips.js';
+export * from './data/viruses.js';
 
 // Re-export utils
-export * from './utils/validation';
+export * from './utils/validation.js';

@@ -1,4 +1,4 @@
-import { Chip } from '../types/Chip';
+import { Chip } from '../types/Chip.js';
 
 /**
  * Core chip definitions

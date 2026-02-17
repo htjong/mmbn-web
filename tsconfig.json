@@ -8,7 +8,6 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "rootDir": "./packages",
     "baseUrl": ".",
     "paths": {
       "@mmbn/shared": ["packages/shared/src/index.ts"],

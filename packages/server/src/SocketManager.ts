@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import { QueueJoinSchema, validateInput } from '@mmbn/shared';
-import { Queue, QueuedPlayer } from './matchmaking/Queue';
-import { BattleRoom } from './battle/BattleRoom';
+import { Queue, QueuedPlayer } from './matchmaking/Queue.js';
+import { BattleRoom } from './battle/BattleRoom.js';
 
 export class SocketManager {
   private io: Server;

@@ -1,4 +1,4 @@
-import { GridPanel, GRID_WIDTH, GRID_HEIGHT } from '../types/GridTypes';
+import { GridPanel, GRID_WIDTH, GRID_HEIGHT } from '../types/GridTypes.js';
 
 /**
  * 6x3 grid logic (6 columns, 3 rows)

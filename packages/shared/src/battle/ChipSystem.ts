@@ -1,4 +1,4 @@
-import { Chip, ChipElement } from '../types/Chip';
+import { Chip, ChipElement } from '../types/Chip.js';
 
 /**
  * Chip execution and damage calculation

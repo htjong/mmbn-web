@@ -1,5 +1,5 @@
-import { Chip } from './Chip';
-import { GridPanel } from './GridTypes';
+import { Chip } from './Chip.js';
+import { GridPanel } from './GridTypes.js';
 
 export interface PlayerState {
   id: string;

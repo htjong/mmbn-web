@@ -1,8 +1,8 @@
-import { BattleState, PlayerState, BattleEvent, PlayerAction } from '../types/BattleState';
-import { GridPanel, GRID_WIDTH, GRID_HEIGHT } from '../types/GridTypes';
-import { Chip } from '../types/Chip';
-import { GridSystem } from './GridSystem';
-import { ChipSystem } from './ChipSystem';
+import { BattleState, PlayerState, BattleEvent, PlayerAction } from '../types/BattleState.js';
+import { GridPanel, GRID_WIDTH, GRID_HEIGHT } from '../types/GridTypes.js';
+import { Chip } from '../types/Chip.js';
+import { GridSystem } from './GridSystem.js';
+import { ChipSystem } from './ChipSystem.js';
 
 const STARTING_HP = 200;
 const STARTING_CUSTOM_GAUGE_MAX = 100;
