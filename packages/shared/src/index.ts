@@ -8,6 +8,7 @@ export * from './types/NetworkMessages.js';
 export * from './battle/BattleEngine.js';
 export * from './battle/GridSystem.js';
 export * from './battle/ChipSystem.js';
+export * from './battle/SimpleAI.js';
 
 // Re-export data
 export * from './data/chips.js';

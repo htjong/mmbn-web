@@ -230,12 +230,12 @@ BattleEngine.applyAction(state, playerId, action) → { state: BattleState, even
 - **JSON serialization:** State is plain objects (no classes with methods)
 
 #### Buster Mechanic
-A basic attack system independent of chips:
-- **Always available** - No custom gauge cost, always usable
-- **Fixed damage** - 10 HP per hit
-- **No cooldown** - Can be used any time
-- **Fallback** - Provides a move when player has no chips
-- **Learning tool** - Helps new players learn the game without chip complexity
+A basic attack matching MMBN3's MegaBuster:
+- **Always available** — No custom gauge cost, always usable
+- **Base damage** — 1 HP per hit (matches MMBN3 base buster)
+- **Same-row only** — Fires horizontally, must be on same row as opponent to hit
+- **No cooldown** — Can be used any time
+- **Fallback** — Provides a weak attack when player has no chips
 
 #### Real-Time Battle Model
 The battle system is **real-time**, not turn-based. Both players act simultaneously:
@@ -280,18 +280,44 @@ All messages validated with Zod schemas in `packages/shared/src/types/NetworkMes
 
 ### Chip System
 
-Chips defined in `packages/shared/src/data/chips.ts` as plain objects:
+Chips defined in `packages/shared/src/data/chips.ts` as plain objects matching MMBN3:
 ```typescript
 {
   id: string,
   name: string,
-  element: 'normal' | 'fire' | 'aqua' | 'elec' | 'wood' | 'wind' | 'break' | 'cursor',
+  element: 'none' | 'fire' | 'aqua' | 'elec' | 'wood',
   damage: number,
-  effects: ChipEffect[]
+  effects: ChipEffect[],
+  description: string
 }
 ```
 
+- **Elements** follow MMBN3 cycle: Fire→Wood→Elec→Aqua→Fire (2x advantage, 0.5x disadvantage)
+- **No rarity system** — MMBN3 uses chip codes (A-Z, *) instead (deferred)
+- **No accuracy** — Chips hit based on positioning, not RNG
+- **Up to 5 chips** selectable per custom screen (matches MMBN3)
+- **Same-row targeting** — Buster and chips fire horizontally
+
 Element effectiveness calculated in `ChipSystem.getElementEffectiveness(source, target)`
+
+### SimpleAI (packages/shared/src/battle/SimpleAI.ts)
+
+AI controller for single-player campaign battles. Called once per frame from `BattleScene`.
+
+```typescript
+const ai = new SimpleAI();
+const action = ai.getNextAction(aiPlayerId, state); // PlayerAction | null
+```
+
+**Design:**
+- **Dual cooldowns** — `moveCooldown` (20 frames/~0.33s) and `attackCooldown` (40 frames/~0.67s) are independent, so AI can move and attack without one blocking the other
+- **Row-aware movement** — When not on opponent's row, 70% chance to move toward opponent's Y; when aligned, random dodge movement
+- **Multi-chip selection** — Selects up to 3 chips per gauge cycle with no cooldown between selects, then uses them on attack cooldown
+- **Smart buster** — Only fires when on same row as opponent (no wasted attacks)
+
+**Priority order:** chip_select (gauge full) → chip_use (has chips) → buster (same row) → movement
+
+**Note:** Uses `Math.random()` — determinism is not required for AI decisions. The AI is a client-side concern; server-authoritative mode would use server-side AI.
 
 ### Client Rendering (packages/client/)
 
@@ -307,6 +333,7 @@ Phaser handles game grid/sprites, React handles UI overlays.
 - `packages/shared/src/battle/BattleEngine.ts` - Core battle logic
 - `packages/shared/src/battle/GridSystem.ts` - 6-column x 3-row grid operations
 - `packages/shared/src/battle/ChipSystem.ts` - Chip execution & damage
+- `packages/shared/src/battle/SimpleAI.ts` - AI controller for campaign battles
 - `packages/shared/src/types/BattleState.ts` - Complete battle state type
 - `packages/shared/src/data/chips.ts` - All chip definitions
 - `packages/client/src/scenes/BattleScene.ts` - Main Phaser scene

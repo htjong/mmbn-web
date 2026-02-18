@@ -43,7 +43,7 @@ The **MVP** is the full shippable product — all major features implemented, te
 - ESLint + Prettier + Vitest tooling
 - 345 dependencies installed and building
 
-#### Sprint 1: Battle Engine
+#### Sprint 1: Battle Engine & Client Rendering
 - `BattleEngine` — deterministic state machine (pure function: state + action → new state + events)
 - `GridSystem` — 6x3 grid with panel ownership (P1: cols 0-2, P2: cols 3-5)
 - `ChipSystem` — chip execution and damage calculations
@@ -51,9 +51,7 @@ The **MVP** is the full shippable product — all major features implemented, te
 - `NetworkMessages` — Zod-validated message schemas
 - 5 core chips defined (Cannon, Sword, etc.)
 - 3 viruses defined
-- 9 unit tests passing (determinism verified)
-
-#### Sprint 2: Client Rendering & Input
+- Real-time simultaneous gameplay (replaced turn-based system)
 - `BattleScene` — main Phaser scene with full game loop integration
 - `GridRenderer` — 6x3 grid rendering with panel colors
 - `NaviRenderer` — navi sprite rendering
@@ -63,15 +61,44 @@ The **MVP** is the full shippable product — all major features implemented, te
 - Panel ownership movement restriction
 - BattleEngine wired into update loop (createInitialState → applyAction → tick)
 - HUD displaying HP, frame count, custom gauge, game over state
-- 8 InputHandler tests passing
+- 17 unit tests passing (9 BattleEngine, 8 InputHandler)
+- TypeScript compilation clean
+
+#### Sprint 2: Server & Deployment Infrastructure
+- Server matchmaking with Socket.io (queue join, match found, battle rooms)
+- Server-authoritative battle simulation (state sync at 60 Hz)
+- DigitalOcean Droplet deployment with GitHub Actions CI/CD
+- ESM import fixes (`.js` extensions for Node production)
+- Dev/prod parity steps
+- Git branching strategy, code review process, PROJECT_CONTEXT.md handoff system
+
+#### Sprint 3: Battle Mechanics & MMBN3 Accuracy
+- ✅ `chip_use` action in BattleEngine — chips deal damage, consumed after use
+- ✅ `chip_selected` event type — distinguishes selection from usage
+- ✅ Same-row targeting — buster and chips only hit when on same row as opponent
+- ✅ SimpleAI — priority-based AI with dual cooldowns and row-aware movement:
+  - Separate move (20f) and attack (40f) cooldowns — AI can move AND attack
+  - Row-aware movement: 70% bias toward opponent's row for effective targeting
+  - Selects up to 3 chips per gauge cycle (no cooldown between selects)
+  - Only fires buster when on same row as opponent (no wasted attacks)
+  - BattleScene integration: AI controls player2 with real chip data
+- ✅ MMBN3 accuracy pass — fixed all values to match original game:
+  - Starting HP: 200 → 100
+  - Buster damage: 10 → 1
+  - Chip select limit: 3 → 5
+  - Chip elements: removed wind/break/cursor, kept none/fire/aqua/elec/wood
+  - Removed accuracy, customCost, rarity fields (not in MMBN3)
+  - Removed buffedDamage/debuffedDefense (not in MMBN3)
+  - Fixed chip data: Cannon/HiCannon/M-Cannon/Sword/ShockWave/AreaGrab
+  - Fixed virus HP: Mettaur 40, Bunny 40, Canodumb 60
+  - Element system: MMBN3 cycle (Fire→Wood→Elec→Aqua→Fire, 2x/0.5x)
+- 32 unit tests passing (14 BattleEngine, 9 SimpleAI, 9 InputHandler)
 - TypeScript compilation clean
 
 ### Remaining Work
 
-1. **Implement `chip_use` action in BattleEngine** — Wire chip execution through `applyAction()` so selected chips deal damage with visual feedback
-2. **Create SimpleAI** — Basic enemy AI (random movement + buster + chip use) so single-player is testable without networking
-3. **Create ChipSelectOverlay** — UI for selecting chips from folder when custom gauge is full (Spacebar opens, select chips, confirm)
-4. **Browser testing & tuning** — Run `npm run dev`, verify full game loop works end-to-end, fix rendering/timing issues
+1. **Create ChipSelectOverlay** — UI for selecting chips from folder when custom gauge is full (Spacebar opens, select chips, confirm)
+2. **Browser testing & tuning** — Run `npm run dev`, verify full game loop works end-to-end, fix rendering/timing issues
 
 ### Acceptance Criteria
 

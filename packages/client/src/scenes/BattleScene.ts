@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BattleState, BattleEngine, Chip } from '@mmbn/shared';
+import { BattleState, BattleEngine, CHIPS, SimpleAI } from '@mmbn/shared';
 import { GridRenderer } from '../rendering/GridRenderer';
 import { NaviRenderer } from '../rendering/NaviRenderer';
 import { InputHandler } from '../input/InputHandler';
@@ -14,6 +14,7 @@ export class BattleScene extends Phaser.Scene {
   private naviRendererPlayer2?: NaviRenderer;
   private battleState?: BattleState;
   private inputHandler?: InputHandler;
+  private simpleAI?: SimpleAI;
   private hpText?: Phaser.GameObjects.Text;
   private frameText?: Phaser.GameObjects.Text;
   private statusText?: Phaser.GameObjects.Text;
@@ -25,9 +26,12 @@ export class BattleScene extends Phaser.Scene {
   create() {
     const { width } = this.cameras.main;
 
-    // Initialize battle state
-    const testChips: Chip[] = []; // TODO: Load from chip data
-    this.battleState = BattleEngine.createInitialState('player1', 'player2', testChips, 'Player 1', 'Player 2');
+    // Initialize battle state with real chip data
+    const chipFolder = Object.values(CHIPS);
+    this.battleState = BattleEngine.createInitialState('player1', 'player2', chipFolder, 'Player 1', 'Player 2');
+
+    // Initialize AI for player2
+    this.simpleAI = new SimpleAI();
 
     // Create input handler (follows player1, starts at their position)
     this.inputHandler = new InputHandler(this.battleState.player1.position);
@@ -40,7 +44,7 @@ export class BattleScene extends Phaser.Scene {
     this.naviRendererPlayer2 = new NaviRenderer(this, 'player2', PANEL_SIZE);
 
     // Create UI text
-    this.hpText = this.add.text(width / 2, 20, 'P1: 200/200 | P2: 200/200', {
+    this.hpText = this.add.text(width / 2, 20, 'P1: 100/100 | P2: 100/100', {
       fontSize: '20px',
       color: '#ffffff',
     });
@@ -87,6 +91,16 @@ export class BattleScene extends Phaser.Scene {
       // Log events for debugging
       if (events.length > 0) {
         console.log('Events:', events);
+      }
+    }
+
+    // Apply player2 AI action
+    if (this.simpleAI) {
+      const aiAction = this.simpleAI.getNextAction('player2', this.battleState);
+      if (aiAction) {
+        const { state: aiState, events: aiEvents } = BattleEngine.applyAction(this.battleState, 'player2', aiAction);
+        this.battleState = aiState;
+        if (aiEvents.length > 0) console.log('AI events:', aiEvents);
       }
     }
 
