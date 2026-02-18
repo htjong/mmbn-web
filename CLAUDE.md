@@ -3,7 +3,9 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Quick Links
-- **[PLAN.md](./PLAN.md)** - Implementation roadmap and current progress
+- **[PLAN.md](./PLAN.md)** - Implementation roadmap and milestones
+- **[kanban/](./kanban/)** - Task tracking (ideas → backlog → ongoing)
+- **[CHANGELOG.md](./CHANGELOG.md)** - Sprint completion history
 - **[BRANCHING.md](./BRANCHING.md)** - Git workflow and branch strategy
 - **[CLAUDE.md](./CLAUDE.md)** - You are here - architecture and patterns guide
 
@@ -37,16 +39,12 @@ As Claude Code working on this project, I ensure these responsibilities:
 - Create feature branches for all work (`feature/phase-name`)
 - Use conventional commit messages (`feat(scope): description`)
 - Never commit directly to main
-- Update PLAN.md after significant progress
+- Update kanban cards and PLAN.md after significant progress
 
 ### 4. Documentation Maintenance
-- **After completing work:** Update PLAN.md with:
-  - Phase status (✅/🔄/🔲)
-  - Files completed
-  - Current blockers
-  - Next priority actions
+- **Follow the Workflow** in [PLAN.md](./PLAN.md#workflow) — it defines exactly when to update what
 - **When finding new patterns:** Document in CLAUDE.md
-- **After each phase:** Commit with clear summary
+- **New ideas during work:** Drop a card in `kanban/ideas/`
 
 ### 5. Testing Discipline
 - Write tests for shared/battle logic (deterministic = testable)
@@ -85,7 +83,7 @@ As Claude Code working on this project, I ensure these responsibilities:
    - Tier 2: Architecture checkpoints (imports, types, purity, patterns)
    - Tier 3: Design review (if not done in step 3)
 7. **Commit:** Use conventional commits with clear messages
-8. **Document:** Update PLAN.md with progress
+8. **Document:** Update kanban cards, CHANGELOG.md, and PLAN.md as needed
 9. **Summarize:** Explain what was accomplished after tasks
 
 ### Red Flags I Watch For
@@ -96,7 +94,7 @@ As Claude Code working on this project, I ensure these responsibilities:
 ❌ Long-lived branches (>3 days)
 ❌ Vague commit messages
 ❌ Mixing multiple features in one branch
-❌ Not updating PLAN.md after significant work
+❌ Not updating kanban/CHANGELOG.md/PLAN.md after significant work
 ❌ Creating new patterns without documenting them
 
 ### My Commitment

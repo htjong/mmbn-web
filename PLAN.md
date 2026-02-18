@@ -22,9 +22,47 @@ The **MVP** is the full shippable product — all major features implemented, te
 
 ### How We Work
 - Work is organized into **sprints** (short focused bursts of implementation)
-- Features are tracked in the **Product Backlog** as milestones
+- Individual tasks are tracked in **[kanban/](./kanban/)** — ideas, backlog, and ongoing work
+- Completion history lives in **[CHANGELOG.md](./CHANGELOG.md)**
+- Features are tracked in the **Product Backlog** below as milestones
 - Each milestone has **acceptance criteria** defining "done"
 - We ship incrementally: First Playable → iterate → MVP
+
+### Workflow
+
+Every piece of work follows this path. The folder a card is in IS its status.
+
+#### 1. Capture → `kanban/ideas/`
+**What:** Any thought worth writing down. One-liner, no template.
+**Gate to next:** Someone specs it out (adds Description, Acceptance Criteria, Notes).
+
+#### 2. Spec → `kanban/backlog/`
+**What:** Specced card with clear acceptance criteria. Ready to pick up.
+**Template:** Description, Acceptance Criteria (checkboxes), Dependencies (only if blocked by another card), Notes.
+**Gate to next:** Work begins. Move the file to `ongoing/`.
+
+#### 3. Build → `kanban/ongoing/`
+**What:** Actively being worked on. Add a Progress section as work happens.
+**Rule:** Max 3 cards in ongoing at any time. Finish before starting new work.
+**Gate to next:** All acceptance criteria on the card are checked off. Tests pass.
+
+#### 4. Ship → delete card, update docs
+**When card AC are all checked:**
+1. Check off the corresponding sprint AC in PLAN.md
+2. Delete the card from `kanban/ongoing/`
+3. Add a line to CHANGELOG.md under the current sprint
+
+**When ALL sprint AC in PLAN.md are checked:**
+1. Mark the sprint complete in PLAN.md (status → COMPLETE)
+2. Set the next sprint as current
+3. Move backlog cards for the next sprint into view
+
+#### Reading project state at a glance
+- **What's being worked on right now?** → `ls kanban/ongoing/`
+- **What's queued next?** → `ls kanban/backlog/`
+- **How far along is the sprint?** → Check the sprint AC checkboxes in PLAN.md
+- **What's been shipped?** → Read CHANGELOG.md
+- **Raw ideas?** → `ls kanban/ideas/`
 
 ---
 
@@ -32,73 +70,7 @@ The **MVP** is the full shippable product — all major features implemented, te
 
 **Status:** IN PROGRESS
 **Goal:** Playable single-player battle against AI in the browser
-
-### Completed (Retroactive)
-
-#### Sprint 0: Project Scaffolding
-- Monorepo setup with npm workspaces (`packages/shared`, `packages/client`, `packages/server`)
-- TypeScript configuration with `@mmbn/*` path aliases
-- Vite + Phaser 3 + React client stack
-- Node.js + Socket.io server skeleton
-- ESLint + Prettier + Vitest tooling
-- 345 dependencies installed and building
-
-#### Sprint 1: Battle Engine & Client Rendering
-- `BattleEngine` — deterministic state machine (pure function: state + action → new state + events)
-- `GridSystem` — 6x3 grid with panel ownership (P1: cols 0-2, P2: cols 3-5)
-- `ChipSystem` — chip execution and damage calculations
-- `BattleState` type — complete battle state definition
-- `NetworkMessages` — Zod-validated message schemas
-- 5 core chips defined (Cannon, Sword, etc.)
-- 3 viruses defined
-- Real-time simultaneous gameplay (replaced turn-based system)
-- `BattleScene` — main Phaser scene with full game loop integration
-- `GridRenderer` — 6x3 grid rendering with panel colors
-- `NaviRenderer` — navi sprite rendering
-- `ChipRenderer` — chip visual effects
-- `InputHandler` — keyboard input (WASD movement, J buster, K chips, Space custom)
-- Press-to-act input (no hold-to-repeat)
-- Panel ownership movement restriction
-- BattleEngine wired into update loop (createInitialState → applyAction → tick)
-- HUD displaying HP, frame count, custom gauge, game over state
-- 17 unit tests passing (9 BattleEngine, 8 InputHandler)
-- TypeScript compilation clean
-
-#### Sprint 2: Server & Deployment Infrastructure
-- Server matchmaking with Socket.io (queue join, match found, battle rooms)
-- Server-authoritative battle simulation (state sync at 60 Hz)
-- DigitalOcean Droplet deployment with GitHub Actions CI/CD
-- ESM import fixes (`.js` extensions for Node production)
-- Dev/prod parity steps
-- Git branching strategy, code review process, PROJECT_CONTEXT.md handoff system
-
-#### Sprint 3: Battle Mechanics & MMBN3 Accuracy
-- ✅ `chip_use` action in BattleEngine — chips deal damage, consumed after use
-- ✅ `chip_selected` event type — distinguishes selection from usage
-- ✅ Same-row targeting — buster and chips only hit when on same row as opponent
-- ✅ SimpleAI — priority-based AI with dual cooldowns and row-aware movement:
-  - Separate move (20f) and attack (40f) cooldowns — AI can move AND attack
-  - Row-aware movement: 70% bias toward opponent's row for effective targeting
-  - Selects up to 3 chips per gauge cycle (no cooldown between selects)
-  - Only fires buster when on same row as opponent (no wasted attacks)
-  - BattleScene integration: AI controls player2 with real chip data
-- ✅ MMBN3 accuracy pass — fixed all values to match original game:
-  - Starting HP: 200 → 100
-  - Buster damage: 10 → 1
-  - Chip select limit: 3 → 5
-  - Chip elements: removed wind/break/cursor, kept none/fire/aqua/elec/wood
-  - Removed accuracy, customCost, rarity fields (not in MMBN3)
-  - Removed buffedDamage/debuffedDefense (not in MMBN3)
-  - Fixed chip data: Cannon/HiCannon/M-Cannon/Sword/ShockWave/AreaGrab
-  - Fixed virus HP: Mettaur 40, Bunny 40, Canodumb 60
-  - Element system: MMBN3 cycle (Fire→Wood→Elec→Aqua→Fire, 2x/0.5x)
-- 32 unit tests passing (14 BattleEngine, 9 SimpleAI, 9 InputHandler)
-- TypeScript compilation clean
-
-### Remaining Work
-
-1. **Create ChipSelectOverlay** — UI for selecting chips from folder when custom gauge is full (Spacebar opens, select chips, confirm)
-2. **Browser testing & tuning** — Run `npm run dev`, verify full game loop works end-to-end, fix rendering/timing issues
+**Remaining work:** See [kanban/backlog/](./kanban/backlog/)
 
 ### Acceptance Criteria
 
@@ -129,15 +101,6 @@ Everything below is ordered by priority. Each milestone builds on the previous o
 - Zustand battle store for client state management
 - Disconnect handling (10s grace period → forfeit)
 
-**Files:**
-- `packages/server/src/SocketManager.ts`
-- `packages/server/src/matchmaking/Queue.ts`
-- `packages/server/src/battle/BattleRoom.ts`
-- `packages/server/src/battle/BattleSimulator.ts`
-- `packages/client/src/network/SocketClient.ts`
-- `packages/client/src/network/StateReconciliation.ts`
-- `packages/client/src/stores/battleStore.ts`
-
 **Acceptance Criteria:**
 - [ ] Two browser windows can join matchmaking and get matched
 - [ ] Complete PVP battle plays out with real-time state sync
@@ -156,11 +119,6 @@ Everything below is ordered by priority. Each milestone builds on the previous o
 - Chip collection and folder management
 - Mission select screen
 
-**Files:**
-- `packages/client/src/campaign/CampaignManager.ts`
-- `packages/client/src/campaign/VirusAI.ts`
-- `packages/client/src/campaign/SaveSystem.ts`
-
 **Acceptance Criteria:**
 - [ ] Player can select and complete missions against virus enemies
 - [ ] Defeated viruses drop chips that add to collection
@@ -177,12 +135,6 @@ Everything below is ordered by priority. Each milestone builds on the previous o
 - Expand virus roster (~20 types with unique behaviors)
 - NaviCust/CustomProgram system
 - Element effectiveness depth
-
-**Files:**
-- `packages/shared/src/data/chips.ts` (expand from 5 → ~200)
-- `packages/shared/src/data/viruses.ts` (expand from 3 → ~20)
-- `packages/shared/src/data/customPrograms.ts`
-- `packages/shared/src/battle/DamageCalculation.ts`
 
 **Acceptance Criteria:**
 - [ ] 50+ unique chips implemented with distinct effects (stretch: 200)
@@ -202,13 +154,6 @@ Everything below is ordered by priority. Each milestone builds on the previous o
 - Particle effects
 - Screen transitions
 - Pixel art sprites (replace placeholder rectangles)
-
-**Files:**
-- `packages/client/src/ui/MainMenu.tsx`
-- `packages/client/src/ui/ChipSelect.tsx`
-- `packages/client/src/ui/FolderEdit.tsx`
-- `packages/client/src/ui/MatchmakingScreen.tsx`
-- `packages/client/src/ui/BattleHUD.tsx`
 
 **Acceptance Criteria:**
 - [ ] All placeholder graphics replaced with pixel art sprites
@@ -259,178 +204,9 @@ How the current architecture supports each milestone:
 
 ---
 
-## Completed Work Log
-
-### Sprint 0 — Project Scaffolding (Complete)
-**Deliverables:**
-- Root `package.json` with npm workspaces
-- `packages/client/` — Vite + Phaser 3 + React
-- `packages/server/` — Node.js + Socket.io skeleton
-- `packages/shared/` — TypeScript library
-- TypeScript configs with `@mmbn/*` path aliases
-- ESLint + Prettier + Vitest
-- Dev scripts (`npm run dev`, `npm run test`, `npm run type-check`)
-
-### Sprint 1 — Battle Engine (Complete)
-**Deliverables:**
-- `packages/shared/src/types/BattleState.ts` — full battle state type
-- `packages/shared/src/types/Chip.ts` — chip type definitions
-- `packages/shared/src/types/GridTypes.ts` — 6x3 grid types
-- `packages/shared/src/types/NetworkMessages.ts` — Zod schemas
-- `packages/shared/src/battle/BattleEngine.ts` — deterministic state machine
-- `packages/shared/src/battle/GridSystem.ts` — panel management
-- `packages/shared/src/battle/ChipSystem.ts` — damage calculations
-- `packages/shared/src/data/chips.ts` — 5 core chips
-- `packages/shared/src/data/viruses.ts` — 3 viruses
-- `packages/shared/src/battle/BattleEngine.test.ts` — 9 tests passing
-
-### Sprint 2 — Client Rendering & Input (Complete)
-**Deliverables:**
-- `packages/client/src/scenes/BattleScene.ts` — main Phaser scene with full BattleEngine integration
-- `packages/client/src/rendering/GridRenderer.ts` — 6x3 grid renderer
-- `packages/client/src/rendering/NaviRenderer.ts` — navi sprites
-- `packages/client/src/rendering/ChipRenderer.ts` — chip visuals
-- `packages/client/src/input/InputHandler.ts` — keyboard input (WASD + J/K/Space)
-- `packages/client/src/input/InputHandler.test.ts` — 8 tests passing
-- Press-to-act input, panel ownership movement validation
-- HUD: HP, frame count, custom gauge, game over display
-
-**Key decisions made:**
-- 6x3 horizontal grid (not 3x6 vertical)
-- Press-to-act input (not hold-to-repeat)
-- Buster as always-available basic attack (10 HP, no cooldown)
-- Real-time simultaneous model (not turn-based)
-
-### Deployment Infrastructure (Complete)
-**Deliverables:**
-- `.github/workflows/deploy.yml` — GitHub Actions CI/CD (build + test in CI, rsync to Droplet)
-- `scripts/nginx.conf` — nginx config (static files + WebSocket proxy, same-origin)
-- `scripts/setup-droplet.sh` — one-time Droplet provisioning (Node.js 22, PM2, nginx, UFW, swap)
-- `.env.example` — environment variables reference
-- `packages/server/src/index.ts` — `/health` endpoint, CORS restricted to env var
-- `package.json` — fixed build ordering (shared → client → server), added `start` and `build:server` scripts
-- `packages/server/package.json` — added `start` script, `--passWithNoTests` flag
-
-**Key decisions made:**
-- Single $6/mo DigitalOcean Droplet (nginx + Node.js + PM2)
-- Build in GitHub Actions (7GB RAM), not on Droplet (512MB) — avoids OOM
-- rsync built artifacts instead of git pull + build on server
-- Same-origin deployment eliminates CORS complexity
-- Dedicated `deploy` SSH user with dedicated key pair (not personal key)
-- Node 22 aligned across local, CI, and Droplet
-- ESM `.js` extensions required on all relative imports (Node ESM strict resolution)
-- Server dist output at `dist/server/src/` (due to cross-package tsc compilation with shared)
-
----
-
-## Reference
-
-### Core Systems Design
-
-#### Battle System
-`BattleEngine` is a pure state machine:
-```typescript
-BattleEngine.createInitialState(player1Id, player2Id, folder) → BattleState
-BattleEngine.tick(state) → { state: BattleState, events: BattleEvent[] }
-BattleEngine.applyAction(state, playerId, action) → { state: BattleState, events: BattleEvent[] }
-```
-- Deterministic: same inputs → same outputs (always)
-- JSON-serializable state (plain objects, no class instances)
-- Runs identically on client and server
-
-#### Grid Layout
-```
-OOOXXX      O = Player 1 panels (columns 0-2)
-O1OX2X      X = Player 2 panels (columns 3-5)
-OOOXXX      1 = P1 start (1,1), 2 = P2 start (4,1)
-```
-Access: `grid[y][x]` (row-major). Bounds: x=[0,5], y=[0,2].
-
-#### Input Controls
-| Key | Action |
-|-----|--------|
-| W/A/S/D | Move up/left/down/right |
-| J | Buster attack (always available, 10 HP) |
-| K | Use selected chip |
-| Space | Open chip selection |
-
-All keys: press-to-act (no hold-to-repeat).
-
-#### Network Protocol
-**Client → Server:** `queue:join`, `battle:input`
-**Server → Client:** `match:found`, `battle:start`, `battle:update`, `battle:end`
-All messages validated with Zod schemas.
-
-### Performance Targets
-- **Client:** 60 FPS during battle, < 3s initial load
-- **Server:** 100+ concurrent battles, < 20ms tick processing
-- **Network:** ~50KB/s per player, < 100ms perceived input lag
-
-### Testing
-- 17 tests passing (9 BattleEngine + 8 InputHandler)
-- Shared package tests are critical — verify determinism
-- Run: `npm run test:shared` after any battle logic changes
-
-### Deployment — Single DigitalOcean Droplet
-
-**Architecture:** One $6/mo Droplet serves everything. nginx handles static files + WebSocket proxy. Same origin = no CORS.
-
-```
-Browser → DigitalOcean Droplet ($6/mo)
-            ├── nginx (:80)
-            │   ├── /              → packages/client/dist/ (static)
-            │   ├── /socket.io     → proxy to Node.js :3000
-            │   └── /health        → proxy to Node.js :3000
-            └── Node.js + PM2 (:3000)
-                └── Socket.io server (game logic)
-```
-
-**Key files:**
-- `.github/workflows/deploy.yml` — GitHub Actions auto-deploy on push to main
-- `scripts/nginx.conf` — nginx config (static files + WebSocket proxy)
-- `scripts/setup-droplet.sh` — one-time Droplet provisioning script
-- `.env.example` — environment variables reference
-
-**Environment variables:**
-| Variable | Default | Notes |
-|----------|---------|-------|
-| `PORT` | `3000` | Node.js server port |
-| `CLIENT_ORIGIN` | `http://localhost:5173` | CORS origin (dev only — same-origin in prod) |
-
-**GitHub Secrets required:**
-- `DO_HOST` — Droplet IP address
-- `DO_SSH_KEY` — private SSH key for deploy user
-- `DO_USERNAME` — SSH username (e.g., `deploy`)
-
-**Deploy flow:** Push to main → GitHub Actions builds + tests → rsync artifacts to Droplet → npm ci --omit=dev → pm2 restart
-
-**Future scaling:**
-- Cloudflare free CDN in front of nginx (DNS change only)
-- Upgrade Droplet ($12/mo, $24/mo) for more concurrent battles
-- Migrate to Cloudflare Workers + Durable Objects for PVP at scale
-
----
-
-## Post-First-Playable: Activate Feature Pipeline
-
-> **Reminder:** FEATURES.md defines a structured multi-agent workflow (Explorer → Formalizer → Architecture Review → PM Breakdown → Sprint) for managing feature development. It was evaluated on 2026-02-17 and deferred — the folder infrastructure doesn't exist yet, it conflicts with this PLAN.md, and the overhead isn't justified pre-First Playable.
->
-> **When First Playable is complete, revisit FEATURES.md and decide:**
-> 1. Whether to activate it as a process layer on top of PLAN.md
-> 2. Create `/features/backlog|approved|in_sprint|completed/` folder structure
-> 3. Fix Agent 3's reference from `ARCHITECTURE.md` → `CLAUDE.md`
-> 4. Add a fast-track tier for trivial/small changes
-> 5. Integrate branch naming from BRANCHING.md into Agent 5's prompt
-> 6. Create `CHANGELOG.md`
-
----
-
 ## Post-MVP Ideas
-- Custom chip creator
-- Mobile support (touch controls)
-- Progressive Web App
-- Community content sharing
-- Advanced animations (sprite sheets + texture atlases)
+
+See [kanban/ideas/](./kanban/ideas/) for post-MVP ideas and raw thoughts.
 
 ---
 
