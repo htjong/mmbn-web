@@ -68,5 +68,5 @@ curl http://localhost:3000/health                # Should return {"status":"ok"}
 scripts/nginx.conf                         # nginx config
 scripts/setup-droplet.sh                   # Droplet provisioning
 packages/server/src/index.ts               # Server entry + health endpoint
-PLAN.md                                    # Full roadmap and progress
+kanban/PLAN.md                             # Full roadmap and progress
 ```

@@ -22,7 +22,7 @@ The **MVP** is the full shippable product — all major features implemented, te
 
 ### How We Work
 - Work is organized into **sprints** (short focused bursts of implementation)
-- Individual tasks are tracked in **[kanban/](./kanban/)** — ideas, backlog, and ongoing work
+- Individual tasks are tracked in **[kanban/](./)** — ideas, backlog, and ongoing work
 - Completion history lives in **[CHANGELOG.md](./CHANGELOG.md)**
 - Features are tracked in the **Product Backlog** below as milestones
 - Each milestone has **acceptance criteria** defining "done"
@@ -70,7 +70,7 @@ Every piece of work follows this path. The folder a card is in IS its status.
 
 **Status:** IN PROGRESS
 **Goal:** Playable single-player battle against AI in the browser
-**Remaining work:** See [kanban/backlog/](./kanban/backlog/)
+**Remaining work:** See [backlog/](./backlog/)
 
 ### Acceptance Criteria
 
@@ -206,7 +206,7 @@ How the current architecture supports each milestone:
 
 ## Post-MVP Ideas
 
-See [kanban/ideas/](./kanban/ideas/) for post-MVP ideas and raw thoughts.
+See [ideas/](./ideas/) for post-MVP ideas and raw thoughts.
 
 ---
 

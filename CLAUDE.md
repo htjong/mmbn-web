@@ -3,11 +3,12 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Quick Links
-- **[PLAN.md](./PLAN.md)** - Implementation roadmap and milestones
+- **[PLAN.md](./kanban/PLAN.md)** - Implementation roadmap and milestones
 - **[kanban/](./kanban/)** - Task tracking (ideas → backlog → ongoing)
-- **[CHANGELOG.md](./CHANGELOG.md)** - Sprint completion history
-- **[BRANCHING.md](./BRANCHING.md)** - Git workflow and branch strategy
+- **[CHANGELOG.md](./kanban/CHANGELOG.md)** - Sprint completion history
+- **[BRANCHING.md](./docs/BRANCHING.md)** - Git workflow and branch strategy
 - **[CLAUDE.md](./CLAUDE.md)** - You are here - architecture and patterns guide
+- **[docs/feature-workflow.md](./docs/feature-workflow.md)** - Feature design workflow (`/feature-explore` → `/feature-formalize`)
 
 ## Context System
 
@@ -35,14 +36,14 @@ As Claude Code working on this project, I ensure these responsibilities:
 - Proper error handling at system boundaries
 
 ### 3. Git Workflow Adherence
-- Follow [BRANCHING.md](./BRANCHING.md) strategy religiously
+- Follow [BRANCHING.md](./docs/BRANCHING.md) strategy religiously
 - Create feature branches for all work (`feature/phase-name`)
 - Use conventional commit messages (`feat(scope): description`)
 - Never commit directly to main
-- Update kanban cards and PLAN.md after significant progress
+- Update kanban cards and kanban/PLAN.md after significant progress
 
 ### 4. Documentation Maintenance
-- **Follow the Workflow** in [PLAN.md](./PLAN.md#workflow) — it defines exactly when to update what
+- **Follow the Workflow** in [PLAN.md](./kanban/PLAN.md#workflow) — it defines exactly when to update what
 - **When finding new patterns:** Document in CLAUDE.md
 - **New ideas during work:** Drop a card in `kanban/ideas/`
 
@@ -75,15 +76,15 @@ As Claude Code working on this project, I ensure these responsibilities:
 
 1. **Understand:** Read relevant files, understand existing patterns
 2. **Plan:** For non-trivial tasks, use plan mode to design approach
-3. **Design Review:** For major architectural changes, see [BRANCHING.md - Tier 3](./BRANCHING.md#tier-3-design-review-for-major-architectural-changes)
+3. **Design Review:** For major architectural changes, see [BRANCHING.md - Tier 3](./docs/BRANCHING.md#tier-3-design-review-for-major-architectural-changes)
 4. **Implement:** Write code following established conventions
 5. **Test:** Verify TypeScript, tests, manual testing
-6. **Code Review:** Before committing, perform review per [BRANCHING.md - Code Review Process](./BRANCHING.md#code-review-process)
+6. **Code Review:** Before committing, perform review per [BRANCHING.md - Code Review Process](./docs/BRANCHING.md#code-review-process)
    - Tier 1: Automated checks (`npm run type-check && npm run test && npm run lint`)
    - Tier 2: Architecture checkpoints (imports, types, purity, patterns)
    - Tier 3: Design review (if not done in step 3)
 7. **Commit:** Use conventional commits with clear messages
-8. **Document:** Update kanban cards, CHANGELOG.md, and PLAN.md as needed
+8. **Document:** Update kanban cards, kanban/CHANGELOG.md, and kanban/PLAN.md as needed
 9. **Summarize:** Explain what was accomplished after tasks
 
 ### Red Flags I Watch For
@@ -94,7 +95,7 @@ As Claude Code working on this project, I ensure these responsibilities:
 ❌ Long-lived branches (>3 days)
 ❌ Vague commit messages
 ❌ Mixing multiple features in one branch
-❌ Not updating kanban/CHANGELOG.md/PLAN.md after significant work
+❌ Not updating kanban/CHANGELOG.md / kanban/PLAN.md after significant work
 ❌ Creating new patterns without documenting them
 
 ### My Commitment
@@ -160,7 +161,7 @@ Import shared code in client/server using: `import { ... } from '@mmbn/shared'`
 
 ## Git Workflow
 
-Follow the [BRANCHING.md](./BRANCHING.md) strategy:
+Follow the [BRANCHING.md](./docs/BRANCHING.md) strategy:
 - Create feature branches: `git checkout -b feature/phase-name main`
 - Commit with conventional messages: `feat(scope): description`
 - Push and create PRs: `git push origin feature/...`
