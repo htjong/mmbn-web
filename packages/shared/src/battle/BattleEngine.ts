@@ -126,7 +126,7 @@ export class BattleEngine {
           player.selectedChips.push(player.hand[chipIndex]);
           events.push({
             frame: newState.frame,
-            type: 'chip_used',
+            type: 'chip_selected',
             playerId,
             data: { chipId: action.chipId },
           });
@@ -169,6 +169,26 @@ export class BattleEngine {
 
         // Set buster cooldown (available every turn, so no actual cooldown)
         player.busterCooldown = 0;
+      }
+    } else if (action.type === 'chip_use') {
+      const chip = player.selectedChips[player.selectedChipIndex];
+      if (chip) {
+        const damage = ChipSystem.calculateDamage(chip, 'normal');
+        opponent.hp = Math.max(0, opponent.hp - damage);
+
+        // Remove used chip from selectedChips
+        player.selectedChips.splice(player.selectedChipIndex, 1);
+        // Clamp index if it's now out of bounds
+        if (player.selectedChipIndex >= player.selectedChips.length) {
+          player.selectedChipIndex = Math.max(0, player.selectedChips.length - 1);
+        }
+
+        events.push({
+          frame: newState.frame,
+          type: 'chip_used',
+          playerId,
+          data: { chipId: chip.id, damage, opponentHp: opponent.hp },
+        });
       }
     }
 

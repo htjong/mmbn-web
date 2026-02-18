@@ -33,6 +33,7 @@ export interface BattleState {
 export interface BattleEvent {
   frame: number;
   type:
+    | 'chip_selected'
     | 'chip_used'
     | 'buster_used'
     | 'damage_dealt'

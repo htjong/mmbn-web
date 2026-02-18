@@ -26,7 +26,7 @@ describe('BattleEngine', () => {
 
   it('should increment frame on tick', () => {
     const chipList = Object.values(CHIPS);
-    let state = BattleEngine.createInitialState(
+    const state = BattleEngine.createInitialState(
       'player1',
       'player2',
       chipList,
@@ -56,7 +56,7 @@ describe('BattleEngine', () => {
       });
 
       expect(newState.player1.selectedChips.length).toBe(1);
-      expect(events.some((e) => e.type === 'chip_used')).toBe(true);
+      expect(events.some((e) => e.type === 'chip_selected')).toBe(true);
     }
   });
 
@@ -180,5 +180,88 @@ describe('BattleEngine', () => {
     });
 
     expect(state1.player1.busterCooldown).toBe(0); // Should be ready immediately
+  });
+
+  it('should deal damage when using a chip', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    // Select a chip first
+    const chipId = state.player1.hand[0]?.id;
+    expect(chipId).toBeDefined();
+    const { state: stateWithChip } = BattleEngine.applyAction(state, 'player1', {
+      type: 'chip_select',
+      chipId: chipId!,
+    });
+    expect(stateWithChip.player1.selectedChips.length).toBe(1);
+
+    const initialHp = stateWithChip.player2.hp;
+    const selectedChip = stateWithChip.player1.selectedChips[0];
+    const expectedDamage = selectedChip.damage; // element vs 'normal' = 1.0x for most chips
+
+    // Use the chip
+    const { state: newState, events } = BattleEngine.applyAction(stateWithChip, 'player1', {
+      type: 'chip_use',
+    });
+
+    expect(newState.player2.hp).toBe(initialHp - expectedDamage);
+    expect(events.some((e) => e.type === 'chip_used')).toBe(true);
+  });
+
+  it('should consume chip after use', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    // Select two chips
+    const chip1Id = state.player1.hand[0]?.id;
+    const chip2Id = state.player1.hand[1]?.id;
+    let current = state;
+    ({ state: current } = BattleEngine.applyAction(current, 'player1', {
+      type: 'chip_select',
+      chipId: chip1Id!,
+    }));
+    ({ state: current } = BattleEngine.applyAction(current, 'player1', {
+      type: 'chip_select',
+      chipId: chip2Id!,
+    }));
+    expect(current.player1.selectedChips.length).toBe(2);
+
+    // Use chip — should remove it
+    const { state: afterUse } = BattleEngine.applyAction(current, 'player1', {
+      type: 'chip_use',
+    });
+    expect(afterUse.player1.selectedChips.length).toBe(1);
+  });
+
+  it('should be a no-op when using chip_use with no selected chips', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    expect(state.player1.selectedChips.length).toBe(0);
+
+    const { state: newState, events } = BattleEngine.applyAction(state, 'player1', {
+      type: 'chip_use',
+    });
+
+    expect(newState.player2.hp).toBe(state.player2.hp);
+    expect(events.length).toBe(0);
   });
 });
