@@ -17,8 +17,8 @@ describe('BattleEngine', () => {
     expect(state.frame).toBe(0);
     expect(state.player1.id).toBe('player1');
     expect(state.player2.id).toBe('player2');
-    expect(state.player1.hp).toBe(200);
-    expect(state.player2.hp).toBe(200);
+    expect(state.player1.hp).toBe(100);
+    expect(state.player2.hp).toBe(100);
     expect(state.isGameOver).toBe(false);
     expect(state.grid.length).toBe(3);
     expect(state.grid[0].length).toBe(6);
@@ -160,7 +160,7 @@ describe('BattleEngine', () => {
       type: 'buster',
     });
 
-    expect(newState.player2.hp).toBe(initialHp - 10);
+    expect(newState.player2.hp).toBe(initialHp - 1);
     expect(events.some((e) => e.type === 'buster_used')).toBe(true);
   });
 
@@ -203,7 +203,7 @@ describe('BattleEngine', () => {
 
     const initialHp = stateWithChip.player2.hp;
     const selectedChip = stateWithChip.player1.selectedChips[0];
-    const expectedDamage = selectedChip.damage; // element vs 'normal' = 1.0x for most chips
+    const expectedDamage = selectedChip.damage;
 
     // Use the chip
     const { state: newState, events } = BattleEngine.applyAction(stateWithChip, 'player1', {
@@ -243,6 +243,69 @@ describe('BattleEngine', () => {
       type: 'chip_use',
     });
     expect(afterUse.player1.selectedChips.length).toBe(1);
+  });
+
+  it('should miss buster when attacker and opponent are on different rows', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    // Move player1 to a different row (1,0)
+    const { state: movedState } = BattleEngine.applyAction(state, 'player1', {
+      type: 'move',
+      gridX: 1,
+      gridY: 0,
+    });
+    expect(movedState.player1.position.y).toBe(0);
+    expect(movedState.player2.position.y).toBe(1);
+
+    const initialHp = movedState.player2.hp;
+    const { state: afterBuster, events } = BattleEngine.applyAction(movedState, 'player1', {
+      type: 'buster',
+    });
+
+    expect(afterBuster.player2.hp).toBe(initialHp); // No damage
+    expect(events.some((e) => e.type === 'buster_used')).toBe(false);
+  });
+
+  it('should miss chip when attacker and opponent are on different rows', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob'
+    );
+
+    // Select a chip
+    const chipId = state.player1.hand[0]?.id;
+    expect(chipId).toBeDefined();
+    let current = state;
+    ({ state: current } = BattleEngine.applyAction(current, 'player1', {
+      type: 'chip_select',
+      chipId: chipId!,
+    }));
+
+    // Move player1 to a different row
+    ({ state: current } = BattleEngine.applyAction(current, 'player1', {
+      type: 'move',
+      gridX: 1,
+      gridY: 0,
+    }));
+
+    const initialHp = current.player2.hp;
+    const { state: afterChip } = BattleEngine.applyAction(current, 'player1', {
+      type: 'chip_use',
+    });
+
+    expect(afterChip.player2.hp).toBe(initialHp); // No damage
+    expect(afterChip.player1.selectedChips.length).toBe(0); // Chip still consumed
   });
 
   it('should be a no-op when using chip_use with no selected chips', () => {

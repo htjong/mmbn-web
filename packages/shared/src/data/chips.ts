@@ -1,17 +1,16 @@
 import { Chip } from '../types/Chip.js';
 
 /**
- * Core chip definitions
- * Start with a few chips, expand to 200+ iteratively
+ * Chip definitions based on Mega Man Battle Network 3
+ * Damage values, elements, and effects match the original game.
  */
 export const CHIPS: Record<string, Chip> = {
   cannon: {
     id: 'cannon',
     name: 'Cannon',
-    element: 'normal',
+    element: 'none',
     damage: 40,
-    accuracy: 100,
-    rarity: 'common',
+
     effects: [
       {
         type: 'damage',
@@ -19,33 +18,14 @@ export const CHIPS: Record<string, Chip> = {
         areaSize: 'single',
       },
     ],
-    customCost: 20,
-    description: 'Basic shot. Deals 40 damage.',
+    description: 'Cannon to attack 1 enemy',
   },
-  cannonP: {
-    id: 'cannonP',
-    name: 'Cannon*',
-    element: 'normal',
-    damage: 60,
-    accuracy: 100,
-    rarity: 'uncommon',
-    effects: [
-      {
-        type: 'damage',
-        value: 60,
-        areaSize: 'single',
-      },
-    ],
-    customCost: 30,
-    description: 'Powered up shot. Deals 60 damage.',
-  },
-  highCannon: {
-    id: 'highCannon',
-    name: 'High Cannon',
-    element: 'normal',
+  hiCannon: {
+    id: 'hiCannon',
+    name: 'HiCannon',
+    element: 'none',
     damage: 80,
-    accuracy: 100,
-    rarity: 'rare',
+
     effects: [
       {
         type: 'damage',
@@ -53,63 +33,66 @@ export const CHIPS: Record<string, Chip> = {
         areaSize: 'single',
       },
     ],
-    customCost: 40,
-    description: 'Strong cannon shot. Deals 80 damage.',
+    description: 'Fires powerful cannon to attack 1 enemy',
+  },
+  mCannon: {
+    id: 'mCannon',
+    name: 'M-Cannon',
+    element: 'none',
+    damage: 120,
+
+    effects: [
+      {
+        type: 'damage',
+        value: 120,
+        areaSize: 'single',
+      },
+    ],
+    description: 'Fires mega cannon to attack 1 enemy',
   },
   sword: {
     id: 'sword',
     name: 'Sword',
-    element: 'break',
+    element: 'none',
+    damage: 80,
+
+    effects: [
+      {
+        type: 'damage',
+        value: 80,
+        areaSize: 'single',
+      },
+    ],
+    description: 'Cuts 1 square ahead with a sword',
+  },
+  shockWave: {
+    id: 'shockWave',
+    name: 'ShockWave',
+    element: 'none',
     damage: 60,
-    accuracy: 100,
-    rarity: 'common',
+
     effects: [
       {
         type: 'damage',
         value: 60,
-        areaSize: 'single',
-      },
-      {
-        type: 'panel_break',
-        value: 1,
-      },
-    ],
-    customCost: 25,
-    description: 'Slashing attack. Deals 60 damage and breaks panels.',
-  },
-  areaGrab: {
-    id: 'areaGrab',
-    name: 'Area Grab',
-    element: 'normal',
-    damage: 30,
-    accuracy: 100,
-    rarity: 'uncommon',
-    effects: [
-      {
-        type: 'damage',
-        value: 30,
-        areaSize: 'area',
-        areaRadius: 1,
-      },
-    ],
-    customCost: 35,
-    description: 'AOE attack. Deals 30 damage in area.',
-  },
-  shockWave: {
-    id: 'shockWave',
-    name: 'Shock Wave',
-    element: 'elec',
-    damage: 50,
-    accuracy: 100,
-    rarity: 'uncommon',
-    effects: [
-      {
-        type: 'damage',
-        value: 50,
         areaSize: 'line',
       },
     ],
-    customCost: 30,
-    description: 'Electrical attack. Deals 50 damage in line.',
+    description: 'Sends a shockwave down the row',
+  },
+  areaGrab: {
+    id: 'areaGrab',
+    name: 'AreaGrab',
+    element: 'none',
+    damage: 0,
+
+    effects: [
+      {
+        type: 'area_effect',
+        value: 1,
+        areaSize: 'area',
+      },
+    ],
+    description: 'Steals 1 column of enemy area',
   },
 };

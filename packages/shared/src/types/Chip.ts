@@ -1,14 +1,11 @@
-export type ChipElement = 'normal' | 'fire' | 'aqua' | 'elec' | 'wood' | 'wind' | 'break' | 'cursor';
+export type ChipElement = 'none' | 'fire' | 'aqua' | 'elec' | 'wood';
 
 export interface Chip {
   id: string;
   name: string;
   element: ChipElement;
   damage: number;
-  accuracy: number; // 0-100, percentage
-  rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
   effects: ChipEffect[];
-  customCost: number; // Points needed to use
   description: string;
 }
 

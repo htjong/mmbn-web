@@ -4,10 +4,10 @@ import { Chip } from '../types/Chip.js';
 import { GridSystem } from './GridSystem.js';
 import { ChipSystem } from './ChipSystem.js';
 
-const STARTING_HP = 200;
+const STARTING_HP = 100;
 const STARTING_CUSTOM_GAUGE_MAX = 100;
 const HAND_SIZE = 5;
-const SELECTED_CHIPS_SIZE = 3;
+const SELECTED_CHIPS_SIZE = 5;
 /**
  * Deterministic battle engine
  * Runs identically on client and server
@@ -64,8 +64,6 @@ export class BattleEngine {
       position: { x: playerId === 'player1' ? 1 : 4, y: 1 }, // Middle of each side
       isStunned: false,
       busterCooldown: 0, // Buster available immediately
-      buffedDamage: 0,
-      debuffedDefense: 0,
     };
   }
 
@@ -155,9 +153,9 @@ export class BattleEngine {
         });
       }
     } else if (action.type === 'buster') {
-      // Use buster attack (basic attack, always available)
-      if (player.busterCooldown === 0) {
-        const busterDamage = 10;
+      // Use buster attack — fires horizontally, hits only if same row
+      if (player.busterCooldown === 0 && player.position.y === opponent.position.y) {
+        const busterDamage = 1;
         opponent.hp = Math.max(0, opponent.hp - busterDamage);
 
         events.push({
@@ -172,8 +170,9 @@ export class BattleEngine {
       }
     } else if (action.type === 'chip_use') {
       const chip = player.selectedChips[player.selectedChipIndex];
-      if (chip) {
-        const damage = ChipSystem.calculateDamage(chip, 'normal');
+      // Chips fire horizontally — must be on same row to hit
+      if (chip && player.position.y === opponent.position.y) {
+        const damage = ChipSystem.calculateDamage(chip, 'none');
         opponent.hp = Math.max(0, opponent.hp - damage);
 
         // Remove used chip from selectedChips
@@ -189,6 +188,12 @@ export class BattleEngine {
           playerId,
           data: { chipId: chip.id, damage, opponentHp: opponent.hp },
         });
+      } else if (chip) {
+        // Chip missed — still consume it
+        player.selectedChips.splice(player.selectedChipIndex, 1);
+        if (player.selectedChipIndex >= player.selectedChips.length) {
+          player.selectedChipIndex = Math.max(0, player.selectedChips.length - 1);
+        }
       }
     }
 

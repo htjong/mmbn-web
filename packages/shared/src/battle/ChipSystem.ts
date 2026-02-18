@@ -2,37 +2,38 @@ import { Chip, ChipElement } from '../types/Chip.js';
 
 /**
  * Chip execution and damage calculation
+ *
+ * MMBN3 element system:
+ * - Fire beats Wood (2x)
+ * - Wood beats Elec (2x)
+ * - Elec beats Aqua (2x)
+ * - Aqua beats Fire (2x)
+ * - None is neutral against everything
  */
 export class ChipSystem {
-  static calculateDamage(chip: Chip, targetElement: ChipElement, hitAccuracy: boolean = true): number {
+  static calculateDamage(chip: Chip, targetElement: ChipElement): number {
     let damage = chip.damage;
 
-    // Element effectiveness
     const effectiveness = this.getElementEffectiveness(chip.element, targetElement);
     damage = Math.floor(damage * effectiveness);
-
-    // Accuracy check
-    if (!hitAccuracy && Math.random() > chip.accuracy / 100) {
-      return 0;
-    }
 
     return damage;
   }
 
   static getElementEffectiveness(source: ChipElement, target: ChipElement): number {
-    // Element advantage system (simplified)
-    const advantages: Record<ChipElement, ChipElement[]> = {
-      fire: ['wood', 'break'],
-      aqua: ['fire', 'elec'],
-      elec: ['aqua'],
-      wood: ['aqua'],
-      wind: ['normal'],
-      break: ['elec'],
-      normal: [],
-      cursor: [],
+    if (source === 'none' || target === 'none') return 1.0;
+
+    const advantages: Partial<Record<ChipElement, ChipElement>> = {
+      fire: 'wood',
+      wood: 'elec',
+      elec: 'aqua',
+      aqua: 'fire',
     };
 
-    return advantages[source]?.includes(target) ? 1.5 : 1.0;
+    if (advantages[source] === target) return 2.0;
+    if (advantages[target] === source) return 0.5;
+
+    return 1.0;
   }
 
   static cloneChip(chip: Chip): Chip {

@@ -14,7 +14,7 @@ export const VIRUSES: Record<string, VirusTemplate> = {
   mettaur: {
     id: 'mettaur',
     name: 'Mettaur',
-    hp: 60,
+    hp: 40,
     attack: 20,
     behavior: 'defensive',
     dropChips: ['cannon', 'sword'],
@@ -22,17 +22,17 @@ export const VIRUSES: Record<string, VirusTemplate> = {
   bunny: {
     id: 'bunny',
     name: 'Bunny',
-    hp: 50,
+    hp: 40,
     attack: 30,
     behavior: 'aggressive',
-    dropChips: ['cannon', 'cannonP'],
+    dropChips: ['cannon', 'hiCannon'],
   },
   canodumb: {
     id: 'canodumb',
     name: 'Canodumb',
-    hp: 80,
+    hp: 60,
     attack: 40,
     behavior: 'aggressive',
-    dropChips: ['shockWave', 'highCannon'],
+    dropChips: ['shockWave', 'mCannon'],
   },
 };
