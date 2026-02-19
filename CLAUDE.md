@@ -27,6 +27,16 @@ Slash commands:
 
 Context files: `.claude/context/` | Agent definitions: `.claude/agents/` | Commands: `.claude/commands/`
 
+## Plan Files
+
+Plan mode (via `EnterPlanMode`/`ExitPlanMode`) writes plans to **`~/.claude/plans/`** (global, per-machine). This is managed by Claude Code automatically.
+
+**Never read `.claude/plans/` (local) as an authoritative plan source.** The local directory is a gitignored scratch area cleaned up by `/work:ceremony-closing`. If a file exists there, treat it as a stale artifact — not the current plan.
+
+- ✅ Plans live in: `~/.claude/plans/<name>.md`
+- ❌ Do not commit anything under `.claude/plans/`
+- ❌ Do not read local `.claude/plans/` files as the current plan for a task
+
 ## Claude's Role
 
 As Claude Code working on this project, I ensure these responsibilities:
@@ -88,6 +98,8 @@ As Claude Code working on this project, I ensure these responsibilities:
 3. **Design Review:** For major architectural changes, see [BRANCHING.md - Tier 3](./docs/BRANCHING.md#tier-3-design-review-for-major-architectural-changes)
 4. **Implement:** Write code following established conventions
 5. **Test:** Verify TypeScript, tests, manual testing
+   - Background validation: spawn `test-runner` agent in background after implementation (non-blocking)
+   - Failure diagnosis: spawn `test-runner` foreground when tests fail for root-cause analysis and prioritized fixes
 6. **Code Review:** Before committing, perform review per [BRANCHING.md - Code Review Process](./docs/BRANCHING.md#code-review-process)
    - Tier 1: Automated checks (`npm run type-check && npm run test && npm run lint`)
    - Tier 2: Architecture checkpoints (imports, types, purity, patterns)
@@ -106,6 +118,8 @@ As Claude Code working on this project, I ensure these responsibilities:
 ❌ Mixing multiple features in one branch
 ❌ Not updating kanban/CHANGELOG.md / kanban/PLAN.md after significant work
 ❌ Creating new patterns without documenting them
+❌ Staging or committing `.claude/plans/` files (plan files are ephemeral — `~/.claude/plans/` only)
+❌ Reading a local `.claude/plans/` file as the current plan (stale artifact — delete it)
 
 ### My Commitment
 
@@ -336,6 +350,87 @@ const action = ai.getNextAction(aiPlayerId, state); // PlayerAction | null
 
 Phaser handles game grid/sprites, React handles UI overlays.
 
+### React UI Architecture — Atomic Design + Dumb Components
+
+The React UI follows **selective atomic design** with dumb presentational components. This is the established pattern for all new UI work.
+
+#### The Rule
+
+| Level | Hook pairing required? | Rationale |
+|-------|----------------------|-----------|
+| **Atoms** (HpBar, GaugeBar, ChipCard, ChipSlot, GameOverOverlay) | **No** — unless complex | Already props-only; adding a hook file is noise |
+| **Molecules** (HudRow, ChipSelectPanel) | **No** — unless reused in 2+ contexts | Controlled components; receive all data as props |
+| **Organisms** (BattleHud) | **Yes — always** | Organisms are the boundary between store and UI |
+
+Pair a component with a hook when: (a) it reads from the Zustand store, or (b) it needs a `useEffect` that depends on external state, or (c) it's reused in 2+ different data contexts.
+
+#### What "Dumb Component" Means
+
+- Receives all data via props — no `useBattleStore()` calls
+- May have `useState` for purely cosmetic local state (hover, tooltip open)
+- May have `useEffect` if the effect is **lifecycle-scoped** (attach/detach listener while mounted) and fires a **callback prop** — this is still considered dumb because behavior is controlled externally
+- Never derives data from the store directly
+
+#### Pattern: Organism + Paired Hook
+
+```
+BattleHud.tsx          ← dumb composition layer; no store access
+useBattleHud.ts        ← single hook; owns all store reads + keyboard effects
+```
+
+The hook returns a flat object. The organism destructures it and passes props down:
+
+```typescript
+// useBattleHud.ts — reads store, owns effects, returns typed props object
+export function useBattleHud() {
+  const store = useBattleStore();
+  useEffect(() => { /* keyboard handling */ }, [store.customScreenOpen]);
+  return { player1, player2, gaugeValue, gaugeMax, customScreenOpen, ... };
+}
+
+// BattleHud.tsx — no store import, no useEffect, pure composition
+export function BattleHud() {
+  const { player1, gaugeValue, ... } = useBattleHud();
+  return <div><HudRow ... /><GaugeBar value={gaugeValue} ... /></div>;
+}
+```
+
+#### Stale Closure Pattern
+
+Inside `useEffect` handlers that fire store actions, always read fresh state from `useBattleStore.getState()` rather than capturing reactive values in the closure:
+
+```typescript
+// ❌ Stale closure — chipCursorIndex is captured at effect creation time
+useEffect(() => {
+  const handler = () => store.toggleChip(store.chipCursorIndex);
+  ...
+}, [store.customScreenOpen, store.chipCursorIndex]); // re-runs on every cursor move
+
+// ✓ Fresh read — always gets current index at event fire time
+useEffect(() => {
+  const handler = () => {
+    const { chipCursorIndex, toggleChip } = useBattleStore.getState();
+    toggleChip(chipCursorIndex);
+  };
+  ...
+}, [customScreenOpen]); // only re-runs when screen opens/closes
+```
+
+#### Storybook
+
+All presentational components have Storybook stories colocated alongside them:
+
+```
+src/ui/atoms/HpBar.tsx              ← component
+src/ui/atoms/HpBar.stories.tsx      ← stories
+```
+
+Run Storybook: `npm run storybook --workspace=packages/client` (port 6006)
+
+Shared mock data for stories: `src/ui/storybookMocks.ts`
+
+When adding a new presentational component, **always add a story file** covering the key prop variants.
+
 ## Key Files
 
 - `packages/shared/src/battle/BattleEngine.ts` - Core battle logic
@@ -373,6 +468,9 @@ describe('BattleEngine', () => {
 All three watch simultaneously with `npm run dev`
 
 ## Adding New Features
+For game data, the following references can be checked first. 
+- https://www.therockmanexezone.com/wiki/Mega_Man_Battle_Network_3
+- https://www.mmhp.net/GameHints/MMBN3-Data.html 
 
 ### Adding a new chip:
 1. Add definition to `packages/shared/src/data/chips.ts`

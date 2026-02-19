@@ -94,6 +94,11 @@ Full deployment guide: [docs/deployment.md](./docs/deployment.md)
 
 ---
 
+## Notes
+Game data: https://www.therockmanexezone.com/wiki/Mega_Man_Battle_Network_3
+
+---
+
 ## Contributing
 
 - Git workflow: [docs/BRANCHING.md](./docs/BRANCHING.md)
