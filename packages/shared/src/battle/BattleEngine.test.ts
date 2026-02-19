@@ -1,17 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { BattleEngine } from './BattleEngine';
+import { BattleEngine, HAND_SIZE } from './BattleEngine';
 import { CHIPS } from '../data/chips';
 
 describe('BattleEngine', () => {
   it('should create initial battle state', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     expect(state.id).toBeDefined();
     expect(state.frame).toBe(0);
@@ -22,17 +16,43 @@ describe('BattleEngine', () => {
     expect(state.isGameOver).toBe(false);
     expect(state.grid.length).toBe(3);
     expect(state.grid[0].length).toBe(6);
+    expect(state.player1.hand.length).toBe(HAND_SIZE);
+    expect(state.player2.hand.length).toBe(HAND_SIZE);
+    expect(state.player1.maxCustomGauge).toBe(600);
+    expect(state.player2.maxCustomGauge).toBe(600);
   });
 
-  it('should increment frame on tick', () => {
+  it('should use provided battleId for deterministic state identity', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
+    const hand1 = BattleEngine.drawChips(chipList, HAND_SIZE);
+    const hand2 = BattleEngine.drawChips(chipList, HAND_SIZE);
+    const stateA = BattleEngine.createInitialState(
       'player1',
       'player2',
       chipList,
       'Alice',
-      'Bob'
+      'Bob',
+      hand1,
+      hand2,
+      'test-battle-001'
     );
+    const stateB = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipList,
+      'Alice',
+      'Bob',
+      hand1,
+      hand2,
+      'test-battle-001'
+    );
+    expect(stateA.id).toBe('test-battle-001');
+    expect(stateA.id).toBe(stateB.id);
+  });
+
+  it('should increment frame on tick', () => {
+    const chipList = Object.values(CHIPS);
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     const { state: newState } = BattleEngine.tick(state);
     expect(newState.frame).toBe(1);
@@ -40,13 +60,7 @@ describe('BattleEngine', () => {
 
   it('should handle chip selection action', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     const chipId = state.player1.hand[0]?.id;
     if (chipId) {
@@ -62,13 +76,7 @@ describe('BattleEngine', () => {
 
   it('should validate game over correctly', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     expect(BattleEngine.isGameOver(state)).toBe(false);
 
@@ -79,13 +87,7 @@ describe('BattleEngine', () => {
 
   it('should handle navi movement with bounds checking', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     // Player1 starts at (1, 1), move to (2, 1)
     const { state: newState, events } = BattleEngine.applyAction(state, 'player1', {
@@ -100,13 +102,7 @@ describe('BattleEngine', () => {
 
   it('should reject movement onto opponent panels', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     // Move P1 to (2,1) first (own territory)
     const { state: state1 } = BattleEngine.applyAction(state, 'player1', {
@@ -127,13 +123,7 @@ describe('BattleEngine', () => {
 
   it('should reject movement outside grid bounds', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     // Try to move outside bounds (not adjacent to starting pos (1,1))
     const { state: newState } = BattleEngine.applyAction(state, 'player1', {
@@ -147,13 +137,7 @@ describe('BattleEngine', () => {
 
   it('should handle buster attack', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     const initialHp = state.player2.hp;
     const { state: newState, events } = BattleEngine.applyAction(state, 'player1', {
@@ -166,13 +150,7 @@ describe('BattleEngine', () => {
 
   it('should keep buster available every turn', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     // Use buster
     const { state: state1 } = BattleEngine.applyAction(state, 'player1', {
@@ -184,13 +162,7 @@ describe('BattleEngine', () => {
 
   it('should deal damage when using a chip', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     // Select a chip first
     const chipId = state.player1.hand[0]?.id;
@@ -216,13 +188,7 @@ describe('BattleEngine', () => {
 
   it('should consume chip after use', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     // Select two chips
     const chip1Id = state.player1.hand[0]?.id;
@@ -247,13 +213,7 @@ describe('BattleEngine', () => {
 
   it('should miss buster when attacker and opponent are on different rows', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     // Move player1 to a different row (1,0)
     const { state: movedState } = BattleEngine.applyAction(state, 'player1', {
@@ -275,13 +235,7 @@ describe('BattleEngine', () => {
 
   it('should miss chip when attacker and opponent are on different rows', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     // Select a chip
     const chipId = state.player1.hand[0]?.id;
@@ -310,13 +264,7 @@ describe('BattleEngine', () => {
 
   it('should be a no-op when using chip_use with no selected chips', () => {
     const chipList = Object.values(CHIPS);
-    const state = BattleEngine.createInitialState(
-      'player1',
-      'player2',
-      chipList,
-      'Alice',
-      'Bob'
-    );
+    const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     expect(state.player1.selectedChips.length).toBe(0);
 

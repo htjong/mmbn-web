@@ -5,8 +5,8 @@ import { GridSystem } from './GridSystem.js';
 import { ChipSystem } from './ChipSystem.js';
 
 const STARTING_HP = 100;
-const STARTING_CUSTOM_GAUGE_MAX = 100;
-const HAND_SIZE = 5;
+const STARTING_CUSTOM_GAUGE_MAX = 600;
+export const HAND_SIZE = 10;
 const SELECTED_CHIPS_SIZE = 5;
 /**
  * Deterministic battle engine
@@ -15,21 +15,45 @@ const SELECTED_CHIPS_SIZE = 5;
  * Output: new state + events
  */
 export class BattleEngine {
+  /**
+   * Draw chips randomly from a folder. Intentionally NOT on the engine — randomness
+   * belongs to the caller (client or server) so the engine stays deterministic.
+   * Pass the results as player1Hand/player2Hand to createInitialState.
+   */
+  static drawChips(folder: Chip[], count: number): Chip[] {
+    const drawn: Chip[] = [];
+    for (let i = 0; i < count && folder.length > 0; i++) {
+      const randomIndex = Math.floor(Math.random() * folder.length);
+      drawn.push(ChipSystem.cloneChip(folder[randomIndex]));
+    }
+    return drawn;
+  }
+
+  /**
+   * Create initial battle state.
+   * @param player1Hand - Pre-drawn hand for player 1 (call BattleEngine.drawChips on the caller side)
+   * @param player2Hand - Pre-drawn hand for player 2
+   * @param battleId    - Stable ID for this battle (supply from server or caller; avoids Date.now())
+   */
   static createInitialState(
     player1Id: string,
     player2Id: string,
     folder: Chip[],
     player1Name: string = 'Player 1',
-    player2Name: string = 'Player 2'
+    player2Name: string = 'Player 2',
+    player1Hand?: Chip[],
+    player2Hand?: Chip[],
+    battleId?: string
   ): BattleState {
     const grid = GridSystem.createInitialGrid();
+    const hand1 = player1Hand ?? this.drawChips(folder, HAND_SIZE);
+    const hand2 = player2Hand ?? this.drawChips(folder, HAND_SIZE);
 
-    // Create initial player states
-    const player1 = this.createPlayerState(player1Id, player1Name, grid, folder);
-    const player2 = this.createPlayerState(player2Id, player2Name, grid, folder);
+    const player1 = this.createPlayerState(player1Id, player1Name, grid, folder, hand1);
+    const player2 = this.createPlayerState(player2Id, player2Name, grid, folder, hand2);
 
     const state: BattleState = {
-      id: `battle_${player1Id}_${player2Id}_${Date.now()}`,
+      id: battleId ?? `battle_${player1Id}_${player2Id}`,
       frame: 0,
       player1,
       player2,
@@ -46,10 +70,9 @@ export class BattleEngine {
     playerId: string,
     playerName: string,
     _grid: GridPanel[][],
-    folder: Chip[]
+    folder: Chip[],
+    hand: Chip[]
   ): PlayerState {
-    const hand = this.drawChips(folder, HAND_SIZE);
-
     return {
       id: playerId,
       name: playerName,
@@ -65,15 +88,6 @@ export class BattleEngine {
       isStunned: false,
       busterCooldown: 0, // Buster available immediately
     };
-  }
-
-  private static drawChips(folder: Chip[], count: number): Chip[] {
-    const drawn: Chip[] = [];
-    for (let i = 0; i < count && folder.length > 0; i++) {
-      const randomIndex = Math.floor(Math.random() * folder.length);
-      drawn.push(ChipSystem.cloneChip(folder[randomIndex]));
-    }
-    return drawn;
   }
 
   static tick(state: BattleState): { state: BattleState; events: BattleEvent[] } {
@@ -136,8 +150,7 @@ export class BattleEngine {
       const newY = action.gridY;
 
       // Validate move: adjacent, within bounds, and on own panels
-      const distance =
-        Math.abs(newX - player.position.x) + Math.abs(newY - player.position.y);
+      const distance = Math.abs(newX - player.position.x) + Math.abs(newY - player.position.y);
       const isInBounds = newX >= 0 && newX < GRID_WIDTH && newY >= 0 && newY < GRID_HEIGHT;
       const playerSide = playerId === 'player1' ? 'player1' : 'player2';
       const targetPanelOwned = isInBounds && newState.grid[newY][newX].owner === playerSide;
