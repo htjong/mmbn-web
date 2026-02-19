@@ -54,7 +54,12 @@ export class GridSystem {
     grid[y][x].damageCounter = 0;
   }
 
-  static setOwner(grid: GridPanel[][], x: number, y: number, owner: 'player1' | 'player2' | 'neutral'): void {
+  static setOwner(
+    grid: GridPanel[][],
+    x: number,
+    y: number,
+    owner: 'player1' | 'player2' | 'neutral'
+  ): void {
     if (!this.isValidPosition(x, y)) return;
     grid[y][x].owner = owner;
   }

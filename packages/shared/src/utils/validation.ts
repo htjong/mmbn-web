@@ -9,7 +9,10 @@ export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): T | nul
   }
 }
 
-export function safeValidate<T>(schema: z.ZodSchema<T>, data: unknown): { success: boolean; data?: T; error?: string } {
+export function safeValidate<T>(
+  schema: z.ZodSchema<T>,
+  data: unknown
+): { success: boolean; data?: T; error?: string } {
   try {
     const parsed = schema.parse(data);
     return { success: true, data: parsed };

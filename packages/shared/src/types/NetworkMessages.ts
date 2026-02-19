@@ -28,9 +28,11 @@ export type BattleInput = z.infer<typeof BattleInputSchema>;
 export const BattleUpdateSchema = z.object({
   frame: z.number(),
   state: z.any() as z.ZodType<BattleState>,
-  events: z.array(z.object({
-    type: z.string(),
-    data: z.any(),
-  })),
+  events: z.array(
+    z.object({
+      type: z.string(),
+      data: z.any(),
+    })
+  ),
 });
 export type BattleUpdate = z.infer<typeof BattleUpdateSchema>;

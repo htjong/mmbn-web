@@ -15,8 +15,8 @@ import { GRID_WIDTH, GRID_HEIGHT } from '../types/GridTypes.js';
 export class SimpleAI {
   private moveCooldown: number = 0;
   private attackCooldown: number = 0;
-  private readonly MOVE_INTERVAL = 20;    // ~0.33s at 60fps
-  private readonly ATTACK_INTERVAL = 40;  // ~0.67s at 60fps
+  private readonly MOVE_INTERVAL = 20; // ~0.33s at 60fps
+  private readonly ATTACK_INTERVAL = 40; // ~0.67s at 60fps
   private chipSelectCount: number = 0;
   private readonly MAX_CHIP_SELECTS = 3;
 
@@ -95,8 +95,8 @@ export class SimpleAI {
       // Not on same row — 70% chance to move toward opponent's Y
       if (Math.random() < 0.7) {
         const targetY = opponent.position.y;
-        const toward = valid.filter(({ gridY }) =>
-          Math.abs(gridY - targetY) < Math.abs(y - targetY)
+        const toward = valid.filter(
+          ({ gridY }) => Math.abs(gridY - targetY) < Math.abs(y - targetY)
         );
         if (toward.length > 0) {
           const choice = toward[Math.floor(Math.random() * toward.length)];

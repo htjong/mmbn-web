@@ -161,7 +161,7 @@ describe('SimpleAI', () => {
 
     // Mock random to force a move toward opponent row
     vi.spyOn(Math, 'random')
-      .mockReturnValueOnce(0.3)  // < 0.7 → move toward opponent
+      .mockReturnValueOnce(0.3) // < 0.7 → move toward opponent
       .mockReturnValueOnce(0.0); // pick first valid direction
 
     const action = ai.getNextAction('player2', state);

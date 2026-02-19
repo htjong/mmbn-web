@@ -35,7 +35,12 @@ export class GridRenderer {
         const panelY = this.y + row * this.panelSize + this.panelSize / 2;
 
         // Create rectangle for panel
-        const rect = this.scene.add.rectangle(panelX, panelY, this.panelSize - 2, this.panelSize - 2);
+        const rect = this.scene.add.rectangle(
+          panelX,
+          panelY,
+          this.panelSize - 2,
+          this.panelSize - 2
+        );
         rect.setStrokeStyle(2, 0xcccccc);
         this.panels[row][col] = rect;
 

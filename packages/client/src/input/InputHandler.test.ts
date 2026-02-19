@@ -4,7 +4,9 @@ import { InputHandler } from './InputHandler';
 
 describe('InputHandler', () => {
   let handler: InputHandler;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let addEventListenerSpy: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let removeEventListenerSpy: any;
 
   beforeEach(() => {

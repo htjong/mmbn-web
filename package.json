@@ -23,7 +23,18 @@
     "test:client": "npm run test --workspace=packages/client",
     "test:server": "npm run test --workspace=packages/server",
     "lint": "eslint . --ext .ts,.tsx",
-    "type-check": "tsc --noEmit"
+    "format": "prettier --write \"packages/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"packages/**/*.{ts,tsx}\"",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky",
+    "storybook": "npm run storybook --workspace=packages/client",
+    "build-storybook": "npm run build-storybook --workspace=packages/client"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@types/node": "^20.10.6",
@@ -31,6 +42,9 @@
     "@typescript-eslint/parser": "^6.17.0",
     "concurrently": "^8.2.2",
     "eslint": "^8.56.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
   }
