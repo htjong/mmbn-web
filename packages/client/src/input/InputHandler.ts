@@ -15,14 +15,18 @@ import { PlayerAction } from '@mmbn/shared';
 export class InputHandler {
   private keysPressed: Set<string> = new Set();
   private keysJustPressed: Set<string> = new Set();
+  private readonly boundKeyDown: (e: KeyboardEvent) => void;
+  private readonly boundKeyUp: (e: KeyboardEvent) => void;
 
   constructor(_initialPosition: { x: number; y: number }) {
+    this.boundKeyDown = (e: KeyboardEvent) => this.handleKeyDown(e);
+    this.boundKeyUp = (e: KeyboardEvent) => this.handleKeyUp(e);
     this.setupKeyListeners();
   }
 
   private setupKeyListeners() {
-    window.addEventListener('keydown', (e) => this.handleKeyDown(e));
-    window.addEventListener('keyup', (e) => this.handleKeyUp(e));
+    window.addEventListener('keydown', this.boundKeyDown);
+    window.addEventListener('keyup', this.boundKeyUp);
   }
 
   private handleKeyDown(event: KeyboardEvent) {
@@ -44,7 +48,6 @@ export class InputHandler {
    * Movement keys require a fresh press (no hold-to-repeat)
    */
   getNextAction(currentGridPosition: { x: number; y: number }): PlayerAction | null {
-
     // Movement requires a fresh key press (consumed after use)
     if (this.keysJustPressed.has('w')) {
       this.keysJustPressed.delete('w');
@@ -85,6 +88,19 @@ export class InputHandler {
   }
 
   /**
+   * Check and consume a just-pressed key — returns true once per physical press.
+   * Used by BattleScene for custom screen navigation where getNextAction() isn't called.
+   */
+  justPressed(key: string): boolean {
+    const k = key.toLowerCase();
+    if (this.keysJustPressed.has(k)) {
+      this.keysJustPressed.delete(k);
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Check if a specific key is currently pressed
    */
   isKeyPressed(key: string): boolean {
@@ -100,9 +116,11 @@ export class InputHandler {
   }
 
   /**
-   * Cleanup: remove event listeners
+   * Cleanup: remove event listeners and clear state
    */
   destroy() {
+    window.removeEventListener('keydown', this.boundKeyDown);
+    window.removeEventListener('keyup', this.boundKeyUp);
     this.keysPressed.clear();
     this.keysJustPressed.clear();
   }
