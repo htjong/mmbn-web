@@ -77,7 +77,7 @@ Every piece of work follows this path. The folder a card is in IS its status.
 - [ ] Can play a complete battle against AI in the browser
 - [ ] Win/lose condition triggers correctly (HP reaches 0)
 - [ ] Chips deal damage when used (chip_use action works)
-- [ ] Custom gauge fills and enables chip selection
+- [x] Custom gauge fills and enables chip selection
 - [ ] AI opponent moves, attacks, and uses chips
 - [ ] All tests pass (`npm run test`)
 - [ ] TypeScript compiles clean (`npm run type-check`)

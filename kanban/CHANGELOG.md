@@ -4,6 +4,36 @@ All notable project progress is documented here, organized by sprint.
 
 ---
 
+## Sprint 6: React UI, Tooling, and Engine Determinism
+**Date:** 2026-02-19 07:12 PST
+
+- Replaced Phaser text HUD with React overlay using Zustand store so UI is
+  composable and decoupled from the Phaser game loop
+- Built atomic UI library (HpBar, GaugeBar, ChipCard, ChipSlot, GameOverOverlay,
+  HudRow, ChipSelectPanel) following atomic design — all presentational, all with
+  Storybook stories
+- Added Storybook to packages/client for isolated component development
+- Wired ESLint + Prettier integration (eslint-config-prettier), husky pre-commit
+  hook, and lint-staged to enforce consistent formatting on every commit
+- Added test-runner agent and wired it into ceremony-closing's failure path for
+  deep test diagnosis when the ceremony is blocked
+- Fixed BattleEngine determinism violations: moved Math.random() (chip drawing)
+  and Date.now() (battle ID) out of the engine — callers now supply pre-drawn
+  hands and a stable battleId
+- Fixed InputHandler.destroy() to properly remove window event listeners
+- Added test assertions for HAND_SIZE and maxCustomGauge constants; added
+  deterministic ID test (32 → 33 total tests passing)
+
+**Key decisions:**
+- Atomic design pattern: Atoms/Molecules are pure props-only; Organisms read
+  from the Zustand store via a paired hook (useBattleHud)
+- Stale closure fix: useEffect handlers read fresh store state via
+  useBattleStore.getState() rather than capturing reactive values in closures
+- BattleEngine determinism restored: randomness is a caller concern, not an
+  engine concern — critical for future server-authoritative PVP validation
+
+---
+
 ## Sprint 5: Server Build Toolchain & Deployment Docs
 **Date:** 2026-02-18 20:18 PST
 
