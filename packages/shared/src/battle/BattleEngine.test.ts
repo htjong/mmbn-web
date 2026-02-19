@@ -210,7 +210,7 @@ describe('BattleEngine', () => {
       type: 'chip_use',
     });
 
-    expect(newState.player2.hp).toBe(initialHp - expectedDamage);
+    expect(newState.player2.hp).toBe(Math.max(0, initialHp - expectedDamage));
     expect(events.some((e) => e.type === 'chip_used')).toBe(true);
   });
 

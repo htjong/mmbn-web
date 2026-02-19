@@ -75,6 +75,25 @@ Full roadmap: [kanban/PLAN.md](./kanban/PLAN.md)
 
 ---
 
+## Deployment
+
+Pushes to `main` trigger a GitHub Actions pipeline that builds, tests, and deploys to a DigitalOcean Droplet via rsync + PM2.
+
+```bash
+# Check server status
+ssh deploy@DROPLET_IP 'pm2 status'
+
+# View live logs
+ssh deploy@DROPLET_IP 'pm2 logs mmbn-server'
+
+# Hit health endpoint
+curl http://DROPLET_IP/health
+```
+
+Full deployment guide: [docs/deployment.md](./docs/deployment.md)
+
+---
+
 ## Contributing
 
 - Git workflow: [docs/BRANCHING.md](./docs/BRANCHING.md)

@@ -62,7 +62,7 @@ nginx -t
 systemctl reload nginx
 
 echo "==> Starting server with PM2"
-sudo -u $DEPLOY_USER pm2 start packages/server/dist/server/src/index.js --name mmbn-server
+sudo -u $DEPLOY_USER pm2 start packages/server/dist/index.js --name mmbn-server
 sudo -u $DEPLOY_USER pm2 startup systemd -u $DEPLOY_USER --hp /home/$DEPLOY_USER
 sudo -u $DEPLOY_USER pm2 save
 

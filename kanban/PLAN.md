@@ -50,7 +50,7 @@ Every piece of work follows this path. The folder a card is in IS its status.
 **When card AC are all checked:**
 1. Check off the corresponding sprint AC in PLAN.md
 2. Delete the card from `kanban/ongoing/`
-3. Add a line to CHANGELOG.md under the current sprint
+3. Add a line to CHANGELOG.md under the current sprint (include date **and time**, e.g. `2026-02-18 20:18 PST`)
 
 **When ALL sprint AC in PLAN.md are checked:**
 1. Mark the sprint complete in PLAN.md (status → COMPLETE)

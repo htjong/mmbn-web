@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **[BRANCHING.md](./docs/BRANCHING.md)** - Git workflow and branch strategy
 - **[CLAUDE.md](./CLAUDE.md)** - You are here - architecture and patterns guide
 - **[docs/feature-workflow.md](./docs/feature-workflow.md)** - Feature design workflow (`/feature:explore` → `/feature:formalize`)
+- **[docs/deployment.md](./docs/deployment.md)** - Deployment architecture and operations guide
 
 ## Context System
 
@@ -92,7 +93,7 @@ As Claude Code working on this project, I ensure these responsibilities:
    - Tier 2: Architecture checkpoints (imports, types, purity, patterns)
    - Tier 3: Design review (if not done in step 3)
 7. **Commit:** Use conventional commits with clear messages
-8. **Document:** Update kanban cards, kanban/CHANGELOG.md, and kanban/PLAN.md as needed
+8. **Document:** Update kanban cards, kanban/CHANGELOG.md, and kanban/PLAN.md as needed — changelog sprint headers must include date **and time** (e.g. `2026-02-18 20:18 PST`)
 9. **Summarize:** Explain what was accomplished after tasks
 
 ### Red Flags I Watch For
@@ -192,7 +193,7 @@ npm run dev              # Starts both client (port 5173) and server (port 3000)
 ### Run Individual Packages
 ```bash
 npm run dev --workspace=packages/client   # Client only (Vite dev server)
-npm run dev --workspace=packages/server   # Server only (ts-node-dev)
+npm run dev --workspace=packages/server   # Server only (tsx watch)
 npm run dev --workspace=packages/shared   # Shared in watch mode (tsc --watch)
 ```
 
@@ -367,7 +368,7 @@ describe('BattleEngine', () => {
 
 1. **Modify shared logic** → shared package auto-rebuilds → client/server hot-reload
 2. **Modify client code** → Vite HMR (instant)
-3. **Modify server code** → ts-node-dev auto-restart
+3. **Modify server code** → tsx watch auto-restart
 
 All three watch simultaneously with `npm run dev`
 
@@ -398,22 +399,26 @@ Configured in `tsconfig.json` and `vite.config.ts`
 
 ## ESM Import Rules
 
-**All relative imports in `packages/shared/` and `packages/server/` MUST use `.js` extensions:**
+**Relative imports in `packages/shared/` MUST use `.js` extensions:**
 
 ```typescript
-// Correct
-import { SocketManager } from './SocketManager.js';
+// Correct (packages/shared/)
 import { Chip } from '../types/Chip.js';
 
-// Wrong — will fail in production
-import { SocketManager } from './SocketManager';
+// Wrong — will fail at runtime
 import { Chip } from '../types/Chip';
 ```
 
-**Why:** The project uses `"type": "module"` (ESM). `ts-node-dev` resolves imports without extensions in dev, but `node` in production requires explicit `.js` extensions. TypeScript understands `.js` extensions pointing to `.ts` files.
+**Why:** `packages/shared/` is built with `tsc` and its output is run directly by Node.js. Node ESM requires explicit `.js` extensions. TypeScript understands `.js` extensions pointing to `.ts` files.
 
-**Note:** `packages/client/` does NOT need this — Vite bundles everything and handles resolution internally.
+**`packages/server/` does NOT need `.js` extensions** — it is built with `tsup` (esbuild), which bundles all server-internal imports and handles module resolution automatically.
+
+**`packages/client/` does NOT need `.js` extensions** — Vite bundles everything and handles resolution internally.
 
 ## Server Build Output
 
-The server's compiled output lives at `packages/server/dist/server/src/` (not `dist/`). This is because `tsc` compiles both server and shared source (cross-package imports) and preserves the relative directory structure. The `start` script and PM2 commands reference this path.
+The server is built with **tsup** (esbuild wrapper), which produces a single bundled file at `packages/server/dist/index.js`. The `@mmbn/shared` package is inlined into this bundle (`noExternal: [/@mmbn/]`), so no workspace symlinks are required on the Droplet at runtime.
+
+The `start` script and PM2 commands reference `packages/server/dist/index.js`.
+
+Dev mode (`npm run dev`) still uses `tsx watch` directly against the source — tsup is only used for production builds.

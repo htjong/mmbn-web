@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import { BattleInputSchema, validateInput } from '@mmbn/shared';
-import { BattleSimulator } from './BattleSimulator.js';
-import { QueuedPlayer } from '../matchmaking/Queue.js';
+import { BattleSimulator } from './BattleSimulator';
+import { QueuedPlayer } from '../matchmaking/Queue';
 
 export class BattleRoom {
   readonly roomId: string;

@@ -1,6 +1,6 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { SocketManager } from './SocketManager.js';
+import { SocketManager } from './SocketManager';
 
 const httpServer = createServer((req, res) => {
   if (req.url === '/health') {

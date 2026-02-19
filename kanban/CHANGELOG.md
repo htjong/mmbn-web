@@ -4,8 +4,32 @@ All notable project progress is documented here, organized by sprint.
 
 ---
 
+## Sprint 5: Server Build Toolchain & Deployment Docs
+**Date:** 2026-02-18 20:18 PST
+
+- Replaced `tsc` with `tsup` (esbuild) for server production build — output now at `packages/server/dist/index.js` (single bundle, `@mmbn/shared` inlined)
+- Replaced `ts-node-dev` with `tsx watch` for server dev mode — native ESM TypeScript, no flags needed
+- Removed `.js` extensions from server-internal relative imports (tsup handles resolution)
+- Simplified `packages/server/tsconfig.json` — type-checking only, tsup owns emit
+- Updated all hardcoded dist paths (`dist/server/src/index.js` → `dist/index.js`) in `deploy.yml`, `setup-droplet.sh`, and root `package.json`
+- Fixed `vitest` → `vitest run` in shared/client test scripts (was hanging in watch mode)
+- Fixed `BattleEngine.test.ts`: HP clamping assertion (`Math.max(0, initialHp - damage)`)
+- Added `docs/deployment.md` — full deployment guide (architecture diagram, PM2 ops, env vars, verification steps)
+- Updated `CLAUDE.md` — Server Build Output section, ESM Import Rules, dev workflow references
+- Updated `README.md` — added Deployment section with quick ops commands
+
+- Documented changelog date+time convention in `kanban/PLAN.md` (Ship workflow step 3) and `CLAUDE.md` (workflow step 8)
+
+**Key decisions:**
+- `tsup` with `noExternal: [/@mmbn/]` bundles shared inline — no workspace symlinks needed on Droplet
+- `tsx` chosen over `ts-node-dev --esm` for cleaner ESM support in dev
+- Build stays in GitHub Actions (7GB RAM); Droplet only runs `npm ci --omit=dev`
+- Changelog sprint headers must include date **and time** (e.g. `2026-02-18 20:18 PST`)
+
+---
+
 ## Sprint 4: Infrastructure & Context System
-**Date:** 2026-02-18
+**Date:** 2026-02-18 18:51 PST
 
 - Replaced `PROJECT_CONTEXT.md` with distributed `.claude/context/` system (9 focused context files)
 - Added `README.md` for human onboarding
@@ -19,7 +43,7 @@ All notable project progress is documented here, organized by sprint.
 ---
 
 ## Sprint 3: Battle Mechanics & MMBN3 Accuracy
-**Date:** 2026-02-18
+**Date:** 2026-02-18 07:50 PST
 
 - `chip_use` action in BattleEngine — chips deal damage, consumed after use
 - `chip_selected` event type — distinguishes selection from usage
@@ -38,7 +62,7 @@ All notable project progress is documented here, organized by sprint.
 - 32 unit tests passing (14 BattleEngine, 9 SimpleAI, 9 InputHandler)
 
 ## Sprint 2: Server & Deployment Infrastructure
-**Date:** 2026-02-17
+**Date:** 2026-02-17 14:43 PST
 
 - Server matchmaking with Socket.io (queue join, match found, battle rooms)
 - Server-authoritative battle simulation (state sync at 60 Hz)
@@ -54,7 +78,7 @@ All notable project progress is documented here, organized by sprint.
 - Same-origin deployment eliminates CORS complexity
 
 ## Sprint 1: Battle Engine & Client Rendering
-**Date:** 2026-02-16
+**Date:** 2026-02-17 08:54 PST
 
 - `BattleEngine` — deterministic state machine (pure function: state + action → new state + events)
 - `GridSystem` — 6x3 grid with panel ownership (P1: cols 0-2, P2: cols 3-5)
@@ -76,7 +100,7 @@ All notable project progress is documented here, organized by sprint.
 - Real-time simultaneous model (not turn-based)
 
 ## Sprint 0: Project Scaffolding
-**Date:** 2026-02-15
+**Date:** 2026-02-16 22:09 PST
 
 - Monorepo setup with npm workspaces (`packages/shared`, `packages/client`, `packages/server`)
 - TypeScript configuration with `@mmbn/*` path aliases
