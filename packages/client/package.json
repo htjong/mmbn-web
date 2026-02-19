@@ -7,7 +7,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@mmbn/shared": "*",
@@ -18,11 +20,13 @@
     "zustand": "^4.4.1"
   },
   "devDependencies": {
+    "@storybook/react-vite": "^10.2.10",
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
     "jsdom": "^28.1.0",
+    "storybook": "^10.2.10",
     "typescript": "^5.3.3",
     "vite": "^5.1.0",
     "vitest": "^1.1.0"

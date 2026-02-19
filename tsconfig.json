@@ -26,7 +26,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx"
   },
   "include": ["packages/*/src/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -1,40 +1,69 @@
 import Phaser from 'phaser';
-import { BattleState, BattleEngine, CHIPS, SimpleAI } from '@mmbn/shared';
+import { CHIPS, SimpleAI, BattleEngine, BattleState, HAND_SIZE } from '@mmbn/shared';
 import { GridRenderer } from '../rendering/GridRenderer';
 import { NaviRenderer } from '../rendering/NaviRenderer';
 import { InputHandler } from '../input/InputHandler';
+import { useBattleStore } from '../stores/battleStore';
 
-const GRID_START_X = 100;
-const GRID_START_Y = 100;
+const GRID_START_X = 250;
+const GRID_START_Y = 45;
 const PANEL_SIZE = 50;
 
 export class BattleScene extends Phaser.Scene {
   private gridRenderer?: GridRenderer;
   private naviRendererPlayer1?: NaviRenderer;
   private naviRendererPlayer2?: NaviRenderer;
-  private battleState?: BattleState;
   private inputHandler?: InputHandler;
   private simpleAI?: SimpleAI;
-  private hpText?: Phaser.GameObjects.Text;
-  private frameText?: Phaser.GameObjects.Text;
-  private statusText?: Phaser.GameObjects.Text;
+  private wasCustomScreenOpen = false;
 
   constructor() {
     super('BattleScene');
   }
 
   create() {
-    const { width } = this.cameras.main;
-
     // Initialize battle state with real chip data
+    // Randomness (drawChips) lives here, not inside BattleEngine, to keep the engine deterministic
     const chipFolder = Object.values(CHIPS);
-    this.battleState = BattleEngine.createInitialState('player1', 'player2', chipFolder, 'Player 1', 'Player 2');
+    const player1Hand = BattleEngine.drawChips(chipFolder, HAND_SIZE);
+    const player2Hand = BattleEngine.drawChips(chipFolder, HAND_SIZE);
+    let initialState = BattleEngine.createInitialState(
+      'player1',
+      'player2',
+      chipFolder,
+      'Player 1',
+      'Player 2',
+      player1Hand,
+      player2Hand,
+      'campaign-battle'
+    );
 
     // Initialize AI for player2
     this.simpleAI = new SimpleAI();
 
-    // Create input handler (follows player1, starts at their position)
-    this.inputHandler = new InputHandler(this.battleState.player1.position);
+    // Set both gauges to max so AI can pre-select chips for the opening round
+    initialState = {
+      ...initialState,
+      player1: { ...initialState.player1, customGauge: initialState.player1.maxCustomGauge },
+      player2: { ...initialState.player2, customGauge: initialState.player2.maxCustomGauge },
+    };
+
+    // Pre-select up to 3 chips for AI before the player sees the screen
+    for (let i = 0; i < 3; i++) {
+      const aiAction = this.simpleAI.getNextAction('player2', initialState);
+      if (aiAction?.type === 'chip_select') {
+        const { state } = BattleEngine.applyAction(initialState, 'player2', aiAction);
+        initialState = state;
+      }
+    }
+
+    // Init store with AI chips loaded, then open player's chip select screen
+    // (openCustomScreen resets both gauges to 0)
+    useBattleStore.getState().init(initialState);
+    useBattleStore.getState().openCustomScreen();
+
+    // Create input handler
+    this.inputHandler = new InputHandler(initialState.player1.position);
 
     // Create grid renderer
     this.gridRenderer = new GridRenderer(this, GRID_START_X, GRID_START_Y, PANEL_SIZE);
@@ -43,114 +72,83 @@ export class BattleScene extends Phaser.Scene {
     this.naviRendererPlayer1 = new NaviRenderer(this, 'player1', PANEL_SIZE);
     this.naviRendererPlayer2 = new NaviRenderer(this, 'player2', PANEL_SIZE);
 
-    // Create UI text
-    this.hpText = this.add.text(width / 2, 20, 'P1: 100/100 | P2: 100/100', {
-      fontSize: '20px',
-      color: '#ffffff',
-    });
-    this.hpText.setOrigin(0.5, 0);
-
-    this.frameText = this.add.text(10, 10, 'Frame: 0', {
-      fontSize: '16px',
-      color: '#ffffff',
-    });
-
-    this.statusText = this.add.text(width / 2, 50, 'Battle in progress...', {
-      fontSize: '16px',
-      color: '#ffffff',
-    });
-    this.statusText.setOrigin(0.5, 0);
-
-    // Create background
     this.cameras.main.setBackgroundColor('#1a1a1a');
-
     console.log('BattleScene created');
   }
 
   update() {
-    if (!this.battleState || !this.inputHandler) {
-      return;
-    }
+    const store = useBattleStore.getState();
+    const battleState = store.battleState;
 
-    // Check for game over
-    if (this.battleState.isGameOver) {
-      const winner = this.battleState.winner === 'player1' ? 'Player 1' : 'Player 2';
-      this.statusText?.setText(`Battle Over! ${winner} wins!`);
+    if (!battleState || !this.inputHandler) return;
+
+    // Stop ticking on game over — React overlay handles it
+    if (battleState.isGameOver) {
       this.inputHandler.clearInput();
       return;
     }
 
-    // Get player action from input handler
-    const playerAction = this.inputHandler.getNextAction(this.battleState.player1.position);
+    // Detect custom screen transition: closing → clear stale inputs
+    if (this.wasCustomScreenOpen && !store.customScreenOpen) {
+      this.inputHandler.clearInput();
+    }
+    this.wasCustomScreenOpen = store.customScreenOpen;
 
-    // Apply player1 action if available
+    // Custom screen is open — React owns input, Phaser freezes
+    if (store.customScreenOpen) {
+      this.renderGrid(store.battleState!);
+      return;
+    }
+
+    // Get player1 action
+    const playerAction = this.inputHandler.getNextAction(battleState.player1.position);
+
     if (playerAction) {
-      const { state, events } = BattleEngine.applyAction(this.battleState, 'player1', playerAction);
-      this.battleState = state;
-
-      // Log events for debugging
-      if (events.length > 0) {
-        console.log('Events:', events);
+      if (
+        playerAction.type === 'confirm' &&
+        battleState.player1.customGauge >= battleState.player1.maxCustomGauge
+      ) {
+        store.openCustomScreen();
+        return;
       }
+      store.applyAction('player1', playerAction);
     }
 
-    // Apply player2 AI action
+    // AI action for player2
     if (this.simpleAI) {
-      const aiAction = this.simpleAI.getNextAction('player2', this.battleState);
+      const currentState = useBattleStore.getState().battleState!;
+      const aiAction = this.simpleAI.getNextAction('player2', currentState);
       if (aiAction) {
-        const { state: aiState, events: aiEvents } = BattleEngine.applyAction(this.battleState, 'player2', aiAction);
-        this.battleState = aiState;
-        if (aiEvents.length > 0) console.log('AI events:', aiEvents);
+        store.applyAction('player2', aiAction);
       }
     }
 
-    // Advance battle state
-    const { state: newState, events: tickEvents } = BattleEngine.tick(this.battleState);
-    this.battleState = newState;
+    // Tick the battle engine
+    store.tick();
 
-    if (tickEvents.length > 0) {
-      console.log('Tick events:', tickEvents);
-    }
+    // Render from updated store state
+    this.renderGrid(useBattleStore.getState().battleState!);
+  }
 
-    // Update UI text
-    this.frameText?.setText(`Frame: ${this.battleState.frame}`);
-    this.hpText?.setText(
-      `P1: ${this.battleState.player1.hp}/${this.battleState.player1.maxHp} | P2: ${this.battleState.player2.hp}/${this.battleState.player2.maxHp}`
-    );
-
-    // Update status text with custom gauge info
-    const p1Gauge = this.battleState.player1.customGauge;
-    const p2Gauge = this.battleState.player2.customGauge;
-    this.statusText?.setText(`Battle! | Custom: P1 ${p1Gauge}% P2 ${p2Gauge}%`);
-
-    // Update renderers
-    this.gridRenderer?.update(this.battleState.grid);
+  private renderGrid(state: BattleState) {
+    this.gridRenderer?.update(state.grid);
     this.naviRendererPlayer1?.update(
-      this.battleState.player1.position,
-      this.battleState.grid,
+      state.player1.position,
+      state.grid,
       GRID_START_X,
       GRID_START_Y,
       PANEL_SIZE
     );
     this.naviRendererPlayer2?.update(
-      this.battleState.player2.position,
-      this.battleState.grid,
+      state.player2.position,
+      state.grid,
       GRID_START_X,
       GRID_START_Y,
       PANEL_SIZE
     );
   }
 
-  setBattleState(state: BattleState) {
-    this.battleState = state;
-  }
-
-  getBattleState(): BattleState | undefined {
-    return this.battleState;
-  }
-
   shutdown() {
-    // Clean up input handler on scene shutdown
     this.inputHandler?.destroy();
   }
 }
