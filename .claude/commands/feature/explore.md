@@ -90,12 +90,12 @@ Once the user commits:
 
 After writing the card, tell the user:
 - Which file was written
-- Suggest: "When you're ready to turn this into a backlog card, run `/feature-formalize [card path]`"
+- Suggest: "When you're ready to turn this into a backlog card, run `/feature:formalize [card path]`"
 
 ## Boundaries
 
 - Do NOT read source files from `packages/`
 - Do NOT evaluate technical feasibility or suggest implementation
-- Do NOT produce a backlog card — that is `/feature-formalize`'s job
+- Do NOT produce a backlog card — that is `/feature:formalize`'s job
 - Do NOT write to any file outside `kanban/ideas/`
 - Do NOT modify CLAUDE.md, kanban/PLAN.md, or kanban/CHANGELOG.md

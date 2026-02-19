@@ -17,18 +17,18 @@ Argument: $ARGUMENTS
 **First**, check if `$ARGUMENTS` is empty, blank, or contains only whitespace. If so:
 - Scan `kanban/ideas/` for any cards that contain a `## Chosen Direction` section
 - If found, list them and ask: "Which idea would you like to formalize? These cards have a chosen direction ready:" followed by the list
-- If none found, ask: "No idea cards have a chosen direction yet. You can run `/feature-explore` to brainstorm one, or paste a direction here."
+- If none found, ask: "No idea cards have a chosen direction yet. You can run `/feature:explore` to brainstorm one, or paste a direction here."
 - Wait for user input before proceeding.
 
 **Then**, if the argument looks like a file path (contains `/` or ends in `.md`):
 - Read that file
 - Look for a `## Chosen Direction` section
-- If no `## Chosen Direction` found, tell the user: "This idea card doesn't have a chosen direction yet. Run `/feature-explore [card path]` first, or paste a direction here."
+- If no `## Chosen Direction` found, tell the user: "This idea card doesn't have a chosen direction yet. Run `/feature:explore [card path]` first, or paste a direction here."
 - Wait for user input if needed
 
 **Otherwise**, treat the argument as freeform text:
-- Check if the conversation contains a direction from a previous `/feature-explore`
-- If not, ask: "Please provide a feature direction. You can run `/feature-explore` to brainstorm one, or describe the direction here."
+- Check if the conversation contains a direction from a previous `/feature:explore`
+- If not, ask: "Please provide a feature direction. You can run `/feature:explore` to brainstorm one, or describe the direction here."
 
 ### STEP 2 — Search the Codebase
 
@@ -163,7 +163,7 @@ If the spec was based on an idea card, mention: "The idea card at [path] still h
 
 ## Boundaries
 
-- Do NOT brainstorm new directions — that is `/feature-explore`'s job
+- Do NOT brainstorm new directions — that is `/feature:explore`'s job
 - Do NOT make architecture decisions — surface information, let the user decide
 - Do NOT write the backlog card until the user explicitly confirms after seeing the review
 - Do NOT modify files outside `kanban/backlog/`

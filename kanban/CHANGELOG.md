@@ -4,6 +4,20 @@ All notable project progress is documented here, organized by sprint.
 
 ---
 
+## Sprint 4: Infrastructure & Context System
+**Date:** 2026-02-18
+
+- Replaced `PROJECT_CONTEXT.md` with distributed `.claude/context/` system (9 focused context files)
+- Added `README.md` for human onboarding
+- Migrated slash commands to colon-based syntax (`/feature:explore`, `/feature:formalize`)
+- Added context management commands (`/context:create`, `/context:prime`, `/context:update`)
+- Added custom agent definitions in `.claude/agents/` (`analyze-code`, `analyze-file`)
+- Updated `CLAUDE.md` with new Context System section
+- Updated `docs/feature-workflow.md` with new command syntax
+- Added `.archive` to `.gitignore`
+
+---
+
 ## Sprint 3: Battle Mechanics & MMBN3 Accuracy
 **Date:** 2026-02-18
 

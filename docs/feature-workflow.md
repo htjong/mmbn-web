@@ -3,36 +3,36 @@
 A 3-stage pipeline for turning vague ideas into implementable backlog cards.
 
 ```
-idea → /feature-explore (diverge) → user picks → /feature-formalize (converge + review) → backlog card
+idea → /feature:explore (diverge) → user picks → /feature:formalize (converge + review) → backlog card
 ```
 
 ## Usage Examples
 
-### `/feature-explore` — Brainstorm directions
+### `/feature:explore` — Brainstorm directions
 
 ```
-/feature-explore kanban/ideas/mobile-support.md   # Existing idea card
-/feature-explore shield chips                       # Freeform text
-/feature-explore                                    # No args — asks what to explore
+/feature:explore kanban/ideas/mobile-support.md   # Existing idea card
+/feature:explore shield chips                       # Freeform text
+/feature:explore                                    # No args — asks what to explore
 ```
 
-### `/feature-formalize` — Converge into a spec
+### `/feature:formalize` — Converge into a spec
 
 ```
-/feature-formalize kanban/ideas/mobile-support.md  # Card with chosen direction
-/feature-formalize                                  # No args — lists cards with chosen directions
+/feature:formalize kanban/ideas/mobile-support.md  # Card with chosen direction
+/feature:formalize                                  # No args — lists cards with chosen directions
 ```
 
 ## What Each Stage Does
 
-### Stage 1: `/feature-explore` (Diverge)
+### Stage 1: `/feature:explore` (Diverge)
 
 Generates 3-4 genuinely distinct design directions for a feature idea. Each direction includes a name, concept, key mechanic, and what it adds to gameplay. Interactive — you can steer, ask "what about X?", or request hybrids until you commit to a direction.
 
 **Reads:** `CLAUDE.md` (game domain only, no source code)
 **Writes:** Appends `## Chosen Direction` to the idea card in `kanban/ideas/`
 
-### Stage 2: `/feature-formalize` (Converge)
+### Stage 2: `/feature:formalize` (Converge)
 
 Takes a chosen direction and turns it into a precise backlog card. Reads the codebase to understand existing architecture, asks 2-4 clarifying questions about edge cases, then drafts a spec with description, acceptance criteria, and implementation notes.
 
@@ -41,14 +41,14 @@ Takes a chosen direction and turns it into a precise backlog card. Reads the cod
 
 ### Stage 3: Architecture Review (Automatic)
 
-Spawned automatically by `/feature-formalize` after you confirm the draft spec. An isolated reviewer agent checks the spec against the codebase and rates 8 categories. Results are presented before the card is written — RED items gate the pipeline.
+Spawned automatically by `/feature:formalize` after you confirm the draft spec. An isolated reviewer agent checks the spec against the codebase and rates 8 categories. Results are presented before the card is written — RED items gate the pipeline.
 
 ## File Outputs
 
 | Stage | Output Location | Format |
 |-------|----------------|--------|
-| `/feature-explore` | `kanban/ideas/<card>.md` | Appends `## Chosen Direction` section |
-| `/feature-formalize` | `kanban/backlog/<card>.md` | Full backlog card (description + AC + notes) |
+| `/feature:explore` | `kanban/ideas/<card>.md` | Appends `## Chosen Direction` section |
+| `/feature:formalize` | `kanban/backlog/<card>.md` | Full backlog card (description + AC + notes) |
 
 ## Architecture Review Categories
 

@@ -15,3 +15,5 @@ build
 .turbo
 coverage
 .nyc_output
+
+.archive

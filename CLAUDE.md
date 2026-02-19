@@ -8,15 +8,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **[CHANGELOG.md](./kanban/CHANGELOG.md)** - Sprint completion history
 - **[BRANCHING.md](./docs/BRANCHING.md)** - Git workflow and branch strategy
 - **[CLAUDE.md](./CLAUDE.md)** - You are here - architecture and patterns guide
-- **[docs/feature-workflow.md](./docs/feature-workflow.md)** - Feature design workflow (`/feature-explore` → `/feature-formalize`)
+- **[docs/feature-workflow.md](./docs/feature-workflow.md)** - Feature design workflow (`/feature:explore` → `/feature:formalize`)
 
 ## Context System
 
-This project uses PROJECT_CONTEXT.md as persistent memory across sessions.
+Session context lives in `.claude/context/` (9 focused files covering architecture, battle system, chips, AI, networking, etc.).
 
-- At the start of a session, read PROJECT_CONTEXT.md to get up to speed.
-- When the user says they're stopping, switching devices, or wrapping up, offer to run: /handoff
-- After major milestones (feature complete, big refactor, PR ready), offer to run: /handoff
+**At session start:** Run `/context:prime` to load relevant context into the conversation.
+**When wrapping up:** Run `/context:update` or `/handoff` to persist session state.
+
+Slash commands:
+- `/context:prime` — Load context files for the current task
+- `/context:create` — Initialize context for a new project area
+- `/context:update` — Update context after completing work
+- `/feature:explore` — Brainstorm feature directions
+- `/feature:formalize` — Turn a chosen direction into an implementable spec
+
+Context files: `.claude/context/` | Agent definitions: `.claude/agents/` | Commands: `.claude/commands/`
 
 ## Claude's Role
 
