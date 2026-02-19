@@ -1,7 +1,7 @@
 ---
 created: 2026-02-19T02:35:20Z
-last_updated: 2026-02-19T02:35:20Z
-version: 1.0
+last_updated: 2026-02-19T04:33:14Z
+version: 1.1
 author: Claude Code PM System
 ---
 
@@ -19,8 +19,9 @@ author: Claude Code PM System
 |------|---------|-------|
 | TypeScript | ^5.3.3 | All packages |
 | Vite | ^5.1.0 | Client build & dev server |
-| tsc | ^5.3.3 | Shared & server compilation |
-| ts-node-dev | ^2.0.0 | Server dev hot-reload |
+| tsc | ^5.3.3 | Shared compilation (type-check only for server) |
+| tsup | ^8.0.0 | Server production build (esbuild, bundles @mmbn/shared inline) |
+| tsx | ^4.21.0 | Server dev hot-reload (replaces ts-node-dev) |
 
 ## Client Dependencies (`@mmbn/client`)
 
@@ -67,6 +68,7 @@ author: Claude Code PM System
 - `tsconfig.json` — Root TypeScript config with path aliases
 - `packages/client/vite.config.ts` — Vite config with `@shared` and `@client` aliases
 - `packages/client/vitest.config.ts` — Client test config with jsdom environment
+- `packages/server/tsup.config.ts` — tsup config (ESM output, Node 20, `@mmbn/shared` inlined)
 
 ## Path Aliases
 
@@ -78,7 +80,7 @@ import { ... } from '@client/...';             // Within client (maps to package
 
 ## Server Build Output
 
-Server compiles to `packages/server/dist/server/src/` (not `dist/`). This is because `tsc` preserves directory structure when compiling cross-package imports.
+Server builds with **tsup** to a single bundled file at `packages/server/dist/index.js`. `@mmbn/shared` is inlined — no workspace symlinks needed on the Droplet. Dev mode uses `tsx watch src/index.ts` (not ts-node-dev).
 
 ## Dev Server Ports
 

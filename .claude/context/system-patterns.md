@@ -1,7 +1,7 @@
 ---
 created: 2026-02-19T02:35:20Z
-last_updated: 2026-02-19T02:35:20Z
-version: 1.0
+last_updated: 2026-02-19T04:33:14Z
+version: 1.1
 author: Claude Code PM System
 ---
 
@@ -92,13 +92,23 @@ Adding a chip = add data + implement effect handler in `ChipSystem.ts`. No archi
 
 ## ESM Import Rule
 
-All relative imports in `packages/shared/` and `packages/server/` MUST use `.js` extensions:
+Relative imports in `packages/shared/` MUST use `.js` extensions:
 ```typescript
-import { GridSystem } from './GridSystem.js'; // correct
-import { GridSystem } from './GridSystem';    // fails in production
+import { GridSystem } from './GridSystem.js'; // correct in shared/
+import { GridSystem } from './GridSystem';    // fails at runtime in shared/
 ```
 
-Client (Vite) is exempt — Vite handles resolution internally.
+`packages/server/` does NOT need `.js` extensions — tsup (esbuild) bundles all server-internal imports and handles resolution automatically.
+
+`packages/client/` does NOT need `.js` extensions — Vite handles resolution internally.
+
+## Server Build Pattern
+
+Server uses **tsup** for production builds (not `tsc`):
+- Entry: `src/index.ts` → Output: `dist/index.js` (single bundled ESM file)
+- `@mmbn/shared` is bundled inline (`noExternal: [/@mmbn/]`) — no symlinks needed on Droplet
+- Dev: `tsx watch src/index.ts` (hot-reload, native ESM TypeScript)
+- `tsconfig.json` is type-checking only for the server package
 
 ## Kanban Workflow Pattern
 

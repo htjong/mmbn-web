@@ -1,7 +1,7 @@
 ---
 created: 2026-02-19T02:35:20Z
-last_updated: 2026-02-19T02:35:20Z
-version: 1.0
+last_updated: 2026-02-19T04:33:14Z
+version: 1.1
 author: Claude Code PM System
 ---
 
@@ -23,6 +23,7 @@ mmbn-web/
 │   └── CHANGELOG.md     # Sprint completion history
 ├── docs/
 │   ├── BRANCHING.md     # Git workflow strategy
+│   ├── deployment.md    # Deployment guide (GitHub Actions → Droplet → PM2)
 │   └── feature-workflow.md
 ├── .claude/
 │   ├── agents/          # Subagent definitions
@@ -96,4 +97,4 @@ packages/server/src/
 - **camelCase** for utilities and data: `chips.ts`, `validation.ts`
 - **kebab-case** for kanban cards: `chip-select-overlay.md`
 - Test files co-located with source: `BattleEngine.test.ts` next to `BattleEngine.ts`
-- `.js` extensions required on all relative imports in `shared/` and `server/`
+- `.js` extensions required on all relative imports in `shared/` only — `server/` is bundled by tsup and does not require them
