@@ -157,15 +157,36 @@ Wait for user confirmation.
 Once the user confirms:
 - Derive a kebab-case filename from the spec title (e.g., "Add Panel Cracking" → `panel-cracking.md`)
 - Write the final spec to `kanban/backlog/[filename].md`
-- Tell the user which file was written
 
-If the spec was based on an idea card, mention: "The idea card at [path] still has the chosen direction for reference."
+**If the spec was based on an idea card:**
+- Read the idea card's full content
+- Prepend it to the backlog card under `## Origin` with the attribution blockquote: `> Copied from \`kanban/ideas/[filename].md\` (now deleted)`
+- Add a `---` horizontal rule divider after the `## Origin` section and before `## Description`
+- Delete the idea card from `kanban/ideas/`
+- Tell the user: "The idea card content has been copied into `## Origin` in the backlog card and the original idea card has been deleted."
+
+The resulting backlog card structure should be:
+
+```markdown
+# [Imperative Title]
+
+## Origin
+> Copied from `kanban/ideas/[filename].md` (now deleted)
+
+[full content of the idea card pasted here verbatim]
+
+---
+
+## Description
+...
+```
 
 ## Boundaries
 
 - Do NOT brainstorm new directions — that is `/feature:explore`'s job
 - Do NOT make architecture decisions — surface information, let the user decide
 - Do NOT write the backlog card until the user explicitly confirms after seeing the review
-- Do NOT modify files outside `kanban/backlog/`
+- Do NOT modify files outside `kanban/backlog/` and `kanban/ideas/`
 - Do NOT modify CLAUDE.md, kanban/PLAN.md, or kanban/CHANGELOG.md
-- Do NOT modify the original idea card in `kanban/ideas/`
+- After writing the backlog card, DELETE the original idea card from `kanban/ideas/` — its content is preserved in the backlog card under `## Origin`
+- When writing a backlog card derived from an idea card, ALWAYS include the full idea card content under `## Origin` before deleting it

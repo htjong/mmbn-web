@@ -1,6 +1,46 @@
 # Changelog
 
-All notable project progress is documented here, organized by sprint.
+Two entry types exist:
+
+**Sprint entries** — record what was implemented in a focused session.
+**Milestone entries** — mark when a major deliverable's all ACs are satisfied.
+
+Sprint format: `## Sprint N: Title` / Date / bullets / Key decisions
+Milestone format: `## 🏁 Milestone: Name` / Reached date / Sprint range / 2-3 sentence summary
+
+Milestone entries appear **above** the sprint entry that completed them.
+
+---
+
+## Sprint 7: Sprint Process & Feature Workflow Overhaul
+**Date:** 2026-02-19 20:32 PST
+
+- Introduced `sprint/*` integration branch strategy and updated all docs
+  (BRANCHING.md, CLAUDE.md, ceremony scripts) to reflect the new git workflow
+- Removed context files from the repo — context is now generated locally per
+  session and never committed, reducing noise from per-user state files
+- Added `/work:ceremony-opening` command to open sprint branches cleanly and
+  stamp a placeholder changelog entry
+- Hardened `/work:ceremony-closing` with sequential verification gates
+  (type-check, lint, tests, dev server, Storybook) and a full merge/tag/push
+  sequence; added code-change detection in Step 2a to skip the `analyze-code`
+  agent when only docs/kanban/.claude files changed
+- Added test-runner agent and wired it into ceremony-closing's failure path for
+  deep test diagnosis
+- Updated `/feature:formalize` to embed the source idea card's full content into
+  the backlog card under `## Origin` then delete the idea file, making backlog
+  cards fully self-contained
+- Updated `/feature:explore` handoff message to set user expectations about the
+  embed-and-delete behavior
+- Promoted game-start-menu idea to a formalized backlog card with full spec and
+  architecture review
+
+**Key decisions:**
+- Idea cards are deleted after formalization — their content lives on in the
+  backlog card's `## Origin` section, keeping the board clean without losing history
+- Context files are gitignored and generated locally; no per-user state in the repo
+- Code analysis is skipped when no code files changed — avoids wasted agent cost
+  on doc-only sessions
 
 ---
 
