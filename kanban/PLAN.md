@@ -82,14 +82,14 @@ Every piece of work follows this path. The folder a card is in IS its status.
 - [x] All tests pass (`npm run test`)
 - [x] TypeScript compiles clean (`npm run type-check`)
 - [x] Game start menu
-- [ ] Basic sprites, simple animations, 
+- [ ] Basic sprites, simple animations
 - [ ] Holding D Pad or WASD should still move the user (capped at 0.5 second delay)
 - [ ] Cooldown mechanics after using a chip
-- [ ] Simple audio for battle feedback (buster, chips)
+- [ ] Simple audio for battle feedback (buster, chips) 
 - [ ] Simple set of viruses and chips - and specific AI behavior for viruses
-- [ ] Feedback button UI for players to submit feedback to a DB
+- [ ] Test bed for campaign mode - 
 - [ ] Simulate AI over network for 1v1
-- [ ] Test bed for campaign mode
+- [ ] Feedback button UI for players to submit feedback to a DB
 
 ---
 
