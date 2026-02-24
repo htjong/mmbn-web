@@ -4,11 +4,12 @@
 1. Stage intended files
 2. Commit with scoped conventional message
 3. Push current branch
-4. Report next merge target (typically active sprint branch)
-5. Post-close next steps:
-   - Open/update merge PR into the reported target branch.
-   - After merge, switch to the target branch and run integration gates (`npm run type-check`, `npm run lint`, `npm run test`).
-   - Start next work from target branch using the next prioritized backlog card.
+4. Identify and report next merge target (typically active sprint branch)
+5. Prompt user for explicit permission to continue with post-close steps:
+   - Merge feature branch into reported target branch.
+   - Run integration gates on target branch: `npm run type-check`, `npm run lint`, `npm run test`.
+   - If integration gates pass, delete merged feature branch (local and remote) with explicit confirmation.
+6. If user declines post-close execution, stop and provide exact merge/gate/cleanup commands.
 
 ## Sprint Close (`sprint/N`)
 1. Commit docs/ceremony updates on sprint branch
@@ -18,7 +19,8 @@
 5. Delete local/remote sprint branch if approved
 6. Post-close next steps:
    - Create and switch to the next sprint branch from updated `main`.
-   - Run opening ceremony on the new sprint branch and seed changelog placeholder.
+   - Ask user before running opening ceremony on the new sprint branch.
+   - If approved, run opening ceremony and seed changelog placeholder.
    - Resume backlog execution on that sprint branch.
 
 Always require explicit user confirmation before step 1.
