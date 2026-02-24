@@ -1,31 +1,72 @@
 # Implement Charge-Weighted Custom Gauge Breathing Glow
 
+## Mode
+- Tier: T1
+- Formalization: Lite
+
 ## Description
-Add a breathing glow to the custom gauge that communicates charge progress through motion intensity. The glow stays off at 0%, then progressively increases pulse amplitude as charge approaches full. At 100%, the gauge continues the same 1-second bright / 1-second dim rhythm at maximum contrast until the custom screen opens. When the custom screen opens, the glow stops immediately.
+Add a breathing glow to the custom gauge that communicates charge progress through motion intensity. The effect is off at 0%, scales smoothly with charge while charging, and reaches maximum contrast at full charge. Cadence stays constant at 1s bright / 1s dim across partial and full states. The glow stops immediately when the custom screen opens.
 
 ## Acceptance Criteria
 - [ ] At `customGauge === 0`, gauge glow styling is inactive (no breathing opacity/brightness effect).
-- [ ] For `0 < customGauge < maxCustomGauge`, breathing pulse amplitude scales continuously with `customGauge / maxCustomGauge` (higher charge produces visibly stronger bright/dim contrast).
-- [ ] At `customGauge >= maxCustomGauge`, the gauge keeps pulsing with maximum amplitude and does not freeze to a static full-state style.
-- [ ] Breathing cadence is exactly `1s bright + 1s dim` in real-time UI animation timing (not battle-tick/frame-derived).
-- [ ] When `customScreenOpen` becomes `true`, glow effect stops immediately for the hidden/inactive gauge state.
-- [ ] GaugeBar Storybook includes examples that make the progression clear (off/low/mid/full pulse intensity).
-- [ ] UI tests verify state-to-style behavior for 0%, partial, full, and custom-screen-open cases.
+- [ ] For `0 < customGauge < maxCustomGauge`, pulse amplitude scales continuously with `customGauge / maxCustomGauge`.
+- [ ] At `customGauge >= maxCustomGauge`, pulse amplitude is max while cadence remains `1s bright + 1s dim`.
+- [ ] Cadence does not change between partial and full charge states.
+- [ ] When `customScreenOpen` becomes `true`, glow effect stops immediately.
+- [ ] Storybook shows off/low/mid/full states with visibly increasing amplitude.
+- [ ] UI tests verify 0%, partial, full, and custom-screen-open behavior.
 
 ## Notes
 - Key files: `packages/client/src/ui/atoms/GaugeBar.tsx`, `packages/client/src/ui/organisms/BattleHud.tsx`, `packages/client/src/ui/hooks/useBattleHud.ts`, `packages/client/src/ui/atoms/GaugeBar.stories.tsx`, `packages/client/src/stores/battleStore.ts`
-- Reuse: existing `gaugeValue`, `gaugeMax`, and `customScreenOpen` from `useBattleHud`; preserve existing width-fill logic and layer pulse styling on top.
-- Risks: frequent inline style recomputation can cause visual jitter/perf issues; ensure pulse is CSS-driven and only intensity parameter changes with charge.
+- Reuse: `gaugeValue`, `gaugeMax`, `customScreenOpen` from `useBattleHud`; preserve existing width-fill logic.
+- Risks: avoid inline style churn; keep pulse animation CSS-driven and only vary intensity by charge.
 
 ## Architecture Review
-- Determinism in shared battle logic: no impact; animation is client-only and not tied to simulation logic.
-- State impact on `BattleState` / `PlayerState`: no schema changes; consumes existing `customGauge` and `maxCustomGauge`.
-- Network message/schema impact: none.
-- Grid/panel rule impact: none.
-- Chip-system type/effect impact: none.
-- Client rendering/UI impact: GaugeBar visual behavior changes and needs explicit style states for 0/partial/full/custom-screen-open.
-- Existing code reuse opportunities: reuse current HUD gauge data path (`useBattleHud` -> `BattleHud` -> `GaugeBar`) and existing full-state detection.
-- Risk and implementation order: implement `GaugeBar` pulse math/CSS first, pass `customScreenOpen` state if needed, then update Storybook, then add tests.
-
-## Blockers
-- None.
+- Determinism:
+  - Status: GREEN
+  - Evidence: UI-only rendering behavior; no shared simulation logic changes.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- State impact:
+  - Status: GREEN
+  - Evidence: consumes existing gauge fields; no `BattleState`/`PlayerState` schema updates.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- Network/schema:
+  - Status: GREEN
+  - Evidence: no protocol, socket event, or schema changes.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- Grid/panel:
+  - Status: GREEN
+  - Evidence: no panel rule or ownership behavior touched.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- Chip system:
+  - Status: GREEN
+  - Evidence: no chip types/effects/fields modified.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- Client rendering/UI:
+  - Status: YELLOW
+  - Evidence: pulse visuals can jitter if tied to rerender-heavy inline style updates.
+  - Risk: visual instability or unnecessary reflow.
+  - Mitigation: use CSS animation plus charge-driven variable intensity only.
+  - Blocking: no
+- Reuse opportunities:
+  - Status: GREEN
+  - Evidence: existing `useBattleHud` -> `BattleHud` -> `GaugeBar` path is sufficient.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- Risk/order:
+  - Status: GREEN
+  - Evidence: low blast radius; isolated to HUD gauge visual behavior.
+  - Risk: minimal
+  - Mitigation: implement style states first, then Storybook, then tests.
+  - Blocking: no

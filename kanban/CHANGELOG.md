@@ -15,6 +15,11 @@ Milestone entries appear **above** the sprint entry that completed them.
 ## Sprint 8: Codex Skill Migration & Local Runtime Hardening
 **Date:** 2026-02-23 23:55 PST
 
+- 2026-02-24 06:57 PST: Finalized Feature Workflow v3.2 in `docs/feature-workflow.md` with Codex command syntax (`$feature-explore`, `$feature-formalize`), strict prompt contract, tier rules, blocker rules, version retention, and validation guidance.
+- 2026-02-24 06:57 PST: Updated `.codex/skills/feature-explore` and `.codex/skills/feature-formalize` to enforce single-prompt emission, numbered options, and docs-anchored prompt contract parity.
+- 2026-02-24 06:57 PST: Added `scripts/validate-prompts.js` and `npm run validate:prompts` for prompt contract + drift checks.
+- 2026-02-24 06:57 PST: Moved legacy idea/backlog cards into `kanban/legacy/` and initialized `kanban/backlog/archive/` for version retention.
+- 2026-02-24 06:57 PST: Formalized `kanban/backlog/custom-gauge-charge-weighted-breathing.md` (T1/Lite) and `kanban/backlog/start-menu-spacebar-only.md` (T2/Full).
 - 2026-02-24 04:25 PST: Hardened `feature-formalize` lifecycle rules to require deleting the source `kanban/ideas/*` card after successful backlog formalization.
 - 2026-02-24 04:25 PST: Added backlog card `kanban/backlog/custom-gauge-charge-weighted-breathing.md` with clarified ACs and architecture review.
 - 2026-02-24 04:25 PST: Added backlog card `kanban/backlog/start-menu-spacebar-only.md` for Space-only title start behavior.

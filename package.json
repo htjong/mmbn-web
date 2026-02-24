@@ -28,7 +28,8 @@
     "type-check": "tsc --noEmit",
     "prepare": "husky",
     "storybook": "npm run storybook --workspace=packages/client",
-    "build-storybook": "npm run build-storybook --workspace=packages/client"
+    "build-storybook": "npm run build-storybook --workspace=packages/client",
+    "validate:prompts": "node scripts/validate-prompts.js"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

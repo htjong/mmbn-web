@@ -1,72 +1,82 @@
-# Feature Design Workflow
+# Feature Workflow v3.2
 
-A 3-stage pipeline for turning vague ideas into implementable backlog cards.
+A simplified, enforced workflow for turning ideas into backlog cards.
 
-```
-idea → /feature:explore (diverge) → user picks → /feature:formalize (converge + review) → backlog card
-```
+## Commands
 
-## Usage Examples
+- `$feature-explore [idea-card-path | freeform-text]`
+- `$feature-formalize [idea-card-path | chosen-direction-text]`
 
-### `/feature:explore` — Brainstorm directions
+## Outcomes
 
-```
-/feature:explore kanban/ideas/mobile-support.md   # Existing idea card
-/feature:explore shield chips                       # Freeform text
-/feature:explore                                    # No args — asks what to explore
-```
+Use only these outcome statuses:
+- `success`
+- `needs-input`
+- `blocked`
+- `aborted`
 
-### `/feature:formalize` — Converge into a spec
+## Lite/Full Tiering
 
-```
-/feature:formalize kanban/ideas/mobile-support.md  # Card with chosen direction
-/feature:formalize                                  # No args — lists cards with chosen directions
-```
+- `T0`: Lite allowed (copy/UI polish only)
+- `T1`: Lite allowed (local client behavior, no shared schema/protocol expansion)
+- `T2`: Full required (shared logic/state/network/schema/chip/grid impact)
+- Ambiguous tier defaults to `T2` and records `Tier-Reason`.
 
-## What Each Stage Does
+## Core Rules
 
-### Stage 1: `/feature:explore` (Diverge)
+- Explore requires explicit chosen-direction selection.
+- Formalize cannot finalize with unresolved `RED` architecture findings.
+- Reruns create versioned files by default (`.vN`).
+- Overwrite requires explicit confirmation.
 
-Generates 3-4 genuinely distinct design directions for a feature idea. Each direction includes a name, concept, key mechanic, and what it adds to gameplay. Interactive — you can steer, ask "what about X?", or request hybrids until you commit to a direction.
+## Version Retention
 
-**Reads:** `CLAUDE.md` (game domain only, no source code)
-**Writes:** Appends `## Chosen Direction` to the idea card in `kanban/ideas/`
+- Active backlog keeps latest version only.
+- Older versions are archived to `kanban/backlog/archive/<slug>.vN.md`.
 
-### Stage 2: `/feature:formalize` (Converge)
+## Legacy Policy
 
-Takes a chosen direction and turns it into a precise backlog card. Reads the codebase to understand existing architecture, asks 2-4 clarifying questions about edge cases, then drafts a spec with description, acceptance criteria, and implementation notes.
+- One-time bulk move:
+  - `kanban/ideas/*` -> `kanban/legacy/`
+  - `kanban/backlog/*` -> `kanban/legacy/`
+- After cutover, only new workflow outputs should live in `kanban/ideas/` and `kanban/backlog/`.
+- `kanban/legacy/` is read-only archival storage.
 
-**Reads:** Idea card + 8+ source files from `packages/`
-**Writes:** Final card to `kanban/backlog/`
+<a id="prompt-contract"></a>
+## Prompt Contract
 
-### Stage 3: Architecture Review (Automatic)
+Canonical prompt contract for `feature-explore` and `feature-formalize`.
+Skills must reference `docs/feature-workflow.md#prompt-contract` and not redefine a conflicting contract.
 
-Spawned automatically by `/feature:formalize` after you confirm the draft spec. An isolated reviewer agent checks the spec against the codebase and rates 8 categories. Results are presented before the card is written — RED items gate the pipeline.
+Required 6-line interactive format:
+1. `STEP:`
+2. `DECISION:`
+3. `RECOMMENDED:`
+4. `IF RECOMMENDED:`
+5. `ALTERNATIVE:`
+6. `STATUS:`
 
-## File Outputs
+Prompt rules:
+- Max 140 chars per line.
+- One sentence per line.
+- Use only outcome statuses: `success`, `needs-input`, `blocked`, `aborted`.
+- Include `Accept Recommended and Continue` for non-blocked steps.
+- Present decision options as numbered choices (`1)`, `2)`, `3)`...) so users can reply with a number.
+- Show expanded details only when requested, blocked, or a `RED` finding exists.
+- Emit each decision prompt once per step; do not duplicate it across update/final messages.
+- Emit one terminal status per completed step.
 
-| Stage | Output Location | Format |
-|-------|----------------|--------|
-| `/feature:explore` | `kanban/ideas/<card>.md` | Appends `## Chosen Direction` section |
-| `/feature:formalize` | `kanban/backlog/<card>.md` | Full backlog card (description + AC + notes) |
+## Architecture Review Status
 
-## Architecture Review Categories
+Use uppercase status labels only:
+- `GREEN`
+- `YELLOW`
+- `RED`
 
-The reviewer rates each category **GREEN**, **YELLOW**, or **RED**:
+## Validation
 
-| # | Category | What It Checks |
-|---|----------|---------------|
-| 1 | **Determinism** | Will shared logic remain pure? No `Math.random`, `Date.now`, side effects? |
-| 2 | **State Impact** | New fields in `PlayerState` or `BattleState`? Changed constraints? |
-| 3 | **Networking** | New Socket.io events? Zod schema changes? Bandwidth impact at 60Hz? |
-| 4 | **Grid/Panel Impact** | New panel states? New ownership rules? |
-| 5 | **Chip System** | New `ChipEffect.type` values? New `Chip` fields? |
-| 6 | **Client Rendering** | New Phaser sprites/animations? New React UI? |
-| 7 | **Existing Code Reuse** | Functions/types the implementer should use (with file paths) |
-| 8 | **Risk Assessment** | Blast radius, hidden complexity, suggested implementation order |
-
-### Rating Meanings
-
-- **GREEN** — No issues, existing code handles it
-- **YELLOW** — Needs careful implementation, flagged for attention
-- **RED** — Blocking: breaks determinism, requires architecture change, or conflicts with existing systems
+Run `npm run validate:prompts` before committing any changes to:
+- `docs/feature-workflow.md`
+- `.codex/skills/feature-explore/SKILL.md`
+- `.codex/skills/feature-formalize/SKILL.md`
+- `.codex/skills/feature-formalize/references/architecture-review-checklist.md`

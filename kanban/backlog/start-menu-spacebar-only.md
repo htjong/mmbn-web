@@ -1,38 +1,74 @@
-# Switch Title Screen Start Input to Spacebar Only
+# Implement Context-Aware Start Prompt with Space-First Menu Start
 
-## Origin
-> Copied from `kanban/ideas/start-menu-spacebar-only.md` (now deleted)
-
-Change start menu prompt from "PRESS ENTER TO START" to "PRESS SPACE TO START" and use Space as the start key.
-
-## Chosen Direction: Spacebar-Only Start
-**Concept:** Replace the title prompt with "PRESS SPACE TO START" and make Space the only keyboard start action. This creates a clean, explicit contract between on-screen instruction and input behavior. It removes ambiguity from multiple-start keys.
-**Key Mechanic:** Single-key start mapping (Space only).
-**What It Adds:** Stronger UI/input consistency and clearer onboarding.
+## Mode
+- Tier: T2
+- Formalization: Full
+- Tier-Reason: User-selected strict Full review because input contract now varies by modality and introduces explicit debounce guards.
 
 ## Description
-Update the title screen onboarding contract so the displayed prompt and actual keyboard behavior are fully aligned around Spacebar. Starting from menu phase should only be possible via Space on keyboard, with Enter intentionally ignored and click/tap start removed. Space input should ignore key-repeat to prevent accidental multi-trigger behavior while transitioning out of menu.
+Update title-screen start behavior so keyboard users start with Space while touch users can start via tap. Prompt copy must match detected input modality: keyboard shows `PRESS SPACE TO START`, touch shows `TAP TO START`. Enter must not start the game in menu phase. Start activation must be protected by both repeat-ignore and a short debounce window to prevent accidental re-triggering.
 
 ## Acceptance Criteria
-- [ ] Title screen prompt text reads exactly `PRESS SPACE TO START` and no longer references Enter.
-- [ ] While `gamePhase === 'menu'`, pressing Space starts the game and transitions to battle.
+- [ ] When last input modality is keyboard and `gamePhase === 'menu'`, prompt text is exactly `PRESS SPACE TO START`.
+- [ ] When last input modality is touch/pointer and `gamePhase === 'menu'`, prompt text is exactly `TAP TO START`.
+- [ ] While `gamePhase === 'menu'`, pressing Space starts the game.
 - [ ] While `gamePhase === 'menu'`, pressing Enter does not start the game.
-- [ ] Click/tap on the title screen does not start the game.
-- [ ] Holding Space does not trigger repeated start attempts (`KeyboardEvent.repeat` is ignored).
-- [ ] Storybook for TitleScreen reflects the updated Space-only start prompt.
-- [ ] Automated tests cover Space-start success and Enter/click/no-repeat non-start behavior.
+- [ ] While `gamePhase === 'menu'`, tap/click start is allowed only for touch/pointer modality.
+- [ ] Start handler ignores `KeyboardEvent.repeat` and applies a 250ms debounce guard for repeated triggers.
+- [ ] Storybook for `TitleScreen` includes keyboard and touch modality variants with correct prompt text.
+- [ ] Automated tests cover: Space-start success, Enter non-start, modality-specific tap behavior, repeat-ignore, and debounce guard.
 
 ## Notes
 - Key files: `packages/client/src/ui/organisms/TitleScreen.tsx`, `packages/client/src/ui/hooks/useTitleScreen.ts`, `packages/client/src/ui/organisms/TitleScreen.stories.tsx`, `packages/client/src/stores/battleStore.test.ts`
-- Reuse: `useBattleStore.getState().startGame()` as the single start transition entrypoint.
-- Risks: Spacebar is used in battle/custom-screen controls; ensure Space-only start binding is active only during menu phase.
+- Reuse: keep using `useBattleStore.getState().startGame()` as the sole transition entrypoint.
+- Risks: modality detection drift can show wrong prompt copy; debounce timing that is too high may feel unresponsive.
 
 ## Architecture Review
-- Determinism in shared battle logic: no impact (client UI/input only).
-- State impact on `BattleState` / `PlayerState`: no schema/state shape change.
-- Network message/schema impact: none.
-- Grid/panel rule impact: none.
-- Chip-system type/effect impact: none.
-- Client rendering/UI impact: title prompt content and title-screen input handler behavior change.
-- Existing code reuse opportunities: retain `startGame` action in battle store; scope logic to existing `gamePhase` guard.
-- Risk and implementation order: low risk; update prompt + key handler first, then remove click start path, then add/update tests and Storybook.
+- Determinism:
+  - Status: GREEN
+  - Evidence: Changes are UI/input side only; no shared simulation logic is modified.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- State impact:
+  - Status: YELLOW
+  - Evidence: May require UI-local tracking of last input modality and debounce timestamp.
+  - Risk: introducing redundant or stale UI state can desync prompt and behavior.
+  - Mitigation: derive modality from existing input handlers and keep a single source of truth.
+  - Blocking: no
+- Network/schema:
+  - Status: GREEN
+  - Evidence: No protocol events, payloads, or schema contracts are changed.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- Grid/panel:
+  - Status: GREEN
+  - Evidence: No battlefield panel logic is touched.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- Chip system:
+  - Status: GREEN
+  - Evidence: No chip type/effect/data behavior is changed.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- Client rendering/UI:
+  - Status: YELLOW
+  - Evidence: Prompt copy now depends on modality and input event source.
+  - Risk: inconsistent prompt text across keyboard/pointer transitions.
+  - Mitigation: centralize modality resolution in title-screen hook and cover with tests/stories.
+  - Blocking: no
+- Reuse opportunities:
+  - Status: GREEN
+  - Evidence: Existing `startGame` action and `gamePhase` gating path are reusable.
+  - Risk: none
+  - Mitigation: none
+  - Blocking: no
+- Risk/order:
+  - Status: GREEN
+  - Evidence: Limited scope to title-screen UI and input handling.
+  - Risk: low
+  - Mitigation: implement in order: modality prompt, start guards, tests/stories.
+  - Blocking: no
