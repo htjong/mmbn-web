@@ -1,0 +1,3 @@
+sandbox_mode = "workspace-write"  # allows writes, but only inside workspace
+approval_policy = "on-request"
+project_root_markers = []
