@@ -11,8 +11,8 @@ describe('BattleEngine', () => {
     expect(state.frame).toBe(0);
     expect(state.player1.id).toBe('player1');
     expect(state.player2.id).toBe('player2');
-    expect(state.player1.hp).toBe(100);
-    expect(state.player2.hp).toBe(100);
+    expect(state.player1.hp).toBe(500);
+    expect(state.player2.hp).toBe(500);
     expect(state.isGameOver).toBe(false);
     expect(state.grid.length).toBe(3);
     expect(state.grid[0].length).toBe(6);
@@ -144,7 +144,7 @@ describe('BattleEngine', () => {
       type: 'buster',
     });
 
-    expect(newState.player2.hp).toBe(initialHp - 1);
+    expect(newState.player2.hp).toBe(initialHp - 10);
     expect(events.some((e) => e.type === 'buster_used')).toBe(true);
   });
 

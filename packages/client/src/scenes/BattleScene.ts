@@ -16,6 +16,7 @@ export class BattleScene extends Phaser.Scene {
   private inputHandler?: InputHandler;
   private simpleAI?: SimpleAI;
   private wasCustomScreenOpen = false;
+  private wasPostConfirmLockActive = false;
 
   constructor() {
     super('BattleScene');
@@ -97,8 +98,19 @@ export class BattleScene extends Phaser.Scene {
     }
     this.wasCustomScreenOpen = store.customScreenOpen;
 
+    if (!this.wasPostConfirmLockActive && store.postConfirmLockActive) {
+      this.inputHandler.clearInput();
+    }
+    this.wasPostConfirmLockActive = store.postConfirmLockActive;
+
     // Custom screen is open — React owns input, Phaser freezes
     if (store.customScreenOpen) {
+      this.renderGrid(store.battleState!);
+      return;
+    }
+
+    // Post-confirm lock is active — battle remains paused.
+    if (store.postConfirmLockActive) {
       this.renderGrid(store.battleState!);
       return;
     }
