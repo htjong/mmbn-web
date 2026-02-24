@@ -81,7 +81,7 @@ Every piece of work follows this path. The folder a card is in IS its status.
 - [x] AI opponent moves, attacks, and uses chips
 - [x] All tests pass (`npm run test`)
 - [x] TypeScript compiles clean (`npm run type-check`)
-- [ ] Game start menu
+- [x] Game start menu
 - [ ] Basic sprites, simple animations, 
 - [ ] Holding D Pad or WASD should still move the user (capped at 0.5 second delay)
 - [ ] Cooldown mechanics after using a chip

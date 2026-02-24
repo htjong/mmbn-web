@@ -35,6 +35,24 @@ Milestone entries appear **above** the sprint entry that completed them.
 - Promoted game-start-menu idea to a formalized backlog card with full spec and
   architecture review
 
+- Implemented game start menu — TitleScreen organism with MMBN-styled title,
+  blinking "PRESS ENTER TO START" prompt, and Enter/click to start; gated behind
+  `gamePhase: 'menu' | 'battle'` in Zustand store; `App` root component routes
+  between TitleScreen and BattleHud based on phase
+- Gated `BattleScene.update()` on `gamePhase` so the engine is frozen during the
+  title screen; `BattleScene.create()` still pre-loads battle state so chip select
+  opens immediately on game start
+- Added context-aware battle controls hint to ChipSelectPanel — shows
+  `WASD: move · K: use chip · J: buster · Space: open chip selection` when chip
+  select is inactive at full opacity, while chip content remains dimmed
+- Added TitleScreen Storybook story
+- Pointed subdomain mmbn.howardtjong.com (Namecheap A record) at DigitalOcean
+  Droplet IP; diagnosed HTTPS redirect issue — Nginx config had `server_name _;`
+  (catch-all) which blocked Certbot from matching the domain; fixed by setting
+  `server_name mmbn.howardtjong.com;` in `/etc/nginx/sites-enabled/mmbn`, then ran
+  `certbot install --cert-name mmbn.howardtjong.com` to complete SSL installation;
+  site now serves HTTPS with valid cert, pending DNS propagation
+
 **Key decisions:**
 - Idea cards are deleted after formalization — their content lives on in the
   backlog card's `## Origin` section, keeping the board clean without losing history

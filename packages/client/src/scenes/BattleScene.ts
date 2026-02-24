@@ -78,6 +78,9 @@ export class BattleScene extends Phaser.Scene {
 
   update() {
     const store = useBattleStore.getState();
+
+    if (store.gamePhase === 'menu') return;
+
     const battleState = store.battleState;
 
     if (!battleState || !this.inputHandler) return;

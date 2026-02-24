@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BattleScene } from './scenes/BattleScene';
-import { BattleHud } from './ui/organisms/BattleHud';
+import { App } from './ui/App';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -20,6 +20,6 @@ const config: Phaser.Types.Core.GameConfig = {
 new Phaser.Game(config);
 
 const uiRoot = document.getElementById('ui')!;
-createRoot(uiRoot).render(React.createElement(BattleHud));
+createRoot(uiRoot).render(React.createElement(App));
 
 console.log('MMBN Web Game Starting...');
