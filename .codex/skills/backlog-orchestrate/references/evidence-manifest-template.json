@@ -1,0 +1,19 @@
+{
+  "ac_trace": [
+    {
+      "ac_id": "AC1",
+      "unit": { "name": "<unit test name>", "path": "<repo path>" },
+      "integration": { "name": "<integration test name>", "path": "<repo path>" },
+      "storybook": { "name": "<storybook story name>", "path": "<repo path>" },
+      "e2e": { "name": "<e2e scenario name>", "path": "<repo path>" },
+      "tdd_proof": {
+        "red": "<failing-first proof>",
+        "green": "<implementation proof>",
+        "refactor": "<refactor proof>"
+      }
+    }
+  ],
+  "assumption_diff_reasons": {
+    "<repo path>": "<reason for touched-not-expected or expected-not-touched>"
+  }
+}

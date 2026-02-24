@@ -1,0 +1,88 @@
+{
+  "ac_trace": [
+    {
+      "ac_id": "AC1",
+      "unit": { "name": "Title prompt keyboard unit", "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts" },
+      "integration": { "name": "Title prompt keyboard integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "TitleScreen keyboard story", "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx" },
+      "e2e": { "name": "Keyboard prompt e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "add failing AC1 tests", "green": "implement AC1", "refactor": "cleanup AC1" }
+    },
+    {
+      "ac_id": "AC2",
+      "unit": { "name": "Title prompt touch unit", "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts" },
+      "integration": { "name": "Title prompt touch integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "TitleScreen touch story", "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx" },
+      "e2e": { "name": "Touch prompt e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "add failing AC2 tests", "green": "implement AC2", "refactor": "cleanup AC2" }
+    },
+    {
+      "ac_id": "AC3",
+      "unit": { "name": "Space starts in menu unit", "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts" },
+      "integration": { "name": "Space starts integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "TitleScreen keyboard interaction story", "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx" },
+      "e2e": { "name": "Space start e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "add failing AC3 tests", "green": "implement AC3", "refactor": "cleanup AC3" }
+    },
+    {
+      "ac_id": "AC4",
+      "unit": { "name": "Enter non-start unit", "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts" },
+      "integration": { "name": "Enter non-start integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "TitleScreen enter non-start story", "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx" },
+      "e2e": { "name": "Enter non-start e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "add failing AC4 tests", "green": "implement AC4", "refactor": "cleanup AC4" }
+    },
+    {
+      "ac_id": "AC5",
+      "unit": { "name": "Pointer gating unit", "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts" },
+      "integration": { "name": "Pointer gating integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "TitleScreen modality stories", "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx" },
+      "e2e": { "name": "Pointer gating e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "add failing AC5 tests", "green": "implement AC5", "refactor": "cleanup AC5" }
+    },
+    {
+      "ac_id": "AC6",
+      "unit": { "name": "Repeat and debounce unit", "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts" },
+      "integration": { "name": "Repeat and debounce integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "TitleScreen debounce story", "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx" },
+      "e2e": { "name": "Debounce e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "add failing AC6 tests", "green": "implement AC6", "refactor": "cleanup AC6" }
+    },
+    {
+      "ac_id": "AC7",
+      "unit": { "name": "Title story variants unit", "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts" },
+      "integration": { "name": "Title story variants integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "TitleScreen keyboard touch stories", "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx" },
+      "e2e": { "name": "Title story smoke e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "add failing AC7 tests", "green": "implement AC7", "refactor": "cleanup AC7" }
+    },
+    {
+      "ac_id": "AC8",
+      "unit": { "name": "Title behavior matrix unit", "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts" },
+      "integration": { "name": "Title behavior matrix integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "Title behavior matrix stories", "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx" },
+      "e2e": { "name": "Title behavior matrix e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "add failing AC8 tests", "green": "implement AC8", "refactor": "cleanup AC8" }
+    }
+  ],
+  "assumption_diff_reasons": {
+    "packages/client/src/ui/organisms/TitleScreen.tsx": "expected title UI/input behavior change",
+    "packages/client/src/ui/hooks/useTitleScreen.ts": "expected prompt and start-guard logic change",
+    "packages/client/src/ui/hooks/useTitleScreen.test.ts": "required unit evidence for all AC rows",
+    "packages/client/src/ui/organisms/TitleScreen.stories.tsx": "expected modality story updates",
+    "packages/client/src/stores/battleStore.test.ts": "expected behavior coverage updates",
+    "tests/e2e/title-screen.spec.ts": "required end-to-end evidence for all AC rows",
+    "codex/config.toml": "pre-existing environment config update unrelated to this card",
+    "package.json": "added orchestrator e2e runner scripts required by workflow",
+    "package-lock.json": "dependency lock update from Playwright installation",
+    ".codex/skills/backlog-orchestrate/": "skill consolidation and contract alignment for orchestrator runtime",
+    "docs/backlog-orchestrator-workflow.md": "workflow documentation update for fail-closed execution",
+    "kanban/backlog/evidence/": "card evidence manifest source directory update",
+    "kanban/reports/": "orchestrator-generated report artifacts",
+    "playwright.config.ts": "project e2e configuration required to scope Playwright tests",
+    "scripts/backlog-orchestrate.mjs": "orchestrator runtime hardening changes",
+    "scripts/run-playwright.mjs": "e2e wrapper argument forwarding fix",
+    "test-results/": "generated Playwright artifacts from validation run",
+    "tests/": "new e2e test files introduced for AC evidence coverage"
+  }
+}

@@ -13,6 +13,7 @@ description: Run session closing ceremony for this repo - execute quality gates,
 - Require explicit user confirmation before deleting local/remote branches.
 - Require explicit user confirmation before running opening ceremony on a newly created sprint branch.
 - Do not bypass critical findings from analysis.
+- When backlog-orchestrator files/cards/evidence are changed, require orchestrator gate results before close.
 
 ## Claude -> Codex Compatibility Map
 - Legacy `/work:ceremony-closing` command -> skill workflow.
