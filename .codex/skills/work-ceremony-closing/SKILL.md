@@ -9,6 +9,7 @@ description: Run session closing ceremony for this repo - execute quality gates,
 - Execute gates in required order and stop on blocking failures.
 - Separate sprint-close flow from feature/fix session-save flow.
 - Require explicit user confirmation before commit/merge/tag/push.
+- Require explicit user confirmation before terminating processes to remediate gate failures.
 - Do not bypass critical findings from analysis.
 
 ## Claude -> Codex Compatibility Map
@@ -19,12 +20,14 @@ description: Run session closing ceremony for this repo - execute quality gates,
 ## Workflow
 1. **Branch mode preamble:** classify branch and announce close mode.
 2. **Quality gates:** run steps from `references/quality-gates.md` in strict order; stop on blockers.
-3. **Change audit:** collect `git status`, diff, commit range; determine code-changed vs docs-only.
-4. **Code analysis gate:** run `analyze-code` equivalent when code changed; stop on critical findings.
-5. **Change summary:** produce intent-level bullets of what changed and why.
-6. **Documentation updates:** changelog, plan AC checks, context progress, and card cleanup using templates in references.
-7. **Confirmation gate:** present planned commit/merge/tag actions and wait for explicit approval.
-8. **Execution:** perform session-save or sprint-close sequence from `references/execution-sequences.md`.
+3. **Gate remediation (conditional):** when blockers are port/process conflicts, ask for explicit confirmation before terminating processes; if approved, rerun only failed/blocked gates.
+4. **Change audit:** collect `git status`, diff, commit range; determine code-changed vs docs-only.
+5. **Code analysis gate:** run `analyze-code` equivalent when code changed; stop on critical findings.
+6. **Change summary:** produce intent-level bullets of what changed and why.
+7. **Documentation updates:** changelog, plan AC checks, context progress, and card cleanup using templates in references.
+8. **Confirmation gate:** present planned commit/merge/tag actions and wait for explicit approval.
+9. **Execution:** perform session-save or sprint-close sequence from `references/execution-sequences.md`.
+10. **Post-close handoff:** provide next-step actions that start after the final execution step (what to do on the target branch next).
 
 ## Output Contract
-- Must include gate results, change audit, analysis outcome, proposed doc updates, and explicit execution plan.
+- Must include gate results, change audit, analysis outcome, proposed doc updates, explicit execution plan, and post-close next steps.

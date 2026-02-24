@@ -15,6 +15,8 @@ Milestone entries appear **above** the sprint entry that completed them.
 ## Sprint 8: Codex Skill Migration & Local Runtime Hardening
 **Date:** 2026-02-23 23:55 PST
 
+- 2026-02-24 02:36 PST: Updated `work-ceremony-closing` to require explicit user confirmation before killing conflicting processes and to rerun only failed/blocked gates after remediation.
+- 2026-02-24 02:59 PST: Added explicit post-close handoff requirements to `work-ceremony-closing` workflow and execution sequences (what to do after the final close step).
 - Migrated 10 Claude-era agent/command workflows into repo-local Codex skills
   under `.codex/skills/*` with explicit intent invariants, compatibility maps,
   and output contracts
