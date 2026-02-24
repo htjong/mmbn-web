@@ -13,7 +13,7 @@ Milestone entries appear **above** the sprint entry that completed them.
 ---
 
 ## Sprint 7: Sprint Process & Feature Workflow Overhaul
-**Date:** 2026-02-19 20:32 PST
+**Date:** 2026-02-19 – 2026-02-23 19:34 PST
 
 - Introduced `sprint/*` integration branch strategy and updated all docs
   (BRANCHING.md, CLAUDE.md, ceremony scripts) to reflect the new git workflow
