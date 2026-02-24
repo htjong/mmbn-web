@@ -4,7 +4,7 @@ import { useBattleStore } from '../../stores/battleStore';
 export function useBattleHud() {
   const store = useBattleStore();
   const state = store.battleState;
-  const { customScreenOpen } = store;
+  const { customScreenOpen, postConfirmLockActive, gameStartTextVisible } = store;
 
   // Keyboard handling for chip select — only active when custom screen is open.
   // Handler reads fresh store state at event time (no stale closure on cursor or OK state).
@@ -73,6 +73,8 @@ export function useBattleHud() {
 
     // Custom screen state
     customScreenOpen,
+    postConfirmLockActive,
+    gameStartTextVisible,
     chipCursorIndex: store.chipCursorIndex,
     chipCursorOnOk: store.chipCursorOnOk,
     customSelectedChipIndices: store.customSelectedChipIndices,

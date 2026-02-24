@@ -1,11 +1,27 @@
 import { create } from 'zustand';
 import { BattleEngine, BattleState, PlayerAction } from '@mmbn/shared';
 
+let gameStartTextTimer: ReturnType<typeof setTimeout> | null = null;
+let postConfirmUnlockTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearPostConfirmTimers() {
+  if (gameStartTextTimer) {
+    clearTimeout(gameStartTextTimer);
+    gameStartTextTimer = null;
+  }
+  if (postConfirmUnlockTimer) {
+    clearTimeout(postConfirmUnlockTimer);
+    postConfirmUnlockTimer = null;
+  }
+}
+
 interface BattleStore {
   // State
   gamePhase: 'menu' | 'battle';
   battleState: BattleState | null;
   customScreenOpen: boolean;
+  postConfirmLockActive: boolean;
+  gameStartTextVisible: boolean;
   chipCursorIndex: number;
   chipCursorOnOk: boolean;
   customSelectedChipIndices: number[];
@@ -16,6 +32,9 @@ interface BattleStore {
   applyAction: (playerId: string, action: PlayerAction) => void;
   tick: () => void;
   openCustomScreen: () => void;
+  startPostConfirmLock: () => void;
+  showGameStartText: () => void;
+  endPostConfirmLock: () => void;
 
   // Actions (called by React — chip select navigation)
   moveCursorLeft: () => void;
@@ -33,6 +52,8 @@ export const useBattleStore = create<BattleStore>((set) => ({
   gamePhase: 'menu',
   battleState: null,
   customScreenOpen: false,
+  postConfirmLockActive: false,
+  gameStartTextVisible: false,
   chipCursorIndex: 0,
   chipCursorOnOk: false,
   customSelectedChipIndices: [],
@@ -58,8 +79,11 @@ export const useBattleStore = create<BattleStore>((set) => ({
   openCustomScreen: () =>
     set((store) => {
       if (!store.battleState) return store;
+      clearPostConfirmTimers();
       return {
         customScreenOpen: true,
+        postConfirmLockActive: false,
+        gameStartTextVisible: false,
         chipCursorIndex: 0,
         chipCursorOnOk: false,
         customSelectedChipIndices: [],
@@ -76,6 +100,24 @@ export const useBattleStore = create<BattleStore>((set) => ({
         },
       };
     }),
+
+  startPostConfirmLock: () => {
+    clearPostConfirmTimers();
+    set({ postConfirmLockActive: true, gameStartTextVisible: false });
+    gameStartTextTimer = setTimeout(() => {
+      useBattleStore.getState().showGameStartText();
+    }, 1000);
+    postConfirmUnlockTimer = setTimeout(() => {
+      useBattleStore.getState().endPostConfirmLock();
+    }, 2000);
+  },
+
+  showGameStartText: () => set({ gameStartTextVisible: true }),
+
+  endPostConfirmLock: () => {
+    clearPostConfirmTimers();
+    set({ postConfirmLockActive: false, gameStartTextVisible: false });
+  },
 
   moveCursorLeft: () =>
     set((store) => {
@@ -150,7 +192,8 @@ export const useBattleStore = create<BattleStore>((set) => ({
       return store;
     }),
 
-  confirmChips: () =>
+  confirmChips: () => {
+    clearPostConfirmTimers();
     set((store) => {
       if (!store.battleState) return store;
       let currentState = store.battleState;
@@ -167,12 +210,33 @@ export const useBattleStore = create<BattleStore>((set) => ({
         }
       }
 
+      // Confirm AI chips for this round before battle resumes.
+      // Pick up to 3 chips from the front of hand.
+      const aiChipIds = currentState.player2.hand.slice(0, 3).map((chip) => chip.id);
+      for (const chipId of aiChipIds) {
+        const { state: aiUpdatedState } = BattleEngine.applyAction(currentState, 'player2', {
+          type: 'chip_select',
+          chipId,
+        });
+        currentState = aiUpdatedState;
+      }
+
       return {
         battleState: currentState,
         customScreenOpen: false,
+        postConfirmLockActive: true,
+        gameStartTextVisible: false,
         chipCursorIndex: 0,
         chipCursorOnOk: false,
         customSelectedChipIndices: [],
       };
-    }),
+    });
+
+    gameStartTextTimer = setTimeout(() => {
+      useBattleStore.getState().showGameStartText();
+    }, 1000);
+    postConfirmUnlockTimer = setTimeout(() => {
+      useBattleStore.getState().endPostConfirmLock();
+    }, 2000);
+  },
 }));

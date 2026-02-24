@@ -4,7 +4,7 @@ import { Chip } from '../types/Chip.js';
 import { GridSystem } from './GridSystem.js';
 import { ChipSystem } from './ChipSystem.js';
 
-const STARTING_HP = 100;
+const STARTING_HP = 500;
 const STARTING_CUSTOM_GAUGE_MAX = 600;
 export const HAND_SIZE = 10;
 const SELECTED_CHIPS_SIZE = 5;
@@ -168,7 +168,7 @@ export class BattleEngine {
     } else if (action.type === 'buster') {
       // Use buster attack — fires horizontally, hits only if same row
       if (player.busterCooldown === 0 && player.position.y === opponent.position.y) {
-        const busterDamage = 1;
+        const busterDamage = 10;
         opponent.hp = Math.max(0, opponent.hp - busterDamage);
 
         events.push({
