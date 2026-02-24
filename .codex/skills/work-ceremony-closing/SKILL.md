@@ -29,7 +29,8 @@ description: Run session closing ceremony for this repo - execute quality gates,
 7. **Documentation updates:** changelog, plan AC checks, context progress, and card cleanup using templates in references.
 8. **Confirmation gate:** present planned commit/merge/tag actions and wait for explicit approval.
 9. **Execution:** perform session-save or sprint-close sequence from `references/execution-sequences.md`.
-10. **Post-close handoff:** offer to execute post-close steps automatically; run only after explicit user confirmation, otherwise report exact next commands and stop.
+10. **Post-close handoff:** automatically present a `Yes/No` continuation prompt after execution; run post-close steps only if user selects `Yes`, otherwise report exact next commands and stop.
 
 ## Output Contract
 - Must include gate results, change audit, analysis outcome, proposed doc updates, explicit execution plan, and post-close next steps (executed or explicitly deferred).
+- For session-save success, must include an explicit prompt: `Continue with post-close steps now?` with `Yes` and `No` choices.

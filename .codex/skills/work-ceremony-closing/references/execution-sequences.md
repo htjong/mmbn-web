@@ -5,11 +5,12 @@
 2. Commit with scoped conventional message
 3. Push current branch
 4. Identify and report next merge target (typically active sprint branch)
-5. Prompt user for explicit permission to continue with post-close steps:
+5. Immediately after step 4, prompt user with: `Continue with post-close steps now?` (`Yes`/`No`)
+6. If `Yes`, execute post-close steps:
    - Merge feature branch into reported target branch.
    - Run integration gates on target branch: `npm run type-check`, `npm run lint`, `npm run test`.
    - If integration gates pass, delete merged feature branch (local and remote) with explicit confirmation.
-6. If user declines post-close execution, stop and provide exact merge/gate/cleanup commands.
+7. If `No`, stop and provide exact merge/gate/cleanup commands.
 
 ## Sprint Close (`sprint/N`)
 1. Commit docs/ceremony updates on sprint branch
