@@ -1,2 +1,2 @@
 # Mobile Support
-Touch controls for mobile browsers.
+Touch controls for mobile browsers. Possibly overlay controls (D Pad | SPACE | B+A) (can toggle on / off) with light opacity for visual hints. Chip selection screen is a modal over the battle scene with the same overlay controls. 

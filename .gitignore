@@ -19,3 +19,5 @@ coverage
 
 .archive
 .claude/plans/
+.claude/context/*
+!.claude/context/README.md

@@ -1,7 +1,7 @@
 # PLAN.md — MMBN Web Game
 
 > **Status:** Living document — updated as development progresses
-> **Last Updated:** 2026-02-18
+> **Last Updated:** 2026-02-19
 > **Methodology:** Agile/iterative — First Playable → iterate → MVP
 
 ---
@@ -10,12 +10,12 @@
 
 This project follows an **agile, iterative approach** with two key milestones:
 
-### First Playable (Current Target)
+### Major Release 1 - First Playable (Current Target)
 The **First Playable** is the earliest state where the core gameplay loop works end-to-end in the browser. It's not feature-complete or polished — it's the foundation we iterate on. Once reached, we can playtest, gather feedback, and make informed decisions about what to build next.
 
 **First Playable = a complete single-player battle against AI in the browser.**
 
-### MVP (Minimum Viable Product)
+### Major Release 2 - MVP (Minimum Viable Product)
 The **MVP** is the full shippable product — all major features implemented, tested, and polished enough for real users. It includes PVP multiplayer, campaign mode, content, and UI polish.
 
 **MVP = all Product Backlog milestones complete.**
@@ -52,10 +52,10 @@ Every piece of work follows this path. The folder a card is in IS its status.
 2. Delete the card from `kanban/ongoing/`
 3. Add a line to CHANGELOG.md under the current sprint (include date **and time**, e.g. `2026-02-18 20:18 PST`)
 
-**When ALL sprint AC in PLAN.md are checked:**
-1. Mark the sprint complete in PLAN.md (status → COMPLETE)
-2. Set the next sprint as current
-3. Move backlog cards for the next sprint into view
+**When ALL Milestone AC in PLAN.md are checked:**
+1. Mark the Milestone complete in PLAN.md (status → COMPLETE)
+2. Set the next Milestone as current
+3. Move backlog cards for the next Milestone into view
 
 #### Reading project state at a glance
 - **What's being worked on right now?** → `ls kanban/ongoing/`
@@ -66,7 +66,7 @@ Every piece of work follows this path. The folder a card is in IS its status.
 
 ---
 
-## Current Sprint: First Playable
+## Current Milestone (towards Major Release 1): First Playable
 
 **Status:** IN PROGRESS
 **Goal:** Playable single-player battle against AI in the browser
@@ -74,13 +74,22 @@ Every piece of work follows this path. The folder a card is in IS its status.
 
 ### Acceptance Criteria
 
-- [ ] Can play a complete battle against AI in the browser
-- [ ] Win/lose condition triggers correctly (HP reaches 0)
-- [ ] Chips deal damage when used (chip_use action works)
+- [x] Can play a complete battle against AI in the browser
+- [x] Win/lose condition triggers correctly (HP reaches 0)
+- [x] Chips deal damage when used (chip_use action works)
 - [x] Custom gauge fills and enables chip selection
-- [ ] AI opponent moves, attacks, and uses chips
-- [ ] All tests pass (`npm run test`)
-- [ ] TypeScript compiles clean (`npm run type-check`)
+- [x] AI opponent moves, attacks, and uses chips
+- [x] All tests pass (`npm run test`)
+- [x] TypeScript compiles clean (`npm run type-check`)
+- [x] Game start menu
+- [ ] Basic sprites, simple animations, 
+- [ ] Holding D Pad or WASD should still move the user (capped at 0.5 second delay)
+- [ ] Cooldown mechanics after using a chip
+- [ ] Simple audio for battle feedback (buster, chips)
+- [ ] Simple set of viruses and chips - and specific AI behavior for viruses
+- [ ] Feedback button UI for players to submit feedback to a DB
+- [ ] Simulate AI over network for 1v1
+- [ ] Test bed for campaign mode
 
 ---
 
@@ -88,7 +97,42 @@ Every piece of work follows this path. The folder a card is in IS its status.
 
 Everything below is ordered by priority. Each milestone builds on the previous ones.
 
-### Milestone 1: PVP Multiplayer
+### Milestone 1: Campaign Mode
+
+**Goal:** Offline single-player experience with progression — fight viruses, collect chips, manage folder.
+
+**Scope:**
+- Campaign manager (mission select, progression)
+- Virus AI (pattern-based behavior trees, more sophisticated than SimpleAI)
+- Save system (localStorage persistence)
+- Chip collection and folder management
+- Mission select screen
+
+**Acceptance Criteria:**
+- [ ] Player can select and complete missions against virus enemies
+- [ ] Defeated viruses drop chips that add to collection
+- [ ] Chip folder can be edited between battles
+- [ ] Progress persists across browser sessions
+- [ ] Multiple virus types with distinct AI behaviors
+
+### Milestone 2: Content Expansion
+
+**Goal:** Enough chips, viruses, and variety for engaging gameplay.
+
+**Scope:**
+- Expand chip library (~200 chips with diverse elements and effects)
+- Expand virus roster (~20 types with unique behaviors)
+- NaviCust/CustomProgram system
+- Element effectiveness depth
+
+**Acceptance Criteria:**
+- [ ] 50+ unique chips implemented with distinct effects (stretch: 200)
+- [ ] 20+ virus types with unique AI patterns
+- [ ] CustomProgram system functional
+- [ ] Element system creates strategic depth
+- [ ] Program Advance
+
+### Milestone 3: PVP Multiplayer
 
 **Goal:** Two players can find each other and battle in real-time over the network.
 
@@ -107,40 +151,6 @@ Everything below is ordered by priority. Each milestone builds on the previous o
 - [ ] Server validates all inputs (rejects invalid actions)
 - [ ] Disconnected player forfeits after timeout
 - [ ] Input lag < 100ms (feels responsive)
-
-### Milestone 2: Campaign Mode
-
-**Goal:** Offline single-player experience with progression — fight viruses, collect chips, manage folder.
-
-**Scope:**
-- Campaign manager (mission select, progression)
-- Virus AI (pattern-based behavior trees, more sophisticated than SimpleAI)
-- Save system (localStorage persistence)
-- Chip collection and folder management
-- Mission select screen
-
-**Acceptance Criteria:**
-- [ ] Player can select and complete missions against virus enemies
-- [ ] Defeated viruses drop chips that add to collection
-- [ ] Chip folder can be edited between battles
-- [ ] Progress persists across browser sessions
-- [ ] Multiple virus types with distinct AI behaviors
-
-### Milestone 3: Content Expansion
-
-**Goal:** Enough chips, viruses, and variety for engaging gameplay.
-
-**Scope:**
-- Expand chip library (~200 chips with diverse elements and effects)
-- Expand virus roster (~20 types with unique behaviors)
-- NaviCust/CustomProgram system
-- Element effectiveness depth
-
-**Acceptance Criteria:**
-- [ ] 50+ unique chips implemented with distinct effects (stretch: 200)
-- [ ] 20+ virus types with unique AI patterns
-- [ ] CustomProgram system functional
-- [ ] Element system creates strategic depth
 
 ### Milestone 4: Polish & UX
 
@@ -210,5 +220,5 @@ See [ideas/](./ideas/) for post-MVP ideas and raw thoughts.
 
 ---
 
-**Last Updated:** 2026-02-18
+**Last Updated:** 2026-02-19
 **Next Review:** After First Playable is achieved

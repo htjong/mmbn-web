@@ -90,7 +90,7 @@ Once the user commits:
 
 After writing the card, tell the user:
 - Which file was written
-- Suggest: "When you're ready to turn this into a backlog card, run `/feature:formalize [card path]`"
+- Suggest: "When you're ready to turn this into a backlog card, run `/feature:formalize [card path]`. The idea card content will be copied into the backlog card as an `## Origin` reference, then the idea card will be deleted."
 
 ## Boundaries
 

@@ -3,10 +3,10 @@
 > **Strategy:** Modified GitHub Flow optimized for rapid game development iteration
 >
 > **Principles:**
-> - Main branch is always deployable
-> - Short-lived feature branches (1-3 days max)
-> - Fast merges to unblock development
-> - Clear phase-based organization
+> - Main branch is always deployable — only receives sprint merge commits
+> - Sprint branches (`sprint/N`) are the WIP integration layer — all daily work lands here
+> - Short-lived feature branches (1-3 days max) branch off the sprint branch
+> - Clear milestone-based planning (milestones are PLAN.md concepts, not git branches)
 > - Minimal overhead for solo/small team development
 
 ---
@@ -15,17 +15,18 @@
 
 This project uses a **modified GitHub Flow** strategy that balances:
 - ✅ Fast iteration and unblocked development
-- ✅ Stability of main branch
-- ✅ Clear organization by game phases
-- ✅ Easy tracking of progress
+- ✅ Stability of main branch — only sprint merge commits land here
+- ✅ Milestone-oriented planning with sprint integration branches
+- ✅ Easy tracking of progress — each sprint tag maps to a merge commit
 - ✅ Straightforward for solo or small teams
 
 ```
-main (always stable, deployable)
-  ├── phase/3-client-rendering (dev work for Phase 3)
-  ├── feature/grid-click-input (feature within a phase)
-  ├── fix/navi-movement-bug (bugfix)
-  └── experiment/custom-gauge (exploration, may be discarded)
+main (always stable — one merge commit per sprint)
+  └── sprint/7 (active sprint integration branch)
+        ├── feature/game-start-menu (feature work)
+        ├── feature/hold-to-move (feature work)
+        ├── fix/navi-bounds (bug fix)
+        └── chore(kanban): update idea cards (PM commits land here directly)
 ```
 
 ---
@@ -42,52 +43,88 @@ main (always stable, deployable)
   - Squash and merge commits (clean history)
 
 **When to merge to main:**
-- Feature complete (even if small)
-- All tests passing
-- TypeScript compiling cleanly
-- Has been tested locally
+- The sprint's batch of work is done (your call — no formal sprint AC list)
+- Any milestone ACs satisfied this sprint are checked off in PLAN.md
+- All tests passing, TypeScript compiling cleanly
+- Ceremony-closing has run and the sprint changelog entry is written
+- Tag `v0.N.0` is applied to the merge commit
 
 ---
 
-### 2. **Phase Branches** (`phase/*`)
-- **Purpose:** Main development branch for each phase
-- **Naming:** `phase/N-phase-name` (e.g., `phase/3-client-rendering`)
-- **Lifetime:** Duration of the phase (~1-3 days)
+### 2. **Sprint Branches** (`sprint/*`)
+- **Purpose:** Integration branch for one sprint — all daily work accumulates here
+- **Naming:** `sprint/N` (e.g., `sprint/7`)
+- **Lifetime:** Duration of the sprint (typically 1–7 days)
 - **Branched from:** `main`
-- **Merges back to:** `main` when phase complete
+- **Merges back to:** `main` at sprint end (regular merge, not squash — preserve history)
 
-**Workflow for each phase:**
-```
-1. Create: git checkout -b phase/3-client-rendering main
-2. Work on features within the phase
-3. When phase complete: Merge PR back to main
-4. Delete branch after merge
+**What goes directly on the sprint branch (no sub-branch needed):**
+- PM commits (`chore(kanban):`, `chore(docs):`, `docs:`)
+- Small fixes (< 30 min, low risk)
+- Ceremony-closing changes (changelog, PLAN.md, progress.md)
+
+**What gets its own `feature/*` sub-branch:**
+- Any new game feature
+- Refactors touching multiple files
+- Risky or experimental work
+
+**Sprint lifecycle:**
+```bash
+# 1. Start sprint
+git checkout main && git pull origin main
+git checkout -b sprint/7
+
+# 2. Work (commit PM/docs directly, branch for features)
+git commit -m "chore(kanban): update idea cards"
+git checkout -b feature/game-start-menu  # branch for real features
+# ... merge feature back to sprint/7
+
+# 3. Close sprint — decide the batch of work is done, then:
+# Run /work:ceremony-closing (updates changelog, checks off any milestone ACs satisfied)
+git checkout main
+git merge sprint/7 --no-ff -m "chore(sprint): close Sprint 7 — [theme]"
+git tag -a v0.7.0 -m "Sprint 7: [theme]"
+git push origin main --tags
+git branch -d sprint/7
+git push origin --delete sprint/7
 ```
 
-**Example phases:**
-- `phase/1-project-setup` ✅ (completed, can delete)
-- `phase/2-battle-core` ✅ (completed, can delete)
-- `phase/3-client-rendering` 🔄 (current, active)
-- `phase/4-server-infrastructure` 🔲 (not started)
+---
+
+### 3. **Milestones (Planning Concept — not git branches)**
+
+Milestones are defined in `kanban/PLAN.md` and represent major deliverables
+(e.g., "First Playable", "PVP Multiplayer"). They span multiple sprints —
+too long for a practical git branch.
+
+**Milestones are NOT branches.** Work toward a milestone flows through
+`sprint/*` integration branches (and `feature/*` sub-branches within them),
+all of which eventually merge to `main` at sprint close.
+A milestone is "complete" when all its ACs in PLAN.md are checked off,
+at which point a `## 🏁 Milestone` entry is added to CHANGELOG.md.
 
 ---
 
 ### 3. **Feature Branches** (`feature/*`)
-- **Purpose:** Individual features or subsystems within a phase
-- **Naming:** `feature/[phase]-[feature-name]` (e.g., `feature/3-keyboard-input`)
+- **Purpose:** Individual features or subsystems toward a milestone
+- **Naming:** `feature/[descriptive-name]` (e.g., `feature/keyboard-input`)
 - **Lifetime:** 1-3 days (should be merged frequently)
-- **Branched from:** Phase branch (or main if working between phases)
-- **Merges back to:** Phase branch or main
+- **Branched from:** `sprint/N`
+- **Merges back to:** `sprint/N`
 
 **When to create a feature branch:**
-- Breaking down a phase into logical chunks
+- Implementing a distinct feature toward the current milestone
 - Working on a specific feature (grid rendering, input handling, etc.)
-- Need to experiment without blocking the phase branch
+- Need to isolate risky or multi-file changes from the sprint branch
+
+**When to skip a feature branch (commit directly to sprint/N):**
+- PM commits (`chore(kanban):`, `docs:`, small config tweaks)
+- Quick fixes under 30 minutes that are obviously safe
 
 **Example feature branches:**
-- `feature/3-grid-rendering`
-- `feature/3-navi-input`
-- `feature/3-battle-integration`
+- `feature/grid-rendering`
+- `feature/navi-input`
+- `feature/battle-integration`
 
 ---
 
@@ -95,11 +132,11 @@ main (always stable, deployable)
 - **Purpose:** Bug fixes
 - **Naming:** `fix/[description]` (e.g., `fix/navi-movement-bounds`)
 - **Lifetime:** Hours to 1 day
-- **Branched from:** Phase branch (or main if urgent hotfix)
-- **Merges back to:** Phase branch or main
+- **Branched from:** `sprint/N`
+- **Merges back to:** `sprint/N`
 
 **When to create a fix branch:**
-- Found a bug in current phase
+- Found a bug during current milestone work
 - Need to fix something critical
 - Want to isolate the fix from other work
 
@@ -109,8 +146,8 @@ main (always stable, deployable)
 - **Purpose:** Exploration, prototyping, testing ideas
 - **Naming:** `experiment/[idea]` (e.g., `experiment/custom-gauge-animation`)
 - **Lifetime:** Short-lived, exploratory only
-- **Branched from:** main or phase branch
-- **Merges back to:** main (if successful) or deleted (if unsuccessful)
+- **Branched from:** `sprint/N`
+- **Merges back to:** `sprint/N` (if successful) or deleted (if unsuccessful)
 
 **When to create an experiment branch:**
 - Trying a new architecture or approach
@@ -127,7 +164,7 @@ main (always stable, deployable)
 - **Naming:** `hotfix/[critical-issue]`
 - **Lifetime:** Hours (urgent)
 - **Branched from:** main (directly)
-- **Merges back to:** main (immediately) + phase branches (later)
+- **Merges back to:** `main` (immediately)
 
 **When to create a hotfix branch:**
 - Critical bug in deployed game
@@ -143,7 +180,6 @@ git commit -m "Fix: critical bug in grid renderer"
 git push origin hotfix/critical-bug
 # Create PR to main - expedite review
 # Merge to main immediately
-# Then cherry-pick to active phase branch if needed
 ```
 
 ---
@@ -152,21 +188,25 @@ git push origin hotfix/critical-bug
 
 ### Branch Naming Format
 ```
-<type>/<phase>-<descriptive-name>
+<type>/<descriptive-name>
+```
+
+Sprint branches use a number only:
+```
+sprint/<N>
 ```
 
 ### Examples
 
 ✅ **Good:**
-- `phase/3-client-rendering`
-- `feature/3-grid-click-input`
+- `sprint/7`
+- `feature/grid-click-input`
 - `fix/navi-movement-bounds`
 - `experiment/custom-gauge-animation`
 - `hotfix/typescript-error-rendering`
 
 ❌ **Bad:**
-- `phase3` (unclear, missing phase name)
-- `feature-grid` (no phase reference)
+- `feature-grid` (missing type prefix)
 - `fix-bug` (vague)
 - `dev` (ambiguous)
 - `wip` (too informal)
@@ -238,71 +278,65 @@ wip
 
 ## Workflows
 
-### Workflow 1: Complete a Phase Feature
+### Workflow 1: Complete a Feature Toward a Milestone
 
 ```bash
-# Start new phase work
-git checkout main
-git pull origin main
-git checkout -b phase/3-client-rendering main
-
-# Create feature branch for specific work
-git checkout -b feature/3-grid-rendering phase/3-client-rendering
+# Branch off the active sprint branch (not main)
+git checkout sprint/7
+git checkout -b feature/grid-rendering
 
 # Make changes, test, commit
-echo "// grid code" > packages/client/src/rendering/GridRenderer.ts
 npm run type-check && npm run test
-git add .
+git add packages/client/src/rendering/GridRenderer.ts
 git commit -m "feat(rendering): Implement grid renderer
 
 - 6x3 grid with panel ownership visualization
 - Blue for player1, red for player2, gray for neutral
 - Updates in real-time as battle state changes"
 
-# Push and create PR
-git push origin feature/3-grid-rendering
-# Create PR from feature/3-grid-rendering → phase/3-client-rendering
+# Merge back to sprint branch (not main)
+git checkout sprint/7
+git merge --squash feature/grid-rendering
+git commit -m "feat(rendering): Implement grid renderer"
+git branch -d feature/grid-rendering
 
-# After review, merge (can be just your own review if solo)
-# Delete feature branch after merge
-
-# Continue with next feature
-git checkout phase/3-client-rendering
-git pull
-git checkout -b feature/3-navi-movement
-# ... repeat
+# Continue with next feature — still on sprint/7
+git checkout -b feature/navi-movement
+# ... repeat until sprint is done
 ```
 
 ### Workflow 2: Fix a Bug During Development
 
 ```bash
-# You're on feature/3-grid-rendering and find a bug
+# Branch off the active sprint branch
+git checkout sprint/7
 git checkout -b fix/grid-color-parsing
 
 # Fix and test
 npm run test
 git commit -m "fix(rendering): Fix hex color parsing in GridRenderer"
 
-# Merge back to the feature/phase branch
-git push origin fix/grid-color-parsing
-# Create PR to feature/3-grid-rendering
-# Merge after review
+# Merge back to sprint branch
+git checkout sprint/7
+git merge --squash fix/grid-color-parsing
+git commit -m "fix(rendering): Fix hex color parsing in GridRenderer"
+git branch -d fix/grid-color-parsing
 ```
 
 ### Workflow 3: Experiment with a New Approach
 
 ```bash
-# Try something risky without blocking phase work
-git checkout -b experiment/custom-gauge-performance main
+# Branch off sprint branch — safe to discard without affecting sprint
+git checkout -b experiment/custom-gauge-performance sprint/7
 
 # Try optimization idea
-# If it works: merge to main
+# If it works: merge back to sprint/7
 # If it doesn't: just delete the branch (no merge)
 
 git push origin experiment/custom-gauge-performance
 
 # Experiment leads nowhere?
-git checkout main
+git checkout sprint/7
 git branch -D experiment/custom-gauge-performance
 ```
 
@@ -317,12 +351,49 @@ git commit -m "fix: restore missing import in BattleEngine"
 
 # Push and create PR with "URGENT" or high priority
 git push origin hotfix/typescript-compilation-error
-# Create PR - request immediate review
-
-# After merge to main, apply to active phase branch if needed
-git checkout phase/3-client-rendering
+# Create PR to main - request immediate review
+# Merge to main immediately
+# Then cherry-pick to active sprint branch to stay in sync:
+git checkout sprint/7
 git cherry-pick <commit-hash>
-git push origin phase/3-client-rendering
+```
+
+### Workflow 5: Sprint Lifecycle (Start → Work → Close)
+
+```bash
+# ── START OF SPRINT ──────────────────────────────────────────
+git checkout main && git pull origin main
+git checkout -b sprint/7
+
+# ── DURING SPRINT ────────────────────────────────────────────
+# PM / docs commits go directly on sprint branch:
+git commit -m "chore(kanban): update idea cards"
+
+# Feature work gets its own branch off sprint:
+git checkout -b feature/game-start-menu
+# ... implement, then merge back:
+git checkout sprint/7
+git merge --squash feature/game-start-menu
+git commit -m "feat(ui): add game start menu"
+git branch -d feature/game-start-menu
+
+# ── CLOSE SPRINT ─────────────────────────────────────────────
+# 1. Run ceremony-closing (/work:ceremony-closing) — updates changelog,
+#    checks off any milestone ACs satisfied, commits docs to sprint/7
+
+# 2. Merge sprint branch to main (--no-ff preserves sprint history)
+git checkout main
+git merge sprint/7 --no-ff -m "chore(sprint): close Sprint 7 — Game Start Menu & Input Polish"
+
+# 3. Tag the merge commit
+git tag -a v0.7.0 -m "Sprint 7: Game Start Menu & Input Polish"
+
+# 4. Push everything
+git push origin main --tags
+
+# 5. Clean up sprint branch
+git branch -d sprint/7
+git push origin --delete sprint/7
 ```
 
 ---
@@ -435,7 +506,7 @@ After automated checks pass, manually verify:
 - New systems (camera, input, effects)
 - Significant refactoring
 - Anything that would "vastly change the architecture"
-- Features spanning multiple phases
+- Features spanning multiple milestones
 
 **Before implementation, ask:**
 
@@ -470,11 +541,11 @@ After automated checks pass, manually verify:
 **How to execute:** Think through, discuss with yourself, document assumptions
 
 **Examples of when to do Tier 3:**
-- ✅ Phase 3: Adding input handling to battle system
-- ✅ Phase 4: Designing server battle simulation
-- ✅ Phase 5: Implementing client-server state sync
-- ❌ Phase 7: Adding new chip to data file (skip, it's data)
-- ❌ Phase 8: Tweaking UI colors (skip, cosmetic)
+- ✅ Adding input handling to the battle system
+- ✅ Designing server battle simulation
+- ✅ Implementing client-server state sync
+- ❌ Adding a new chip to the data file (skip, it's data)
+- ❌ Tweaking UI colors (skip, cosmetic)
 
 ---
 
@@ -524,70 +595,58 @@ Require linear history: Optional (recommended: Yes)
 
 ---
 
-## Phase-Based Organization
+## Milestone-Based Organization
 
-### Phase 1-2 (Completed)
-```
-✅ main (contains all completed work)
-```
+Milestones are defined in `kanban/PLAN.md`. Work flows through `sprint/*` integration branches,
+with `feature/*` sub-branches within each sprint. Only sprint merge commits land on `main`.
 
-### Phase 3 (Current)
-```
-main
-└── phase/3-client-rendering
-    ├── feature/3-grid-rendering ✅ (merged)
-    ├── feature/3-navi-movement 🔄 (in progress)
-    ├── feature/3-chip-effects 🔲 (queued)
-    └── fix/input-bounds 🔲 (if needed)
-```
+### First Playable (In Progress — Sprint 1–N)
+Each sprint delivers a batch of work toward the milestone.
+Milestone complete when all ACs in PLAN.md are checked.
+A `## 🏁 Milestone` changelog entry is written at that point.
 
-### Phase 4+ (Future)
-```
-main (will hold all previous phases)
-├── phase/4-server-infrastructure
-├── phase/5-client-server-integration
-└── ... etc
-```
+### Campaign Mode, PVP Multiplayer, Content Expansion, Polish & UX, Competitive Features (Future)
+Each will be delivered across multiple sprints in the same pattern.
 
 ---
 
 ## Common Git Commands
 
-### Create a feature branch
+### Start a new sprint
 ```bash
-git checkout -b feature/3-keyboard-input main
+git checkout main && git pull origin main
+git checkout -b sprint/7
+git push origin sprint/7
+```
+
+### Create a feature branch (off sprint)
+```bash
+git checkout -b feature/keyboard-input sprint/7
 ```
 
 ### Work and commit
 ```bash
 git status
-git add .
+git add packages/client/src/input/InputHandler.ts
 git commit -m "feat(input): Add keyboard input handling for movement"
 ```
 
-### Push and create PR
+### Merge feature back to sprint (squash)
 ```bash
-git push origin feature/3-keyboard-input
-# Then create PR on GitHub/GitLab
+git checkout sprint/7
+git merge --squash feature/keyboard-input
+git commit -m "feat(input): Add keyboard input handling for movement"
+git branch -d feature/keyboard-input
 ```
 
-### Merge PR locally (if needed)
+### Close sprint — merge to main and tag
 ```bash
 git checkout main
-git pull origin main
-git merge --squash feature/3-keyboard-input
-git commit -m "feat(input): Add keyboard input handling for movement"
-git push origin main
-```
-
-### Delete local branch
-```bash
-git branch -d feature/3-keyboard-input
-```
-
-### Delete remote branch
-```bash
-git push origin --delete feature/3-keyboard-input
+git merge sprint/7 --no-ff -m "chore(sprint): close Sprint 7 — [theme]"
+git tag -a v0.7.0 -m "Sprint 7: [theme]"
+git push origin main --tags
+git branch -d sprint/7
+git push origin --delete sprint/7
 ```
 
 ### View all branches
@@ -597,8 +656,8 @@ git branch -a
 
 ### Switch between branches
 ```bash
-git checkout phase/3-client-rendering
-git checkout feature/3-grid-rendering
+git checkout sprint/7
+git checkout feature/grid-rendering
 ```
 
 ---
@@ -606,10 +665,10 @@ git checkout feature/3-grid-rendering
 ## Best Practices
 
 ### ✅ Do
-- ✅ Create branches for all work (never commit directly to main)
-- ✅ Keep branches focused on single feature/fix
-- ✅ Merge frequently (at least daily)
-- ✅ Delete branches after merge
+- ✅ All daily work goes to `sprint/N` — never commit directly to main
+- ✅ Keep `feature/*` branches focused on a single feature/fix
+- ✅ Merge feature branches back to sprint branch frequently (at least daily)
+- ✅ Delete feature/fix branches after merging to sprint
 - ✅ Write descriptive commit messages
 - ✅ Test before pushing
 - ✅ Use type-safe imports: `import { ... } from '@mmbn/shared'`
@@ -618,54 +677,67 @@ git checkout feature/3-grid-rendering
 ### ❌ Don't
 - ❌ Force push to main
 - ❌ Commit directly to main
-- ❌ Long-lived branches (>3 days)
-- ❌ Mix multiple features in one branch
+- ❌ Long-lived `feature/*` or `fix/*` branches (>3 days) — merge to sprint and move on
+- ❌ Mix multiple features in one `feature/*` branch
 - ❌ Push broken code (check `npm run type-check` first)
 - ❌ Large commits without clear message
 - ❌ Delete main branch
 - ❌ Rebase main (use squash merge instead)
 
+**Note on sprint branch lifetime:** `sprint/*` branches are the exception to the "no long-lived branches" rule. A sprint can span 1–7 days by design. The constraint is on `feature/*` branches within the sprint, not on the sprint branch itself.
+
 ---
 
 ## Typical Week of Development
 
+Milestones are the north star. Sprints are the weekly cadence. `main` only moves at sprint close.
+
 ### Monday
 ```
-✅ Phase 1-2: Complete (merged to main)
-🔄 Phase 3: Start
-   ├─ phase/3-client-rendering created
-   ├─ feature/3-grid-rendering in progress
+Milestone: First Playable (in progress)
+
+git checkout -b sprint/7 main   ← sprint branch created
+
+🔄 feature/chip-damage-engine branched from sprint/7
+   ├─ ChipSystem.ts updated — chips deal damage
+   └─ BattleEngine tests updated
 ```
 
 ### Tuesday
 ```
-✅ feature/3-grid-rendering merged to phase/3-client-rendering
-🔄 feature/3-navi-movement in progress
-   (feature/3-grid-rendering branch deleted)
+✅ feature/chip-damage-engine merged to sprint/7 (deleted)
+🔄 feature/simple-ai-wiring branched from sprint/7
+   └─ SimpleAI.ts + BattleScene integration
+chore(kanban): add idea cards   ← PM commit directly on sprint/7
 ```
 
 ### Wednesday
 ```
-✅ feature/3-navi-movement merged
-🔄 feature/3-battle-integration in progress
-✅ Phase 3 nearing completion
+✅ feature/simple-ai-wiring merged to sprint/7 (deleted)
+🔄 feature/hud-react-overlay branched from sprint/7
+   ├─ React HUD components
+   └─ Zustand store integration
 ```
 
 ### Thursday
 ```
-✅ Phase 3: Complete
-   ├─ phase/3-client-rendering merged to main
-   ├─ All feature branches deleted
-   ├─ main branch now contains Phases 1-3
-🔄 Phase 4: Start
-   └─ phase/4-server-infrastructure created
+✅ feature/hud-react-overlay merged to sprint/7 (deleted)
+🔄 /work:ceremony-closing runs on sprint/7
+   ├─ Changelog entry written, milestone ACs checked off
+   └─ All docs updated
+
+git checkout main
+git merge sprint/7 --no-ff     ← sprint closes, main moves
+git tag -a v0.7.0              ← tagged
+git push origin main --tags
+git branch -d sprint/7
 ```
 
 ### Friday
 ```
-🔄 Phase 4 development
-   ├─ feature/4-socket-setup in progress
-   └─ experiment/custom-protocol-testing (exploration)
+git checkout -b sprint/8 main  ← next sprint starts immediately
+🔄 feature/win-lose-condition branched from sprint/8
+└─ experiment/battle-replay branched from sprint/8 (exploration)
 ```
 
 ---
@@ -710,56 +782,47 @@ git log main..HEAD  # Show commits in current branch
 ### Version Format
 
 ```
-v0.<phase>.<patch>
+v0.<sprint>.<patch>
 ```
 
 - **Major (`0`):** Stays at `0` until first public release (v1.0.0)
-- **Minor:** Maps to the completed phase number
-- **Patch:** Increments for hotfixes or follow-up fixes within a phase
-
-### Existing Tags
-
-| Tag | Description |
-|-----|-------------|
-| `v0.1.0` | Phases 1+2: Project setup, monorepo, shared battle core |
-| `v0.3.0` | Phase 3: Client rendering, input handling, real-time battle loop |
-| `v0.4.0` | Phase 4: Server infrastructure - matchmaking, battle rooms |
+- **Minor:** Maps to the completed sprint number
+- **Patch:** Increments for hotfixes or follow-up fixes within a sprint
 
 ### When to Tag
 
-Tag main after a phase is **complete and merged**:
-1. All phase work merged to main
-2. All tests passing (`npm run test`)
-3. TypeScript compiling (`npm run type-check`)
-4. Tested locally (browser or server as applicable)
+Tag `main` immediately after merging the sprint branch:
+1. `sprint/N` merged to `main` with `--no-ff`
+2. Ceremony-closing has run — changelog updated, milestone ACs checked
+3. All tests passing, TypeScript compiling
 
 ### How to Tag
 
 ```bash
-# After merging phase work to main
-git checkout main
-git pull origin main
-git tag -a v0.<phase>.0 -m "Phase <N>: <short description>"
-git push origin v0.<phase>.0
+# Immediately after: git merge sprint/N --no-ff
+git tag -a v0.<N>.0 -m "Sprint <N>: <short description>"
+git push origin main --tags
 ```
+
+Tag the merge commit — not a feature commit or docs commit mid-sprint.
 
 ### Patch Tags
 
-For hotfixes or follow-up fixes after a phase tag:
+For hotfixes or follow-up fixes after a sprint tag:
 
 ```bash
-# e.g., fixing a bug discovered after Phase 3 was tagged
-git tag -a v0.3.1 -m "Phase 3: Fix InputHandler test environment"
-git push origin v0.3.1
+# e.g., fixing a bug discovered after Sprint 7 was tagged
+git tag -a v0.7.1 -m "Sprint 7: Fix [description]"
+git push origin v0.7.1
 ```
 
 ### v1.0.0 Milestone
 
 The project graduates to `v1.0.0` when:
-- Campaign mode is playable (Phase 6)
-- PVP matchmaking works end-to-end (Phases 4-5)
-- Core content exists (Phase 7 minimum viable)
-- UI is polished enough for public use (Phase 8)
+- First Playable milestone complete
+- PVP Multiplayer milestone complete
+- Campaign Mode milestone complete
+- Polish & UX milestone complete
 
 After v1.0.0, follow standard [semver](https://semver.org/):
 - **Major:** Breaking changes to network protocol or save format
@@ -791,9 +854,9 @@ This ensures main is always stable and deployable.
 | **Merge strategy** | Squash and merge to main |
 | **Iteration speed** | Daily or multiple times daily |
 | **Team scalability** | Good for 1-10 developers |
-| **Release process** | Tag main per phase (see Tagging Strategy) |
+| **Release process** | Tag main per sprint/milestone (see Tagging Strategy) |
 | **Hotfix handling** | Direct branch from main, urgent merge |
 
 ---
 
-**Last Updated:** 2026-02-17
+**Last Updated:** 2026-02-19

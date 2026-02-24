@@ -1,6 +1,64 @@
 # Changelog
 
-All notable project progress is documented here, organized by sprint.
+Two entry types exist:
+
+**Sprint entries** — record what was implemented in a focused session.
+**Milestone entries** — mark when a major deliverable's all ACs are satisfied.
+
+Sprint format: `## Sprint N: Title` / Date / bullets / Key decisions
+Milestone format: `## 🏁 Milestone: Name` / Reached date / Sprint range / 2-3 sentence summary
+
+Milestone entries appear **above** the sprint entry that completed them.
+
+---
+
+## Sprint 7: Sprint Process & Feature Workflow Overhaul
+**Date:** 2026-02-19 – 2026-02-23 19:34 PST
+
+- Introduced `sprint/*` integration branch strategy and updated all docs
+  (BRANCHING.md, CLAUDE.md, ceremony scripts) to reflect the new git workflow
+- Removed context files from the repo — context is now generated locally per
+  session and never committed, reducing noise from per-user state files
+- Added `/work:ceremony-opening` command to open sprint branches cleanly and
+  stamp a placeholder changelog entry
+- Hardened `/work:ceremony-closing` with sequential verification gates
+  (type-check, lint, tests, dev server, Storybook) and a full merge/tag/push
+  sequence; added code-change detection in Step 2a to skip the `analyze-code`
+  agent when only docs/kanban/.claude files changed
+- Added test-runner agent and wired it into ceremony-closing's failure path for
+  deep test diagnosis
+- Updated `/feature:formalize` to embed the source idea card's full content into
+  the backlog card under `## Origin` then delete the idea file, making backlog
+  cards fully self-contained
+- Updated `/feature:explore` handoff message to set user expectations about the
+  embed-and-delete behavior
+- Promoted game-start-menu idea to a formalized backlog card with full spec and
+  architecture review
+
+- Implemented game start menu — TitleScreen organism with MMBN-styled title,
+  blinking "PRESS ENTER TO START" prompt, and Enter/click to start; gated behind
+  `gamePhase: 'menu' | 'battle'` in Zustand store; `App` root component routes
+  between TitleScreen and BattleHud based on phase
+- Gated `BattleScene.update()` on `gamePhase` so the engine is frozen during the
+  title screen; `BattleScene.create()` still pre-loads battle state so chip select
+  opens immediately on game start
+- Added context-aware battle controls hint to ChipSelectPanel — shows
+  `WASD: move · K: use chip · J: buster · Space: open chip selection` when chip
+  select is inactive at full opacity, while chip content remains dimmed
+- Added TitleScreen Storybook story
+- Pointed subdomain mmbn.howardtjong.com (Namecheap A record) at DigitalOcean
+  Droplet IP; diagnosed HTTPS redirect issue — Nginx config had `server_name _;`
+  (catch-all) which blocked Certbot from matching the domain; fixed by setting
+  `server_name mmbn.howardtjong.com;` in `/etc/nginx/sites-enabled/mmbn`, then ran
+  `certbot install --cert-name mmbn.howardtjong.com` to complete SSL installation;
+  site now serves HTTPS with valid cert, pending DNS propagation
+
+**Key decisions:**
+- Idea cards are deleted after formalization — their content lives on in the
+  backlog card's `## Origin` section, keeping the board clean without losing history
+- Context files are gitignored and generated locally; no per-user state in the repo
+- Code analysis is skipped when no code files changed — avoids wasted agent cost
+  on doc-only sessions
 
 ---
 

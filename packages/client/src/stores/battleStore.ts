@@ -3,6 +3,7 @@ import { BattleEngine, BattleState, PlayerAction } from '@mmbn/shared';
 
 interface BattleStore {
   // State
+  gamePhase: 'menu' | 'battle';
   battleState: BattleState | null;
   customScreenOpen: boolean;
   chipCursorIndex: number;
@@ -10,6 +11,7 @@ interface BattleStore {
   customSelectedChipIndices: number[];
 
   // Actions (called by Phaser)
+  startGame: () => void;
   init: (state: BattleState) => void;
   applyAction: (playerId: string, action: PlayerAction) => void;
   tick: () => void;
@@ -28,11 +30,14 @@ interface BattleStore {
 }
 
 export const useBattleStore = create<BattleStore>((set) => ({
+  gamePhase: 'menu',
   battleState: null,
   customScreenOpen: false,
   chipCursorIndex: 0,
   chipCursorOnOk: false,
   customSelectedChipIndices: [],
+
+  startGame: () => set({ gamePhase: 'battle' }),
 
   init: (state) => set({ battleState: state }),
 

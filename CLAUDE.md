@@ -56,9 +56,10 @@ As Claude Code working on this project, I ensure these responsibilities:
 
 ### 3. Git Workflow Adherence
 - Follow [BRANCHING.md](./docs/BRANCHING.md) strategy religiously
-- Create feature branches for all work (`feature/phase-name`)
+- All daily work goes on the active `sprint/N` branch — never commit directly to `main`
+- Feature work gets its own `feature/descriptive-name` branch off `sprint/N`; PM/docs commits go directly on `sprint/N`
 - Use conventional commit messages (`feat(scope): description`)
-- Never commit directly to main
+- `main` only receives sprint merge commits (`--no-ff`) tagged `v0.N.0`
 - Update kanban cards and kanban/PLAN.md after significant progress
 
 ### 4. Documentation Maintenance
@@ -81,7 +82,7 @@ As Claude Code working on this project, I ensure these responsibilities:
 ### 7. Progress Tracking
 - Mark tasks in progress when starting: `TaskUpdate #4 in_progress`
 - Mark tasks complete when done: `TaskUpdate #4 completed`
-- Create subtasks for complex phases
+- Create subtasks for complex features or milestones
 - Keep task list clean and up-to-date
 
 ### 8. Problem-Solving Approach
@@ -110,10 +111,10 @@ As Claude Code working on this project, I ensure these responsibilities:
 
 ### Red Flags I Watch For
 
-❌ Committing directly to main
+❌ Committing directly to main (all work goes to `sprint/N` first)
 ❌ Skipping tests
 ❌ Breaking TypeScript compilation
-❌ Long-lived branches (>3 days)
+❌ Long-lived `feature/*` or `fix/*` branches (>3 days) — `sprint/*` branches are the exception
 ❌ Vague commit messages
 ❌ Mixing multiple features in one branch
 ❌ Not updating kanban/CHANGELOG.md / kanban/PLAN.md after significant work
@@ -185,17 +186,19 @@ Import shared code in client/server using: `import { ... } from '@mmbn/shared'`
 ## Git Workflow
 
 Follow the [BRANCHING.md](./docs/BRANCHING.md) strategy:
-- Create feature branches: `git checkout -b feature/phase-name main`
+- Start each sprint: `git checkout -b sprint/N main`
+- Feature work: `git checkout -b feature/descriptive-name sprint/N`
 - Commit with conventional messages: `feat(scope): description`
-- Push and create PRs: `git push origin feature/...`
-- Merge to main when complete
+- Merge features back to sprint branch; close sprint by merging sprint → main with `--no-ff`
 
 **Branch types:**
-- `phase/*` - Main development for each phase
-- `feature/*` - Individual features within a phase
-- `fix/*` - Bug fixes
-- `experiment/*` - Exploratory work
-- `hotfix/*` - Critical fixes to main
+- `sprint/*` - Integration branch for one sprint (1–7 days); all daily work lands here
+- `feature/*` - Individual features branched off `sprint/N`, merged back to `sprint/N`
+- `fix/*` - Bug fixes branched off `sprint/N`
+- `experiment/*` - Exploratory work branched off `sprint/N`
+- `hotfix/*` - Critical fixes to `main` directly (cherry-pick back to sprint branch after)
+
+Milestones are planning concepts tracked in `kanban/PLAN.md`, not git branches. `sprint/*` is the primary integration unit; `feature/*` branches are short-lived work units within a sprint.
 
 ## Development Commands
 
