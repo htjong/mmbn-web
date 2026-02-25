@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { CHIPS, SimpleAI, BattleEngine, BattleState, HAND_SIZE } from '@mmbn/shared';
 import { GridRenderer } from '../rendering/GridRenderer';
 import { NaviRenderer } from '../rendering/NaviRenderer';
+import { NAVI_TEXTURES } from '../rendering/naviSprites';
 import { InputHandler } from '../input/InputHandler';
 import { useBattleStore } from '../stores/battleStore';
 
@@ -20,6 +21,12 @@ export class BattleScene extends Phaser.Scene {
 
   constructor() {
     super('BattleScene');
+  }
+
+  preload() {
+    for (const texture of NAVI_TEXTURES) {
+      this.load.image(texture.key, texture.url);
+    }
   }
 
   create() {
@@ -77,7 +84,7 @@ export class BattleScene extends Phaser.Scene {
     console.log('BattleScene created');
   }
 
-  update() {
+  update(_time: number, _delta: number) {
     const store = useBattleStore.getState();
 
     if (store.gamePhase === 'menu') return;
@@ -147,20 +154,8 @@ export class BattleScene extends Phaser.Scene {
 
   private renderGrid(state: BattleState) {
     this.gridRenderer?.update(state.grid);
-    this.naviRendererPlayer1?.update(
-      state.player1.position,
-      state.grid,
-      GRID_START_X,
-      GRID_START_Y,
-      PANEL_SIZE
-    );
-    this.naviRendererPlayer2?.update(
-      state.player2.position,
-      state.grid,
-      GRID_START_X,
-      GRID_START_Y,
-      PANEL_SIZE
-    );
+    this.naviRendererPlayer1?.update(state.player1, GRID_START_X, GRID_START_Y, PANEL_SIZE);
+    this.naviRendererPlayer2?.update(state.player2, GRID_START_X, GRID_START_Y, PANEL_SIZE);
   }
 
   shutdown() {

@@ -15,6 +15,8 @@ export interface PlayerState {
   position: { x: number; y: number }; // Navi position on grid (0-5 x, 0-2 y)
   isStunned: boolean;
   busterCooldown: number; // Frames until buster can be used again (0 = ready)
+  busterPhase: 'idle' | 'firing' | 'landing' | 'cooldown';
+  busterFramesRemaining: number;
 }
 
 export interface BattleState {

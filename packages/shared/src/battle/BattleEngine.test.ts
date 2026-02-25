@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { BattleEngine, HAND_SIZE } from './BattleEngine';
+import {
+  BattleEngine,
+  BUSTER_COOLDOWN_FRAMES,
+  BUSTER_FIRE_FRAMES,
+  BUSTER_LAND_DELAY_FRAMES,
+  HAND_SIZE,
+} from './BattleEngine';
 import { CHIPS } from '../data/chips';
 
 describe('BattleEngine', () => {
@@ -11,8 +17,8 @@ describe('BattleEngine', () => {
     expect(state.frame).toBe(0);
     expect(state.player1.id).toBe('player1');
     expect(state.player2.id).toBe('player2');
-    expect(state.player1.hp).toBe(500);
-    expect(state.player2.hp).toBe(500);
+    expect(state.player1.hp).toBe(1000);
+    expect(state.player2.hp).toBe(1000);
     expect(state.isGameOver).toBe(false);
     expect(state.grid.length).toBe(3);
     expect(state.grid[0].length).toBe(6);
@@ -135,29 +141,57 @@ describe('BattleEngine', () => {
     expect(newState.player1.position.x).toBe(1); // Should not move
   });
 
-  it('should handle buster attack', () => {
+  it('should resolve buster damage after firing and landing delays', () => {
     const chipList = Object.values(CHIPS);
     const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
     const initialHp = state.player2.hp;
-    const { state: newState, events } = BattleEngine.applyAction(state, 'player1', {
-      type: 'buster',
-    });
+    const { state: startedState, events: startEvents } = BattleEngine.applyAction(
+      state,
+      'player1',
+      {
+        type: 'buster',
+      }
+    );
+    expect(startEvents.some((e) => e.type === 'buster_used')).toBe(false);
+    expect(startedState.player1.busterPhase).toBe('firing');
+    expect(startedState.player2.hp).toBe(initialHp);
 
-    expect(newState.player2.hp).toBe(initialHp - 10);
+    let current = startedState;
+    for (let i = 0; i < BUSTER_FIRE_FRAMES + BUSTER_LAND_DELAY_FRAMES - 1; i++) {
+      ({ state: current } = BattleEngine.tick(current));
+    }
+    expect(current.player2.hp).toBe(initialHp);
+
+    const { state: resolvedState, events } = BattleEngine.tick(current);
+    expect(resolvedState.player2.hp).toBe(initialHp - 10);
     expect(events.some((e) => e.type === 'buster_used')).toBe(true);
   });
 
-  it('should keep buster available every turn', () => {
+  it('should enforce post-land buster cooldown before refire', () => {
     const chipList = Object.values(CHIPS);
     const state = BattleEngine.createInitialState('player1', 'player2', chipList, 'Alice', 'Bob');
 
-    // Use buster
-    const { state: state1 } = BattleEngine.applyAction(state, 'player1', {
+    let current = state;
+    ({ state: current } = BattleEngine.applyAction(current, 'player1', {
+      type: 'buster',
+    }));
+    for (let i = 0; i < BUSTER_FIRE_FRAMES + BUSTER_LAND_DELAY_FRAMES; i++) {
+      ({ state: current } = BattleEngine.tick(current));
+    }
+    expect(current.player1.busterPhase).toBe('cooldown');
+    expect(current.player1.busterCooldown).toBe(BUSTER_COOLDOWN_FRAMES);
+
+    const { state: blockedRefire } = BattleEngine.applyAction(current, 'player1', {
       type: 'buster',
     });
+    expect(blockedRefire.player1.busterPhase).toBe('cooldown');
 
-    expect(state1.player1.busterCooldown).toBe(0); // Should be ready immediately
+    for (let i = 0; i < BUSTER_COOLDOWN_FRAMES; i++) {
+      ({ state: current } = BattleEngine.tick(current));
+    }
+    expect(current.player1.busterPhase).toBe('idle');
+    expect(current.player1.busterCooldown).toBe(0);
   });
 
   it('should deal damage when using a chip', () => {
@@ -225,9 +259,14 @@ describe('BattleEngine', () => {
     expect(movedState.player2.position.y).toBe(1);
 
     const initialHp = movedState.player2.hp;
-    const { state: afterBuster, events } = BattleEngine.applyAction(movedState, 'player1', {
+    let current = movedState;
+    ({ state: current } = BattleEngine.applyAction(current, 'player1', {
       type: 'buster',
-    });
+    }));
+    for (let i = 0; i < BUSTER_FIRE_FRAMES + BUSTER_LAND_DELAY_FRAMES; i++) {
+      ({ state: current } = BattleEngine.tick(current));
+    }
+    const { state: afterBuster, events } = BattleEngine.tick(current);
 
     expect(afterBuster.player2.hp).toBe(initialHp); // No damage
     expect(events.some((e) => e.type === 'buster_used')).toBe(false);

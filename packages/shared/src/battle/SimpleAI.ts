@@ -51,7 +51,12 @@ export class SimpleAI {
     }
 
     // Priority 3: Buster only when on same row as opponent (attack cooldown)
-    if (this.attackCooldown <= 0 && player.position.y === opponent.position.y) {
+    if (
+      this.attackCooldown <= 0 &&
+      player.position.y === opponent.position.y &&
+      player.busterPhase === 'idle' &&
+      player.busterCooldown === 0
+    ) {
       this.attackCooldown = this.ATTACK_INTERVAL;
       return { type: 'buster' };
     }

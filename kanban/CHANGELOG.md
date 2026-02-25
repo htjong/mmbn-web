@@ -16,6 +16,17 @@ Milestone entries appear **above** the sprint entry that completed them.
 **Date:** 2026-02-23 23:55 PST
 
 - 2026-02-24 22:30 PST: Added idea and formalized backlog cards for battle canvas presentation update (`kanban/ideas/battle-canvas-600-centered-scale.md`, `kanban/backlog/battle-canvas-600-centered-scale.md`) covering 600px canvas height, centered 1.2x aspect-safe scaling, fit-down behavior, and test expectations.
+- 2026-02-24 22:22 PST: Re-ran full reliability gates on `feature/player-ai-sprite-buster-animation` before sprint merge: `type-check`, `lint`, `test`, `test:e2e` (elevated), dev startup health, and Storybook build health.
+- 2026-02-24 21:00 PST: Added sprite normalization pipeline (`scripts/normalize-sprites.py`) and regenerated `assets/normalized/*` to stabilize cross-frame visual registration.
+- 2026-02-24 21:00 PST: Updated battle renderer placement tuning: centered MegaMan/Forte, increased Forte render scale to 125% of MegaMan, and applied final horizontal nudges (+5% panel shift) for both actors.
+- 2026-02-24 21:00 PST: Preserved existing buster timing flow while refining visual alignment so buster animation remains stable during sprite swaps.
+- 2026-02-24 21:24 PST: Restored battle panel size from `60` to `50` and converted render offsets to panel-relative ratios so MegaMan/Forte centering and vertical lift tuning stay consistent after panel-size changes.
+- 2026-02-24 19:49 PST: Implemented player/simpleAI sprite rendering pipeline in battle with ready/move/buster frame handling and shared texture manifests.
+- 2026-02-24 19:49 PST: Added shared buster phase timing flow (firing -> landing -> cooldown), delayed damage landing, and synchronized AI gating logic.
+- 2026-02-24 19:49 PST: Raised starting HP baseline from 500 to 1000 and updated engine tests.
+- 2026-02-24 19:49 PST: Generated orchestration artifacts for `player-ai-sprite-buster-animation` in `kanban/reports/`.
+- 2026-02-24 19:31 PST: Added battle sprite asset set for player (`MMBN3_MM_LEFT_FIELD_*`) and simpleAI (`MMBN3_FORTE_RIGHT_FIELD_*`) under `assets/` covering ready, move, and buster frames.
+- 2026-02-24 19:31 PST: Captured chosen direction in `kanban/ideas/player-ai-sprite-buster-animation.md` and formalized it into `kanban/backlog/player-ai-sprite-buster-animation.md` with T2/Full ACs and architecture review.
 - 2026-02-24 15:23 PST: Added backlog-orchestrator developer runbook (`docs/backlog-orchestrator-runbook.md`) and linked it from `README.md` Contributing section.
 - 2026-02-24 15:23 PST: Updated `.gitignore` to exclude Playwright artifacts (`test-results`, `playwright-report`) from accidental commits.
 - 2026-02-24 06:57 PST: Finalized Feature Workflow v3.2 in `docs/feature-workflow.md` with Codex command syntax (`$feature-explore`, `$feature-formalize`), strict prompt contract, tier rules, blocker rules, version retention, and validation guidance.
