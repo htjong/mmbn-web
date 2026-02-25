@@ -74,7 +74,7 @@ export function BattleHud() {
           activeChipIndex={player1.selectedChipIndex}
         />
 
-        <GaugeBar value={gaugeValue} max={gaugeMax} />
+        <GaugeBar value={gaugeValue} max={gaugeMax} customScreenOpen={customScreenOpen} />
 
         <ChipSelectPanel
           hand={player1.hand}

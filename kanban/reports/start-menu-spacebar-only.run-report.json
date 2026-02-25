@@ -1,0 +1,421 @@
+{
+  "run_id": "orchestrator-1771969422749",
+  "card_id": "start-menu-spacebar-only",
+  "card_path": "kanban/backlog/start-menu-spacebar-only.md",
+  "mode": "execute",
+  "state": "ready-for-pr",
+  "status": "success",
+  "branch": "feature/start-menu-spacebar-only-auto",
+  "base_sha": "4400104",
+  "head_sha": "4400104",
+  "stage_history": [
+    {
+      "stage": "intake",
+      "status": "started",
+      "note": "Validating backlog card schema.",
+      "timestamp": "2026-02-24T21:43:42.763Z"
+    },
+    {
+      "stage": "intake",
+      "status": "passed",
+      "note": "Card schema and architecture gate passed.",
+      "timestamp": "2026-02-24T21:43:42.763Z"
+    },
+    {
+      "stage": "assumption_snapshot",
+      "status": "started",
+      "note": "Reviewing card key files.",
+      "timestamp": "2026-02-24T21:43:42.763Z"
+    },
+    {
+      "stage": "assumption_snapshot",
+      "status": "passed",
+      "note": "Key files reviewed.",
+      "timestamp": "2026-02-24T21:43:42.764Z"
+    },
+    {
+      "stage": "tdd_red",
+      "status": "started",
+      "note": "Validating TDD red evidence.",
+      "timestamp": "2026-02-24T21:43:42.764Z"
+    },
+    {
+      "stage": "tdd_red",
+      "status": "passed",
+      "note": "All AC artifacts exist for red phase evidence.",
+      "timestamp": "2026-02-24T21:43:42.766Z"
+    },
+    {
+      "stage": "tdd_green",
+      "status": "passed",
+      "note": "Green evidence provided in manifest.",
+      "timestamp": "2026-02-24T21:43:42.766Z"
+    },
+    {
+      "stage": "tdd_refactor",
+      "status": "passed",
+      "note": "Refactor evidence provided in manifest.",
+      "timestamp": "2026-02-24T21:43:42.766Z"
+    },
+    {
+      "stage": "validating",
+      "status": "started",
+      "note": "Running validation/test suite.",
+      "timestamp": "2026-02-24T21:43:42.813Z"
+    },
+    {
+      "stage": "validating",
+      "status": "passed",
+      "note": "Validation commands passed.",
+      "timestamp": "2026-02-24T21:43:48.227Z"
+    },
+    {
+      "stage": "reviewing",
+      "status": "started",
+      "note": "Running static review checks on changed files.",
+      "timestamp": "2026-02-24T21:43:48.227Z"
+    },
+    {
+      "stage": "reviewing",
+      "status": "passed",
+      "note": "No critical/major review findings remain.",
+      "timestamp": "2026-02-24T21:43:48.247Z"
+    },
+    {
+      "stage": "assumption_diff",
+      "status": "started",
+      "note": "Comparing initial key-file assumptions against touched files.",
+      "timestamp": "2026-02-24T21:43:48.247Z"
+    },
+    {
+      "stage": "assumption_diff",
+      "status": "passed",
+      "note": "Assumption diff fully explained.",
+      "timestamp": "2026-02-24T21:43:48.248Z"
+    },
+    {
+      "stage": "packaging",
+      "status": "started",
+      "note": "Generating PR payload artifact.",
+      "timestamp": "2026-02-24T21:43:48.248Z"
+    },
+    {
+      "stage": "packaging",
+      "status": "passed",
+      "note": "PR payload written to kanban/reports/start-menu-spacebar-only.pr.md.",
+      "timestamp": "2026-02-24T21:43:48.248Z"
+    }
+  ],
+  "assumptions": {
+    "key_files_initial": [
+      "packages/client/src/ui/organisms/TitleScreen.tsx",
+      "packages/client/src/ui/hooks/useTitleScreen.ts",
+      "packages/client/src/ui/organisms/TitleScreen.stories.tsx",
+      "packages/client/src/stores/battleStore.test.ts"
+    ],
+    "key_files_reviewed": [
+      "packages/client/src/ui/organisms/TitleScreen.tsx",
+      "packages/client/src/ui/hooks/useTitleScreen.ts",
+      "packages/client/src/ui/organisms/TitleScreen.stories.tsx",
+      "packages/client/src/stores/battleStore.test.ts"
+    ]
+  },
+  "assumptions_diff": {
+    "same": [
+      "packages/client/src/ui/organisms/TitleScreen.tsx",
+      "packages/client/src/ui/hooks/useTitleScreen.ts",
+      "packages/client/src/ui/organisms/TitleScreen.stories.tsx"
+    ],
+    "different": [
+      {
+        "file": "packages/client/src/stores/battleStore.test.ts",
+        "reason": "expected behavior coverage updates",
+        "type": "expected-not-touched"
+      },
+      {
+        "file": "packages/client/src/ui/hooks/useTitleScreen.test.ts",
+        "reason": "required unit evidence for all AC rows",
+        "type": "touched-not-expected"
+      },
+      {
+        "file": "tests/e2e/title-screen.spec.ts",
+        "reason": "required end-to-end evidence for all AC rows",
+        "type": "touched-not-expected"
+      }
+    ]
+  },
+  "ac_trace": [
+    {
+      "ac_id": "AC1",
+      "ac_text": "When last input modality is keyboard and `gamePhase === 'menu'`, prompt text is exactly `PRESS SPACE TO START`.",
+      "unit": {
+        "name": "Title prompt keyboard unit",
+        "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts"
+      },
+      "integration": {
+        "name": "Title prompt keyboard integration",
+        "path": "packages/client/src/stores/battleStore.test.ts"
+      },
+      "storybook": {
+        "name": "TitleScreen keyboard story",
+        "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx"
+      },
+      "e2e": {
+        "name": "Keyboard prompt e2e",
+        "path": "tests/e2e/title-screen.spec.ts"
+      },
+      "tdd_proof": {
+        "red": "add failing AC1 tests",
+        "green": "implement AC1",
+        "refactor": "cleanup AC1"
+      },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC2",
+      "ac_text": "When last input modality is touch/pointer and `gamePhase === 'menu'`, prompt text is exactly `TAP TO START`.",
+      "unit": {
+        "name": "Title prompt touch unit",
+        "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts"
+      },
+      "integration": {
+        "name": "Title prompt touch integration",
+        "path": "packages/client/src/stores/battleStore.test.ts"
+      },
+      "storybook": {
+        "name": "TitleScreen touch story",
+        "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx"
+      },
+      "e2e": {
+        "name": "Touch prompt e2e",
+        "path": "tests/e2e/title-screen.spec.ts"
+      },
+      "tdd_proof": {
+        "red": "add failing AC2 tests",
+        "green": "implement AC2",
+        "refactor": "cleanup AC2"
+      },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC3",
+      "ac_text": "While `gamePhase === 'menu'`, pressing Space starts the game.",
+      "unit": {
+        "name": "Space starts in menu unit",
+        "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts"
+      },
+      "integration": {
+        "name": "Space starts integration",
+        "path": "packages/client/src/stores/battleStore.test.ts"
+      },
+      "storybook": {
+        "name": "TitleScreen keyboard interaction story",
+        "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx"
+      },
+      "e2e": {
+        "name": "Space start e2e",
+        "path": "tests/e2e/title-screen.spec.ts"
+      },
+      "tdd_proof": {
+        "red": "add failing AC3 tests",
+        "green": "implement AC3",
+        "refactor": "cleanup AC3"
+      },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC4",
+      "ac_text": "While `gamePhase === 'menu'`, pressing Enter does not start the game.",
+      "unit": {
+        "name": "Enter non-start unit",
+        "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts"
+      },
+      "integration": {
+        "name": "Enter non-start integration",
+        "path": "packages/client/src/stores/battleStore.test.ts"
+      },
+      "storybook": {
+        "name": "TitleScreen enter non-start story",
+        "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx"
+      },
+      "e2e": {
+        "name": "Enter non-start e2e",
+        "path": "tests/e2e/title-screen.spec.ts"
+      },
+      "tdd_proof": {
+        "red": "add failing AC4 tests",
+        "green": "implement AC4",
+        "refactor": "cleanup AC4"
+      },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC5",
+      "ac_text": "While `gamePhase === 'menu'`, tap/click start is allowed only for touch/pointer modality.",
+      "unit": {
+        "name": "Pointer gating unit",
+        "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts"
+      },
+      "integration": {
+        "name": "Pointer gating integration",
+        "path": "packages/client/src/stores/battleStore.test.ts"
+      },
+      "storybook": {
+        "name": "TitleScreen modality stories",
+        "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx"
+      },
+      "e2e": {
+        "name": "Pointer gating e2e",
+        "path": "tests/e2e/title-screen.spec.ts"
+      },
+      "tdd_proof": {
+        "red": "add failing AC5 tests",
+        "green": "implement AC5",
+        "refactor": "cleanup AC5"
+      },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC6",
+      "ac_text": "Start handler ignores `KeyboardEvent.repeat` and applies a 250ms debounce guard for repeated triggers.",
+      "unit": {
+        "name": "Repeat and debounce unit",
+        "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts"
+      },
+      "integration": {
+        "name": "Repeat and debounce integration",
+        "path": "packages/client/src/stores/battleStore.test.ts"
+      },
+      "storybook": {
+        "name": "TitleScreen debounce story",
+        "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx"
+      },
+      "e2e": {
+        "name": "Debounce e2e",
+        "path": "tests/e2e/title-screen.spec.ts"
+      },
+      "tdd_proof": {
+        "red": "add failing AC6 tests",
+        "green": "implement AC6",
+        "refactor": "cleanup AC6"
+      },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC7",
+      "ac_text": "Storybook for `TitleScreen` includes keyboard and touch modality variants with correct prompt text.",
+      "unit": {
+        "name": "Title story variants unit",
+        "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts"
+      },
+      "integration": {
+        "name": "Title story variants integration",
+        "path": "packages/client/src/stores/battleStore.test.ts"
+      },
+      "storybook": {
+        "name": "TitleScreen keyboard touch stories",
+        "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx"
+      },
+      "e2e": {
+        "name": "Title story smoke e2e",
+        "path": "tests/e2e/title-screen.spec.ts"
+      },
+      "tdd_proof": {
+        "red": "add failing AC7 tests",
+        "green": "implement AC7",
+        "refactor": "cleanup AC7"
+      },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC8",
+      "ac_text": "Automated tests cover: Space-start success, Enter non-start, modality-specific tap behavior, repeat-ignore, and debounce guard.",
+      "unit": {
+        "name": "Title behavior matrix unit",
+        "path": "packages/client/src/ui/hooks/useTitleScreen.test.ts"
+      },
+      "integration": {
+        "name": "Title behavior matrix integration",
+        "path": "packages/client/src/stores/battleStore.test.ts"
+      },
+      "storybook": {
+        "name": "Title behavior matrix stories",
+        "path": "packages/client/src/ui/organisms/TitleScreen.stories.tsx"
+      },
+      "e2e": {
+        "name": "Title behavior matrix e2e",
+        "path": "tests/e2e/title-screen.spec.ts"
+      },
+      "tdd_proof": {
+        "red": "add failing AC8 tests",
+        "green": "implement AC8",
+        "refactor": "cleanup AC8"
+      },
+      "status": "pass"
+    }
+  ],
+  "commands": [
+    {
+      "cmd": "npm run lint",
+      "exit_code": 0,
+      "duration_ms": 833,
+      "stdout": "\n> mmbn-web@0.1.0 lint\n> eslint . --ext .ts,.tsx\n\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "npm run type-check",
+      "exit_code": 0,
+      "duration_ms": 1542,
+      "stdout": "\n> mmbn-web@0.1.0 type-check\n> tsc --noEmit\n\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "npm run test:client",
+      "exit_code": 0,
+      "duration_ms": 1084,
+      "stdout": "\n> mmbn-web@0.1.0 test:client\n> npm run test --workspace=packages/client\n\n\n> @mmbn/client@0.1.0 test\n> vitest run\n\n\n RUN  v1.6.1 /Users/howardtjong/Vibes/mmbn-web/packages/client\n\n ✓ src/input/InputHandler.test.ts  (9 tests) 5ms\n ✓ src/ui/atoms/GaugeBar.test.tsx  (4 tests) 1ms\n ✓ src/ui/hooks/useTitleScreen.test.ts  (3 tests) 2ms\n ✓ src/stores/battleStore.test.ts  (3 tests) 4ms\n\n Test Files  4 passed (4)\n      Tests  19 passed (19)\n   Start at  13:43:45\n   Duration  589ms (transform 171ms, setup 0ms, collect 272ms, tests 12ms, environment 1.23s, prepare 187ms)\n\n",
+      "stderr": ""
+    },
+    {
+      "cmd": "npm run test:e2e:card -- --grep start-menu-spacebar-only",
+      "exit_code": 0,
+      "duration_ms": 1955,
+      "stdout": "\n> mmbn-web@0.1.0 test:e2e:card\n> node scripts/run-playwright.mjs --card --grep start-menu-spacebar-only\n\n\nRunning 2 tests using 1 worker\n\n  ✓  1 tests/e2e/title-screen.spec.ts:4:3 › start-menu-spacebar-only › start-menu-spacebar-only space key starts flow smoke (80ms)\n  ✓  2 tests/e2e/title-screen.spec.ts:10:3 › start-menu-spacebar-only › start-menu-spacebar-only enter key non-start smoke (68ms)\n\n  2 passed (1.2s)\n",
+      "stderr": "(node:41935) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41935) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+    }
+  ],
+  "review_findings": [],
+  "review_proof": {
+    "findings_total": 0,
+    "critical_open": 0,
+    "major_open": 0,
+    "minor_open": 0
+  },
+  "architecture_gate": {
+    "statuses": [],
+    "unresolved_red": []
+  },
+  "implementation_proof": {
+    "git_diff_present": true,
+    "files_changed_count": 5,
+    "changed_files": [
+      "packages/client/src/ui/hooks/useTitleScreen.ts",
+      "packages/client/src/ui/organisms/TitleScreen.stories.tsx",
+      "packages/client/src/ui/organisms/TitleScreen.tsx",
+      "packages/client/src/ui/hooks/useTitleScreen.test.ts",
+      "tests/e2e/title-screen.spec.ts"
+    ],
+    "key_file_overlap": [
+      "packages/client/src/ui/hooks/useTitleScreen.ts",
+      "packages/client/src/ui/organisms/TitleScreen.stories.tsx",
+      "packages/client/src/ui/organisms/TitleScreen.tsx"
+    ]
+  },
+  "retry_count": 0,
+  "blocked_reason": null,
+  "exit_code": 0,
+  "timestamps": {
+    "started_at": "2026-02-24T21:43:42.762Z",
+    "updated_at": "2026-02-24T21:43:48.257Z"
+  }
+}

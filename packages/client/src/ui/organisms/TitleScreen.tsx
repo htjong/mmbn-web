@@ -1,4 +1,4 @@
-import { useTitleScreen } from '../hooks/useTitleScreen';
+import { InputModality, useTitleScreen } from '../hooks/useTitleScreen';
 
 const styles = {
   overlay: {
@@ -39,8 +39,12 @@ const styles = {
   },
 };
 
-export function TitleScreen() {
-  useTitleScreen();
+interface TitleScreenProps {
+  initialModality?: InputModality;
+}
+
+export function TitleScreen({ initialModality = 'keyboard' }: TitleScreenProps) {
+  const { promptText } = useTitleScreen(initialModality);
 
   return (
     <>
@@ -53,7 +57,7 @@ export function TitleScreen() {
       <div style={styles.overlay}>
         <div style={styles.title}>MEGA MAN BATTLE NETWORK</div>
         <div style={styles.subtitle}>WEB EDITION</div>
-        <div style={styles.prompt}>PRESS ENTER TO START</div>
+        <div style={styles.prompt}>{promptText}</div>
       </div>
     </>
   );

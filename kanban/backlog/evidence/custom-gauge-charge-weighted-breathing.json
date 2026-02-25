@@ -1,0 +1,85 @@
+{
+  "ac_trace": [
+    {
+      "ac_id": "AC1",
+      "unit": { "name": "GaugeBar zero glow unit", "path": "packages/client/src/ui/atoms/GaugeBar.test.tsx" },
+      "integration": { "name": "BattleHud zero glow integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "GaugeBar Off story", "path": "packages/client/src/ui/atoms/GaugeBar.stories.tsx" },
+      "e2e": { "name": "Gauge zero no pulse", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "add failing AC1 tests", "green": "implement AC1", "refactor": "cleanup AC1" }
+    },
+    {
+      "ac_id": "AC2",
+      "unit": { "name": "GaugeBar scaled amplitude unit", "path": "packages/client/src/ui/atoms/GaugeBar.test.tsx" },
+      "integration": { "name": "BattleHud charge scaling integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "GaugeBar Low Mid stories", "path": "packages/client/src/ui/atoms/GaugeBar.stories.tsx" },
+      "e2e": { "name": "Gauge partial scaling", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "add failing AC2 tests", "green": "implement AC2", "refactor": "cleanup AC2" }
+    },
+    {
+      "ac_id": "AC3",
+      "unit": { "name": "GaugeBar full max amplitude unit", "path": "packages/client/src/ui/atoms/GaugeBar.test.tsx" },
+      "integration": { "name": "BattleHud full charge integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "GaugeBar Full story", "path": "packages/client/src/ui/atoms/GaugeBar.stories.tsx" },
+      "e2e": { "name": "Gauge full pulse", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "add failing AC3 tests", "green": "implement AC3", "refactor": "cleanup AC3" }
+    },
+    {
+      "ac_id": "AC4",
+      "unit": { "name": "GaugeBar cadence parity unit", "path": "packages/client/src/ui/atoms/GaugeBar.test.tsx" },
+      "integration": { "name": "BattleHud cadence parity integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "GaugeBar cadence parity stories", "path": "packages/client/src/ui/atoms/GaugeBar.stories.tsx" },
+      "e2e": { "name": "Gauge cadence parity", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "add failing AC4 tests", "green": "implement AC4", "refactor": "cleanup AC4" }
+    },
+    {
+      "ac_id": "AC5",
+      "unit": { "name": "GaugeBar customScreenOpen stop unit", "path": "packages/client/src/ui/atoms/GaugeBar.test.tsx" },
+      "integration": { "name": "BattleHud customScreenOpen integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "GaugeBar custom screen open story", "path": "packages/client/src/ui/atoms/GaugeBar.stories.tsx" },
+      "e2e": { "name": "Gauge stops on custom screen", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "add failing AC5 tests", "green": "implement AC5", "refactor": "cleanup AC5" }
+    },
+    {
+      "ac_id": "AC6",
+      "unit": { "name": "GaugeBar story state unit", "path": "packages/client/src/ui/atoms/GaugeBar.test.tsx" },
+      "integration": { "name": "Gauge story wiring integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "GaugeBar off low mid full stories", "path": "packages/client/src/ui/atoms/GaugeBar.stories.tsx" },
+      "e2e": { "name": "Gauge story visual smoke", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "add failing AC6 tests", "green": "implement AC6", "refactor": "cleanup AC6" }
+    },
+    {
+      "ac_id": "AC7",
+      "unit": { "name": "Gauge behavior matrix unit", "path": "packages/client/src/ui/atoms/GaugeBar.test.tsx" },
+      "integration": { "name": "Gauge behavior matrix integration", "path": "packages/client/src/stores/battleStore.test.ts" },
+      "storybook": { "name": "GaugeBar behavior story evidence", "path": "packages/client/src/ui/atoms/GaugeBar.stories.tsx" },
+      "e2e": { "name": "Gauge behavior matrix e2e", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "add failing AC7 tests", "green": "implement AC7", "refactor": "cleanup AC7" }
+    }
+  ],
+  "assumption_diff_reasons": {
+    "packages/client/src/ui/atoms/GaugeBar.tsx": "expected core UI change",
+    "packages/client/src/ui/organisms/BattleHud.tsx": "expected integration wiring",
+    "packages/client/src/ui/hooks/useBattleHud.ts": "expected state derivation update",
+    "packages/client/src/ui/atoms/GaugeBar.stories.tsx": "expected story updates",
+    "packages/client/src/stores/battleStore.ts": "expected supporting state updates",
+    "packages/client/src/ui/atoms/GaugeBar.test.tsx": "required unit evidence for all AC rows",
+    "tests/e2e/custom-gauge.spec.ts": "required end-to-end evidence for all AC rows",
+    "codex/config.toml": "pre-existing environment config update unrelated to this card",
+    "package.json": "added orchestrator e2e runner scripts required by workflow",
+    "package-lock.json": "dependency lock update from Playwright installation",
+    "packages/client/src/ui/hooks/useTitleScreen.ts": "pre-existing start-menu card changes in same workspace",
+    "packages/client/src/ui/organisms/TitleScreen.stories.tsx": "pre-existing start-menu story updates in same workspace",
+    "packages/client/src/ui/organisms/TitleScreen.tsx": "pre-existing start-menu UI changes in same workspace",
+    "packages/client/src/ui/hooks/useTitleScreen.test.ts": "pre-existing start-menu unit test evidence in same workspace",
+    ".codex/skills/backlog-orchestrate/": "skill consolidation and contract alignment for orchestrator runtime",
+    "docs/backlog-orchestrator-workflow.md": "workflow documentation update for fail-closed execution",
+    "kanban/backlog/evidence/": "card evidence manifest source directory updates",
+    "kanban/reports/": "orchestrator-generated report artifacts",
+    "playwright.config.ts": "project e2e configuration required to scope Playwright tests",
+    "scripts/backlog-orchestrate.mjs": "orchestrator runtime hardening changes",
+    "scripts/run-playwright.mjs": "e2e wrapper argument forwarding fix",
+    "test-results/": "generated Playwright artifacts from validation run",
+    "tests/": "new e2e test files introduced for AC evidence coverage"
+  }
+}

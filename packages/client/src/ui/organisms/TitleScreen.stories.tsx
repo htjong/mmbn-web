@@ -16,3 +16,17 @@ type Story = StoryObj<typeof TitleScreen>;
 export const Default: Story = {
   name: 'Title Screen',
 };
+
+export const KeyboardStart: Story = {
+  name: 'Keyboard Prompt',
+  args: {
+    initialModality: 'keyboard',
+  },
+};
+
+export const TouchStart: Story = {
+  name: 'Touch Prompt',
+  args: {
+    initialModality: 'pointer',
+  },
+};

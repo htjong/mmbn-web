@@ -29,7 +29,11 @@
     "prepare": "husky",
     "storybook": "npm run storybook --workspace=packages/client",
     "build-storybook": "npm run build-storybook --workspace=packages/client",
-    "validate:prompts": "node scripts/validate-prompts.js"
+    "validate:prompts": "node scripts/validate-prompts.js",
+    "orchestrate:backlog": "node scripts/backlog-orchestrate.mjs --mode dry",
+    "orchestrate:backlog:execute": "node scripts/backlog-orchestrate.mjs --mode execute",
+    "test:e2e": "node scripts/run-playwright.mjs",
+    "test:e2e:card": "node scripts/run-playwright.mjs --card"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -38,6 +42,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/node": "^20.10.6",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",

@@ -16,6 +16,8 @@ storybook-static
 .turbo
 coverage
 .nyc_output
+test-results
+playwright-report
 
 .archive
 .claude/plans/
