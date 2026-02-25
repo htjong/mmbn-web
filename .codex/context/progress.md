@@ -1,6 +1,6 @@
 ---
 created: 2026-02-24T08:40:08Z
-last_updated: 2026-02-24T10:59:41Z
+last_updated: 2026-02-25T06:22:00Z
 version: 1.0
 author: codex
 ---
@@ -10,25 +10,29 @@ author: codex
 ## Current Status
 - Codex skill migration context is captured in `.archive/context/codex-skill-migration-context-2026-02-24.md`.
 - Repo-local skill set and references exist under `.codex/skills/*`.
-- Closing ceremony gates were executed for this session:
+- Sprite normalization + renderer placement tuning is complete on `feature/player-ai-sprite-buster-animation`.
+- Reliability verification gates completed on the feature branch:
   - Pass: `npm run type-check`
   - Pass: `npm run lint`
   - Pass: `npm run test`
-  - Pass: `npm run dev` startup health check (Vite and server both started)
-  - Pass: Storybook health (`http://localhost:6006/` responding `200`)
+  - Pass: `npm run test:e2e` (required elevated run due sandbox browser-launch restrictions)
+  - Pass: `npm run dev --workspace=packages/client` startup health check
+  - Pass: `npm run build-storybook --workspace=packages/client`
 
 ## What Changed This Session
-- Added Codex skills, references, scripts, and context README under `.codex/`.
-- Added Sprint 8 changelog entry in `kanban/CHANGELOG.md`.
-- Added this progress document for ceremony/context continuity.
-- Saved closing-ceremony port preflight plan in `.archive/plans/`.
-- Updated closing-ceremony skill references with explicit post-close handoff steps.
+- Added normalized sprite generation workflow (`scripts/normalize-sprites.py`) and normalized outputs under `assets/normalized/`.
+- Finalized navi visual tuning in renderer:
+  - MegaMan/Forte centering adjustments
+  - Forte relative scale at 1.25x
+  - Panel-size rollback to 50 with panel-relative offset preservation
+- Updated Sprint 8 changelog entries to reflect the above tuning and reliability state.
+- Logged final pre-merge reliability verification run in `kanban/CHANGELOG.md`.
 
 ## Notes
-- Local runtime checks required elevated execution in this environment due sandbox `EPERM` socket/IPC restrictions.
-- A persisted approval now exists for elevated `npm run dev` and `npm run storybook`.
+- In this environment, `test:e2e` and dev-server checks require elevated execution due sandbox `EPERM` socket/IPC restrictions.
+- Untracked `worktrees/` is present at repo root and intentionally excluded from staging/merge operations.
 
 ## Next Steps
-1. Merge `feature/codex-setup` into the reported target branch (typically the active `sprint/*` branch) after review/approval.
-2. On the target branch, re-run integration gates (`npm run type-check`, `npm run lint`, `npm run test`) and resolve any merge fallout.
-3. Start the next work session from the target branch and pick the next prioritized backlog card.
+1. Merge `feature/player-ai-sprite-buster-animation` into `sprint/8`.
+2. Re-run integration gates on `sprint/8` (`type-check`, `lint`, `test`, `test:e2e`) and push `sprint/8`.
+3. Continue backlog execution from updated sprint branch.
