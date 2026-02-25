@@ -1,109 +1,109 @@
 {
-  "run_id": "orchestrator-1771969422749",
+  "run_id": "orchestrator-1771978026761",
   "card_id": "start-menu-spacebar-only",
   "card_path": "kanban/backlog/start-menu-spacebar-only.md",
   "mode": "execute",
   "state": "ready-for-pr",
   "status": "success",
   "branch": "feature/start-menu-spacebar-only-auto",
-  "base_sha": "4400104",
-  "head_sha": "4400104",
+  "base_sha": "b497487",
+  "head_sha": "b497487",
   "stage_history": [
     {
       "stage": "intake",
       "status": "started",
       "note": "Validating backlog card schema.",
-      "timestamp": "2026-02-24T21:43:42.763Z"
+      "timestamp": "2026-02-25T00:07:06.775Z"
     },
     {
       "stage": "intake",
       "status": "passed",
       "note": "Card schema and architecture gate passed.",
-      "timestamp": "2026-02-24T21:43:42.763Z"
+      "timestamp": "2026-02-25T00:07:06.775Z"
     },
     {
       "stage": "assumption_snapshot",
       "status": "started",
       "note": "Reviewing card key files.",
-      "timestamp": "2026-02-24T21:43:42.763Z"
+      "timestamp": "2026-02-25T00:07:06.775Z"
     },
     {
       "stage": "assumption_snapshot",
       "status": "passed",
       "note": "Key files reviewed.",
-      "timestamp": "2026-02-24T21:43:42.764Z"
+      "timestamp": "2026-02-25T00:07:06.775Z"
     },
     {
       "stage": "tdd_red",
       "status": "started",
       "note": "Validating TDD red evidence.",
-      "timestamp": "2026-02-24T21:43:42.764Z"
+      "timestamp": "2026-02-25T00:07:06.776Z"
     },
     {
       "stage": "tdd_red",
       "status": "passed",
       "note": "All AC artifacts exist for red phase evidence.",
-      "timestamp": "2026-02-24T21:43:42.766Z"
+      "timestamp": "2026-02-25T00:07:06.777Z"
     },
     {
       "stage": "tdd_green",
       "status": "passed",
       "note": "Green evidence provided in manifest.",
-      "timestamp": "2026-02-24T21:43:42.766Z"
+      "timestamp": "2026-02-25T00:07:06.777Z"
     },
     {
       "stage": "tdd_refactor",
       "status": "passed",
       "note": "Refactor evidence provided in manifest.",
-      "timestamp": "2026-02-24T21:43:42.766Z"
+      "timestamp": "2026-02-25T00:07:06.777Z"
     },
     {
       "stage": "validating",
       "status": "started",
       "note": "Running validation/test suite.",
-      "timestamp": "2026-02-24T21:43:42.813Z"
+      "timestamp": "2026-02-25T00:07:06.827Z"
     },
     {
       "stage": "validating",
       "status": "passed",
       "note": "Validation commands passed.",
-      "timestamp": "2026-02-24T21:43:48.227Z"
+      "timestamp": "2026-02-25T00:07:12.005Z"
     },
     {
       "stage": "reviewing",
       "status": "started",
       "note": "Running static review checks on changed files.",
-      "timestamp": "2026-02-24T21:43:48.227Z"
+      "timestamp": "2026-02-25T00:07:12.005Z"
     },
     {
       "stage": "reviewing",
       "status": "passed",
       "note": "No critical/major review findings remain.",
-      "timestamp": "2026-02-24T21:43:48.247Z"
+      "timestamp": "2026-02-25T00:07:12.024Z"
     },
     {
       "stage": "assumption_diff",
       "status": "started",
       "note": "Comparing initial key-file assumptions against touched files.",
-      "timestamp": "2026-02-24T21:43:48.247Z"
+      "timestamp": "2026-02-25T00:07:12.024Z"
     },
     {
       "stage": "assumption_diff",
       "status": "passed",
       "note": "Assumption diff fully explained.",
-      "timestamp": "2026-02-24T21:43:48.248Z"
+      "timestamp": "2026-02-25T00:07:12.024Z"
     },
     {
       "stage": "packaging",
       "status": "started",
       "note": "Generating PR payload artifact.",
-      "timestamp": "2026-02-24T21:43:48.248Z"
+      "timestamp": "2026-02-25T00:07:12.024Z"
     },
     {
       "stage": "packaging",
       "status": "passed",
       "note": "PR payload written to kanban/reports/start-menu-spacebar-only.pr.md.",
-      "timestamp": "2026-02-24T21:43:48.248Z"
+      "timestamp": "2026-02-25T00:07:12.025Z"
     }
   ],
   "assumptions": {
@@ -358,30 +358,30 @@
     {
       "cmd": "npm run lint",
       "exit_code": 0,
-      "duration_ms": 833,
+      "duration_ms": 837,
       "stdout": "\n> mmbn-web@0.1.0 lint\n> eslint . --ext .ts,.tsx\n\n",
       "stderr": ""
     },
     {
       "cmd": "npm run type-check",
       "exit_code": 0,
-      "duration_ms": 1542,
+      "duration_ms": 1497,
       "stdout": "\n> mmbn-web@0.1.0 type-check\n> tsc --noEmit\n\n",
       "stderr": ""
     },
     {
       "cmd": "npm run test:client",
       "exit_code": 0,
-      "duration_ms": 1084,
-      "stdout": "\n> mmbn-web@0.1.0 test:client\n> npm run test --workspace=packages/client\n\n\n> @mmbn/client@0.1.0 test\n> vitest run\n\n\n RUN  v1.6.1 /Users/howardtjong/Vibes/mmbn-web/packages/client\n\n ✓ src/input/InputHandler.test.ts  (9 tests) 5ms\n ✓ src/ui/atoms/GaugeBar.test.tsx  (4 tests) 1ms\n ✓ src/ui/hooks/useTitleScreen.test.ts  (3 tests) 2ms\n ✓ src/stores/battleStore.test.ts  (3 tests) 4ms\n\n Test Files  4 passed (4)\n      Tests  19 passed (19)\n   Start at  13:43:45\n   Duration  589ms (transform 171ms, setup 0ms, collect 272ms, tests 12ms, environment 1.23s, prepare 187ms)\n\n",
+      "duration_ms": 1008,
+      "stdout": "\n> mmbn-web@0.1.0 test:client\n> npm run test --workspace=packages/client\n\n\n> @mmbn/client@0.1.0 test\n> vitest run\n\n\n RUN  v1.6.1 /Users/howardtjong/Vibes/mmbn-web/packages/client\n\n ✓ src/ui/atoms/GaugeBar.test.tsx  (4 tests) 2ms\n ✓ src/input/InputHandler.test.ts  (9 tests) 4ms\n ✓ src/ui/hooks/useTitleScreen.test.ts  (3 tests) 2ms\n ✓ src/stores/battleStore.test.ts  (3 tests) 5ms\n\n Test Files  4 passed (4)\n      Tests  19 passed (19)\n   Start at  16:07:09\n   Duration  516ms (transform 121ms, setup 0ms, collect 217ms, tests 13ms, environment 1.10s, prepare 170ms)\n\n",
       "stderr": ""
     },
     {
       "cmd": "npm run test:e2e:card -- --grep start-menu-spacebar-only",
       "exit_code": 0,
-      "duration_ms": 1955,
-      "stdout": "\n> mmbn-web@0.1.0 test:e2e:card\n> node scripts/run-playwright.mjs --card --grep start-menu-spacebar-only\n\n\nRunning 2 tests using 1 worker\n\n  ✓  1 tests/e2e/title-screen.spec.ts:4:3 › start-menu-spacebar-only › start-menu-spacebar-only space key starts flow smoke (80ms)\n  ✓  2 tests/e2e/title-screen.spec.ts:10:3 › start-menu-spacebar-only › start-menu-spacebar-only enter key non-start smoke (68ms)\n\n  2 passed (1.2s)\n",
-      "stderr": "(node:41935) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:41935) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
+      "duration_ms": 1836,
+      "stdout": "\n> mmbn-web@0.1.0 test:e2e:card\n> node scripts/run-playwright.mjs --card --grep start-menu-spacebar-only\n\n\nRunning 2 tests using 1 worker\n\n  ✓  1 tests/e2e/title-screen.spec.ts:4:3 › start-menu-spacebar-only › start-menu-spacebar-only space key starts flow smoke (76ms)\n  ✓  2 tests/e2e/title-screen.spec.ts:10:3 › start-menu-spacebar-only › start-menu-spacebar-only enter key non-start smoke (62ms)\n\n  2 passed (1.2s)\n",
+      "stderr": "(node:61875) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n(node:61875) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.\n(Use `node --trace-warnings ...` to show where the warning was created)\n"
     }
   ],
   "review_findings": [],
@@ -399,10 +399,10 @@
     "git_diff_present": true,
     "files_changed_count": 5,
     "changed_files": [
+      "packages/client/src/ui/hooks/useTitleScreen.test.ts",
       "packages/client/src/ui/hooks/useTitleScreen.ts",
       "packages/client/src/ui/organisms/TitleScreen.stories.tsx",
       "packages/client/src/ui/organisms/TitleScreen.tsx",
-      "packages/client/src/ui/hooks/useTitleScreen.test.ts",
       "tests/e2e/title-screen.spec.ts"
     ],
     "key_file_overlap": [
@@ -415,7 +415,7 @@
   "blocked_reason": null,
   "exit_code": 0,
   "timestamps": {
-    "started_at": "2026-02-24T21:43:42.762Z",
-    "updated_at": "2026-02-24T21:43:48.257Z"
+    "started_at": "2026-02-25T00:07:06.773Z",
+    "updated_at": "2026-02-25T00:07:12.033Z"
   }
 }

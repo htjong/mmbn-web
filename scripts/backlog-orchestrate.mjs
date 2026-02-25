@@ -394,6 +394,20 @@ function collectChangedFilesSinceBase(baseSha) {
     .filter(Boolean);
 }
 
+function collectChangedFilesFromHeadCommit() {
+  let output = safeGit('git diff --name-only HEAD^1..HEAD', '');
+  if (!output) {
+    output = safeGit('git show --name-only --pretty="" HEAD', '');
+  }
+  if (!output) {
+    return [];
+  }
+  return output
+    .split('\n')
+    .map((line) => line.trim().replace(/^"|"$/g, ''))
+    .filter(Boolean);
+}
+
 function deriveCardScopePaths(keyFiles, acTrace) {
   const scope = new Set(keyFiles.map((file) => toRepoPath(file)));
   for (const item of acTrace) {
@@ -624,6 +638,7 @@ async function processCard(cardPath, options, runId, baseSha) {
   report.state = STATE.IMPLEMENTING;
   const allChangedFiles = new Set([
     ...collectChangedFilesSinceBase(baseSha),
+    ...collectChangedFilesFromHeadCommit(),
     ...collectChangedFiles()
   ]);
   const cardScopePaths = deriveCardScopePaths(parsed.keyFiles, report.ac_trace);
