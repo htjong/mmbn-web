@@ -15,6 +15,10 @@ Milestone entries appear **above** the sprint entry that completed them.
 ## Sprint 8: Codex Skill Migration & Local Runtime Hardening
 **Date:** 2026-02-23 23:55 PST
 
+- 2026-02-24 21:00 PST: Added sprite normalization pipeline (`scripts/normalize-sprites.py`) and regenerated `assets/normalized/*` to stabilize cross-frame visual registration.
+- 2026-02-24 21:00 PST: Updated battle renderer placement tuning: centered MegaMan/Forte, increased Forte render scale to 125% of MegaMan, and applied final horizontal nudges (+5% panel shift) for both actors.
+- 2026-02-24 21:00 PST: Preserved existing buster timing flow while refining visual alignment so buster animation remains stable during sprite swaps.
+- 2026-02-24 21:24 PST: Restored battle panel size from `60` to `50` and converted render offsets to panel-relative ratios so MegaMan/Forte centering and vertical lift tuning stay consistent after panel-size changes.
 - 2026-02-24 19:49 PST: Implemented player/simpleAI sprite rendering pipeline in battle with ready/move/buster frame handling and shared texture manifests.
 - 2026-02-24 19:49 PST: Added shared buster phase timing flow (firing -> landing -> cooldown), delayed damage landing, and synchronized AI gating logic.
 - 2026-02-24 19:49 PST: Raised starting HP baseline from 500 to 1000 and updated engine tests.

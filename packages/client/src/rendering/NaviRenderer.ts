@@ -2,19 +2,31 @@ import Phaser from 'phaser';
 import { PlayerState } from '@mmbn/shared';
 import {
   ANIMATION_FRAME_MS,
+  IDLE_PROFILES,
   MOVE_ANIMATION_MS,
   getBusterFrameIndex,
-  getLoopFrameIndex,
+  getIdleBobOffsetY,
   getMoveRenderPosition,
 } from './naviAnimation';
 import { NAVI_SPRITES } from './naviSprites';
+
+const PLAYER_SCALE_MULTIPLIER: Record<'player1' | 'player2', number> = {
+  player1: 1,
+  player2: 1.25,
+};
+
+const PLAYER_RENDER_OFFSET_RATIO: Record<'player1' | 'player2', { x: number; y: number }> = {
+  // Calibrated from panel size 60 tuning.
+  player1: { x: -11 / 60, y: 0 },
+  player2: { x: 1 / 60, y: -6 / 60 },
+};
 
 export class NaviRenderer {
   private scene: Phaser.Scene;
   private player: 'player1' | 'player2';
   private panelSize: number;
   private sprite?: Phaser.GameObjects.Sprite;
-  private readyElapsedMs = 0;
+  private idleElapsedMs = 0;
   private busterElapsedMs = 0;
   private activeBusterPhase: PlayerState['busterPhase'] = 'idle';
   private moveElapsedMs = MOVE_ANIMATION_MS;
@@ -45,7 +57,10 @@ export class NaviRenderer {
     if (!this.sprite) {
       const initialTexture = NAVI_SPRITES[this.player].ready[0];
       this.sprite = this.scene.add.sprite(0, 0, initialTexture);
-      this.sprite.setDisplaySize(this.panelSize - 4, this.panelSize - 4);
+      const targetHeight = this.panelSize - 4;
+      const baseScale = targetHeight / this.sprite.height;
+      this.sprite.setScale(baseScale * PLAYER_SCALE_MULTIPLIER[this.player]);
+      this.sprite.setOrigin(0.5, 0.5);
       this.sprite.setDepth(10);
     }
 
@@ -63,7 +78,12 @@ export class NaviRenderer {
 
     const screenX = gridStartX + renderPosition.x * panelSize + panelSize / 2;
     const screenY = gridStartY + renderPosition.y * panelSize + panelSize / 2;
-    this.sprite.setPosition(screenX, screenY);
+    const renderOffsetRatio = PLAYER_RENDER_OFFSET_RATIO[this.player];
+    const renderOffsetX = Math.round(panelSize * renderOffsetRatio.x);
+    const renderOffsetY = Math.round(panelSize * renderOffsetRatio.y);
+    const anchoredScreenX = screenX + renderOffsetX;
+    const anchoredScreenY = screenY + renderOffsetY;
+    this.sprite.setPosition(anchoredScreenX, anchoredScreenY);
 
     const busterActive =
       playerState.busterPhase === 'firing' || playerState.busterPhase === 'landing';
@@ -75,6 +95,7 @@ export class NaviRenderer {
       }
       const frameIndex = getBusterFrameIndex(this.busterElapsedMs);
       this.sprite.setTexture(NAVI_SPRITES[this.player].buster[frameIndex]);
+      this.sprite.setPosition(anchoredScreenX, anchoredScreenY);
       this.activeBusterPhase = playerState.busterPhase;
       return;
     }
@@ -86,11 +107,13 @@ export class NaviRenderer {
       return;
     }
 
-    this.readyElapsedMs += deltaMs;
-    const readyFrameIndex = getLoopFrameIndex(
-      this.readyElapsedMs,
-      NAVI_SPRITES[this.player].ready.length
-    );
-    this.sprite.setTexture(NAVI_SPRITES[this.player].ready[readyFrameIndex]);
+    this.idleElapsedMs += deltaMs;
+    const idleProfile = IDLE_PROFILES[this.player];
+    this.sprite.setTexture(NAVI_SPRITES[this.player].ready[idleProfile.frameIndex]);
+    const idleBobOffsetY =
+      idleProfile.mode === 'bob'
+        ? getIdleBobOffsetY(this.idleElapsedMs, idleProfile.bobPx, idleProfile.bobPeriodMs)
+        : 0;
+    this.sprite.setPosition(anchoredScreenX, anchoredScreenY + idleBobOffsetY);
   }
 }

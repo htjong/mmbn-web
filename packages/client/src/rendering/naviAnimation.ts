@@ -1,5 +1,26 @@
 export const ANIMATION_FRAME_MS = 100;
 export const MOVE_ANIMATION_MS = 300;
+export const FORTE_IDLE_BOB_PX = 2;
+export const FORTE_IDLE_BOB_PERIOD_MS = 600;
+
+export interface IdleProfile {
+  mode: 'static' | 'bob';
+  frameIndex: number;
+  bobPx: number;
+  bobPeriodMs: number;
+}
+
+export const IDLE_PROFILES: Record<'player1' | 'player2', IdleProfile> = {
+  // MegaMan should stay visually steady while idle.
+  player1: { mode: 'static', frameIndex: 0, bobPx: 0, bobPeriodMs: 0 },
+  // Forte keeps a subtle vertical breathing motion.
+  player2: {
+    mode: 'bob',
+    frameIndex: 0,
+    bobPx: FORTE_IDLE_BOB_PX,
+    bobPeriodMs: FORTE_IDLE_BOB_PERIOD_MS,
+  },
+};
 
 export interface GridPosition {
   x: number;
@@ -34,4 +55,13 @@ export const getMoveRenderPosition = (
     };
   }
   return target;
+};
+
+export const getIdleBobOffsetY = (
+  elapsedMs: number,
+  bobPx: number,
+  bobPeriodMs: number
+): number => {
+  if (bobPx <= 0 || bobPeriodMs <= 0) return 0;
+  return Math.sin((elapsedMs / bobPeriodMs) * Math.PI * 2) * bobPx;
 };

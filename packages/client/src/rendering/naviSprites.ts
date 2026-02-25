@@ -1,5 +1,5 @@
 const spriteAssetUrl = (filename: string): string =>
-  new URL(`../../../../assets/${filename}`, import.meta.url).href;
+  new URL(`../../../../assets/normalized/${filename}`, import.meta.url).href;
 
 export interface NaviSpriteSet {
   ready: [string, string, string, string];

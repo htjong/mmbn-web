@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   ANIMATION_FRAME_MS,
+  FORTE_IDLE_BOB_PERIOD_MS,
+  FORTE_IDLE_BOB_PX,
+  IDLE_PROFILES,
   MOVE_ANIMATION_MS,
   getBusterFrameIndex,
+  getIdleBobOffsetY,
   getLoopFrameIndex,
   getMoveFrameIndex,
   getMoveRenderPosition,
@@ -37,5 +41,25 @@ describe('naviAnimation helpers', () => {
     expect(getMoveRenderPosition(source, target, 0)).toEqual(source);
     expect(getMoveRenderPosition(source, target, ANIMATION_FRAME_MS)).toEqual({ x: 1.5, y: 1 });
     expect(getMoveRenderPosition(source, target, MOVE_ANIMATION_MS)).toEqual(target);
+  });
+
+  it('keeps player1 idle profile static', () => {
+    expect(IDLE_PROFILES.player1.mode).toBe('static');
+    expect(IDLE_PROFILES.player1.bobPx).toBe(0);
+    expect(IDLE_PROFILES.player1.frameIndex).toBe(0);
+  });
+
+  it('keeps player2 idle bob offset vertical within amplitude', () => {
+    expect(getIdleBobOffsetY(0, FORTE_IDLE_BOB_PX, FORTE_IDLE_BOB_PERIOD_MS)).toBe(0);
+    expect(
+      getIdleBobOffsetY(FORTE_IDLE_BOB_PERIOD_MS, FORTE_IDLE_BOB_PX, FORTE_IDLE_BOB_PERIOD_MS)
+    ).toBeCloseTo(0, 6);
+    const quarter = getIdleBobOffsetY(
+      FORTE_IDLE_BOB_PERIOD_MS / 4,
+      FORTE_IDLE_BOB_PX,
+      FORTE_IDLE_BOB_PERIOD_MS
+    );
+    expect(quarter).toBeCloseTo(FORTE_IDLE_BOB_PX, 6);
+    expect(Math.abs(quarter)).toBeLessThanOrEqual(FORTE_IDLE_BOB_PX);
   });
 });
