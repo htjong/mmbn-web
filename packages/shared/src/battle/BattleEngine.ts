@@ -4,7 +4,7 @@ import { Chip } from '../types/Chip.js';
 import { GridSystem } from './GridSystem.js';
 import { ChipSystem } from './ChipSystem.js';
 
-const STARTING_HP = 500;
+const STARTING_HP = 1000;
 const STARTING_CUSTOM_GAUGE_MAX = 600;
 export const HAND_SIZE = 10;
 const SELECTED_CHIPS_SIZE = 5;
