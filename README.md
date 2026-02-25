@@ -102,6 +102,7 @@ Game data: https://www.therockmanexezone.com/wiki/Mega_Man_Battle_Network_3
 ## Contributing
 
 - Git workflow: [docs/BRANCHING.md](./docs/BRANCHING.md)
+- Backlog orchestrator runbook: [docs/backlog-orchestrator-runbook.md](./docs/backlog-orchestrator-runbook.md)
 - Task tracking: [kanban/](./kanban/)
 - Architecture & patterns: [CLAUDE.md](./CLAUDE.md)
 - Changelog: [kanban/CHANGELOG.md](./kanban/CHANGELOG.md)

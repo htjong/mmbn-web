@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mmbn-web.local/schemas/backlog-orchestrator-run-report.v2.json",
+  "title": "Backlog Orchestrator Run Report V2",
+  "type": "object",
+  "required": [
+    "run_id",
+    "card_id",
+    "card_path",
+    "mode",
+    "state",
+    "status",
+    "branch",
+    "base_sha",
+    "head_sha",
+    "stage_history",
+    "assumptions",
+    "assumptions_diff",
+    "ac_trace",
+    "commands",
+    "review_findings",
+    "review_proof",
+    "architecture_gate",
+    "implementation_proof",
+    "retry_count",
+    "blocked_reason",
+    "exit_code",
+    "timestamps"
+  ],
+  "properties": {
+    "run_id": { "type": "string" },
+    "card_id": { "type": "string" },
+    "card_path": { "type": "string" },
+    "mode": { "type": "string", "enum": ["dry", "execute"] },
+    "state": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "intake_failed",
+        "analyzing",
+        "implementing",
+        "validating",
+        "reviewing",
+        "packaging",
+        "ready-for-pr",
+        "blocked",
+        "failed"
+      ]
+    },
+    "status": { "type": "string", "enum": ["success", "needs-input", "blocked", "aborted"] },
+    "branch": { "type": "string" },
+    "base_sha": { "type": "string" },
+    "head_sha": { "type": "string" },
+    "stage_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stage", "status", "note", "timestamp"],
+        "properties": {
+          "stage": { "type": "string" },
+          "status": { "type": "string" },
+          "note": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "assumptions": {
+      "type": "object",
+      "required": ["key_files_initial", "key_files_reviewed"],
+      "properties": {
+        "key_files_initial": { "type": "array", "items": { "type": "string" } },
+        "key_files_reviewed": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "assumptions_diff": {
+      "type": "object",
+      "required": ["same", "different"],
+      "properties": {
+        "same": { "type": "array", "items": { "type": "string" } },
+        "different": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["file", "reason", "type"],
+            "properties": {
+              "file": { "type": "string" },
+              "reason": { "type": ["string", "null"] },
+              "type": { "type": "string", "enum": ["expected-not-touched", "touched-not-expected"] }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ac_trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ac_id", "ac_text", "unit", "integration", "storybook", "e2e", "tdd_proof", "status"],
+        "properties": {
+          "ac_id": { "type": "string" },
+          "ac_text": { "type": "string" },
+          "unit": { "type": ["object", "null"] },
+          "integration": { "type": ["object", "null"] },
+          "storybook": { "type": ["object", "null"] },
+          "e2e": { "type": ["object", "null"] },
+          "tdd_proof": {
+            "type": "object",
+            "required": ["red", "green", "refactor"],
+            "properties": {
+              "red": { "type": ["string", "null"] },
+              "green": { "type": ["string", "null"] },
+              "refactor": { "type": ["string", "null"] }
+            },
+            "additionalProperties": false
+          },
+          "status": { "type": "string", "enum": ["pending", "pass", "blocked", "fail"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "commands": { "type": "array" },
+    "review_findings": { "type": "array" },
+    "review_proof": {
+      "type": "object",
+      "required": ["findings_total", "critical_open", "major_open", "minor_open"],
+      "properties": {
+        "findings_total": { "type": "integer", "minimum": 0 },
+        "critical_open": { "type": "integer", "minimum": 0 },
+        "major_open": { "type": "integer", "minimum": 0 },
+        "minor_open": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "architecture_gate": { "type": "object" },
+    "implementation_proof": {
+      "type": "object",
+      "required": ["git_diff_present", "files_changed_count", "changed_files", "key_file_overlap"],
+      "properties": {
+        "git_diff_present": { "type": "boolean" },
+        "files_changed_count": { "type": "integer", "minimum": 0 },
+        "changed_files": { "type": "array", "items": { "type": "string" } },
+        "key_file_overlap": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "retry_count": { "type": "integer", "minimum": 0 },
+    "blocked_reason": { "type": ["string", "null"] },
+    "exit_code": { "type": "integer", "enum": [0, 1] },
+    "timestamps": {
+      "type": "object",
+      "required": ["started_at", "updated_at"],
+      "properties": {
+        "started_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

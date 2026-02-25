@@ -14,22 +14,26 @@ export default meta;
 type Story = StoryObj<typeof GaugeBar>;
 
 export const Empty: Story = {
+  name: 'Off',
   args: { value: 0, max: 600 },
 };
 
 export const QuarterFull: Story = {
-  args: { value: 150, max: 600 },
+  name: 'Low',
+  args: { value: 120, max: 600 },
 };
 
 export const HalfFull: Story = {
+  name: 'Mid',
   args: { value: 300, max: 600 },
 };
 
-export const AlmostFull: Story = {
-  args: { value: 540, max: 600 },
+export const Full: Story = {
+  name: 'Full',
+  args: { value: 600, max: 600 },
 };
 
-export const Full: Story = {
-  name: 'Full (lavender + ready)',
-  args: { value: 600, max: 600 },
+export const CustomScreenOpen: Story = {
+  name: 'Custom Screen Open (Glow Off)',
+  args: { value: 420, max: 600, customScreenOpen: true },
 };

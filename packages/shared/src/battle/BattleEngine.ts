@@ -4,10 +4,21 @@ import { Chip } from '../types/Chip.js';
 import { GridSystem } from './GridSystem.js';
 import { ChipSystem } from './ChipSystem.js';
 
-const STARTING_HP = 100;
+const STARTING_HP = 1000;
 const STARTING_CUSTOM_GAUGE_MAX = 600;
 export const HAND_SIZE = 10;
 const SELECTED_CHIPS_SIZE = 5;
+const TARGET_FPS = 60;
+const FRAME_MS = 1000 / TARGET_FPS;
+const msToFrames = (ms: number): number => Math.round(ms / FRAME_MS);
+
+export const BUSTER_FIRE_MS = 400;
+export const BUSTER_LAND_DELAY_MS = 100;
+export const BUSTER_COOLDOWN_MS = 200;
+export const BUSTER_FIRE_FRAMES = msToFrames(BUSTER_FIRE_MS);
+export const BUSTER_LAND_DELAY_FRAMES = msToFrames(BUSTER_LAND_DELAY_MS);
+export const BUSTER_COOLDOWN_FRAMES = msToFrames(BUSTER_COOLDOWN_MS);
+const BUSTER_DAMAGE = 10;
 /**
  * Deterministic battle engine
  * Runs identically on client and server
@@ -87,6 +98,8 @@ export class BattleEngine {
       position: { x: playerId === 'player1' ? 1 : 4, y: 1 }, // Middle of each side
       isStunned: false,
       busterCooldown: 0, // Buster available immediately
+      busterPhase: 'idle',
+      busterFramesRemaining: 0,
     };
   }
 
@@ -103,6 +116,9 @@ export class BattleEngine {
       }
     }
 
+    const busterEvents = this.tickBusterState(newState);
+    events.push(...busterEvents);
+
     // Check for game over
     if (newState.player1.hp <= 0 || newState.player2.hp <= 0) {
       newState.isGameOver = true;
@@ -116,6 +132,51 @@ export class BattleEngine {
     }
 
     return { state: newState, events };
+  }
+
+  private static tickBusterState(state: BattleState): BattleEvent[] {
+    const events: BattleEvent[] = [];
+    const pairs: Array<[PlayerState, PlayerState]> = [
+      [state.player1, state.player2],
+      [state.player2, state.player1],
+    ];
+
+    for (const [player, opponent] of pairs) {
+      if (player.busterFramesRemaining > 0) {
+        player.busterFramesRemaining -= 1;
+      }
+
+      if (player.busterPhase === 'firing' && player.busterFramesRemaining === 0) {
+        player.busterPhase = 'landing';
+        player.busterFramesRemaining = BUSTER_LAND_DELAY_FRAMES;
+        continue;
+      }
+
+      if (player.busterPhase === 'landing' && player.busterFramesRemaining === 0) {
+        if (player.position.y === opponent.position.y) {
+          opponent.hp = Math.max(0, opponent.hp - BUSTER_DAMAGE);
+          events.push({
+            frame: state.frame,
+            type: 'buster_used',
+            playerId: player.id,
+            data: { damage: BUSTER_DAMAGE, opponentHp: opponent.hp },
+          });
+        }
+        player.busterPhase = 'cooldown';
+        player.busterCooldown = BUSTER_COOLDOWN_FRAMES;
+        player.busterFramesRemaining = BUSTER_COOLDOWN_FRAMES;
+        continue;
+      }
+
+      if (player.busterPhase === 'cooldown' && player.busterFramesRemaining === 0) {
+        player.busterPhase = 'idle';
+        player.busterCooldown = 0;
+      } else if (player.busterPhase === 'cooldown') {
+        player.busterCooldown = player.busterFramesRemaining;
+      }
+    }
+
+    return events;
   }
 
   static applyAction(
@@ -166,20 +227,10 @@ export class BattleEngine {
         });
       }
     } else if (action.type === 'buster') {
-      // Use buster attack — fires horizontally, hits only if same row
-      if (player.busterCooldown === 0 && player.position.y === opponent.position.y) {
-        const busterDamage = 1;
-        opponent.hp = Math.max(0, opponent.hp - busterDamage);
-
-        events.push({
-          frame: newState.frame,
-          type: 'buster_used',
-          playerId,
-          data: { damage: busterDamage, opponentHp: opponent.hp },
-        });
-
-        // Set buster cooldown (available every turn, so no actual cooldown)
-        player.busterCooldown = 0;
+      // Buster now resolves with a timed firing -> landing -> cooldown sequence.
+      if (player.busterPhase === 'idle' && player.busterCooldown === 0) {
+        player.busterPhase = 'firing';
+        player.busterFramesRemaining = BUSTER_FIRE_FRAMES;
       }
     } else if (action.type === 'chip_use') {
       const chip = player.selectedChips[player.selectedChipIndex];
