@@ -8,15 +8,15 @@
 Replace placeholder battler rectangles with the provided sprite sets for player (`MMBN3_MM`) and simpleAI (`MMBN3_FORTE`) across ready, movement, and buster actions. Buster firing must animate over 4 frames at 100ms per frame, resolve damage 100ms after the final frame, and enforce a 200ms cooldown before the next shot can start. Movement must animate over 3 frames at 100ms per frame from source to destination. Ready animation cycles every 100ms while no other action is active, and buster input requires one shot per discrete `J` key press (no hold-to-auto-fire).
 
 ## Acceptance Criteria
-- [ ] Both combatants render with provided sprite assets (no placeholder rectangle rendering during battle).
-- [ ] Ready state uses 4-frame loops at 100ms per frame for both player and simpleAI whenever no other action is active.
-- [ ] Movement uses 3-frame animation at 100ms per frame: source-cell frame, in-transition frame, and landing frame on destination cell.
-- [ ] Buster firing uses 4 frames at 100ms per frame (400ms total) for both player and simpleAI.
-- [ ] Buster damage lands exactly 100ms after frame 4 completes, and not earlier.
-- [ ] After buster hit lands, a 200ms cooldown blocks the next buster start for that actor.
-- [ ] Holding `J` does not auto-fire; one new physical press is required per buster attempt.
-- [ ] Automated tests cover timing gates for fire/land/cooldown and confirm parity between player and simpleAI behavior.
-- [ ] Visual/render tests (or deterministic renderer assertions) cover ready, movement, and buster frame progression for both actors.
+- [x] Both combatants render with provided sprite assets (no placeholder rectangle rendering during battle).
+- [x] Ready state uses 4-frame loops at 100ms per frame for both player and simpleAI whenever no other action is active.
+- [x] Movement uses 3-frame animation at 100ms per frame: source-cell frame, in-transition frame, and landing frame on destination cell.
+- [x] Buster firing uses 4 frames at 100ms per frame (400ms total) for both player and simpleAI.
+- [x] Buster damage lands exactly 100ms after frame 4 completes, and not earlier.
+- [x] After buster hit lands, a 200ms cooldown blocks the next buster start for that actor.
+- [x] Holding `J` does not auto-fire; one new physical press is required per buster attempt.
+- [x] Automated tests cover timing gates for fire/land/cooldown and confirm parity between player and simpleAI behavior.
+- [x] Visual/render tests (or deterministic renderer assertions) cover ready, movement, and buster frame progression for both actors.
 
 ## Notes
 - Key files: `packages/client/src/rendering/NaviRenderer.ts`, `packages/client/src/scenes/BattleScene.ts`, `packages/client/src/input/InputHandler.ts`, `packages/shared/src/battle/BattleEngine.ts`, `packages/shared/src/types/BattleState.ts`, `packages/shared/src/battle/SimpleAI.ts`

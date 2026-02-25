@@ -1,0 +1,230 @@
+{
+  "run_id": "orchestrator-20260225-player-ai-sprite-buster-animation",
+  "card_id": "player-ai-sprite-buster-animation",
+  "card_path": "kanban/backlog/player-ai-sprite-buster-animation.md",
+  "mode": "execute",
+  "state": "ready-for-pr",
+  "status": "success",
+  "branch": "feature/player-ai-sprite-buster-animation",
+  "base_sha": "cc0429a",
+  "head_sha": "cc0429a",
+  "stage_history": [
+    { "stage": "intake", "status": "passed", "note": "Backlog card parsed and architecture RED gate clear.", "timestamp": "2026-02-25T03:36:00Z" },
+    { "stage": "assumption_snapshot", "status": "passed", "note": "Key files reviewed before edits.", "timestamp": "2026-02-25T03:36:20Z" },
+    { "stage": "tdd_red", "status": "passed", "note": "Buster-timing and animation assertions established in test files.", "timestamp": "2026-02-25T03:37:10Z" },
+    { "stage": "tdd_green", "status": "passed", "note": "Shared timing state and sprite renderer implementation landed.", "timestamp": "2026-02-25T03:38:30Z" },
+    { "stage": "tdd_refactor", "status": "passed", "note": "Animation helper extraction and sprite manifest reuse completed.", "timestamp": "2026-02-25T03:39:00Z" },
+    { "stage": "validating", "status": "passed", "note": "lint, type-check, shared/client tests, and e2e suite passed.", "timestamp": "2026-02-25T03:40:30Z" },
+    { "stage": "reviewing", "status": "passed", "note": "No open critical/major findings.", "timestamp": "2026-02-25T03:40:40Z" },
+    { "stage": "assumption_diff", "status": "passed", "note": "Touched file deltas vs key files explained.", "timestamp": "2026-02-25T03:40:50Z" },
+    { "stage": "packaging", "status": "passed", "note": "Run report and PR payload artifacts written.", "timestamp": "2026-02-25T03:41:00Z" }
+  ],
+  "assumptions": {
+    "key_files_initial": [
+      "packages/client/src/rendering/NaviRenderer.ts",
+      "packages/client/src/scenes/BattleScene.ts",
+      "packages/client/src/input/InputHandler.ts",
+      "packages/shared/src/battle/BattleEngine.ts",
+      "packages/shared/src/types/BattleState.ts",
+      "packages/shared/src/battle/SimpleAI.ts"
+    ],
+    "key_files_reviewed": [
+      "packages/client/src/rendering/NaviRenderer.ts",
+      "packages/client/src/scenes/BattleScene.ts",
+      "packages/client/src/input/InputHandler.ts",
+      "packages/shared/src/battle/BattleEngine.ts",
+      "packages/shared/src/types/BattleState.ts",
+      "packages/shared/src/battle/SimpleAI.ts"
+    ]
+  },
+  "assumptions_diff": {
+    "same": [
+      "packages/client/src/rendering/NaviRenderer.ts",
+      "packages/client/src/scenes/BattleScene.ts",
+      "packages/shared/src/battle/BattleEngine.ts",
+      "packages/shared/src/types/BattleState.ts",
+      "packages/shared/src/battle/SimpleAI.ts"
+    ],
+    "different": [
+      {
+        "file": "packages/client/src/input/InputHandler.ts",
+        "reason": "existing just-pressed behavior already satisfied non-hold firing requirement",
+        "type": "expected-not-touched"
+      },
+      {
+        "file": "packages/shared/src/battle/BattleEngine.test.ts",
+        "reason": "added timing-gate regression coverage",
+        "type": "touched-not-expected"
+      },
+      {
+        "file": "packages/client/src/rendering/naviAnimation.ts",
+        "reason": "extracted deterministic frame/position helpers for renderer assertions",
+        "type": "touched-not-expected"
+      },
+      {
+        "file": "packages/client/src/rendering/naviAnimation.test.ts",
+        "reason": "added deterministic render progression tests",
+        "type": "touched-not-expected"
+      },
+      {
+        "file": "packages/client/src/rendering/naviSprites.ts",
+        "reason": "centralized sprite key and preload URL mapping",
+        "type": "touched-not-expected"
+      },
+      {
+        "file": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx",
+        "reason": "added storybook artifact for sprite visuals",
+        "type": "touched-not-expected"
+      }
+    ]
+  },
+  "ac_trace": [
+    {
+      "ac_id": "AC1",
+      "ac_text": "Both combatants render with provided sprite assets (no placeholder rectangle rendering during battle).",
+      "unit": { "name": "Navi sprite key mapping unit", "path": "packages/client/src/rendering/naviAnimation.test.ts" },
+      "integration": { "name": "Battle scene renderer integration", "path": "packages/client/src/scenes/BattleScene.ts" },
+      "storybook": { "name": "BattleStageSprites default story", "path": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx" },
+      "e2e": { "name": "Battle smoke e2e regression suite", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "added renderer frame assertions before implementation", "green": "replaced rectangle renderer with sprite renderer", "refactor": "moved texture catalog to naviSprites.ts" },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC2",
+      "ac_text": "Ready state uses 4-frame loops at 100ms per frame for both player and simpleAI whenever no other action is active.",
+      "unit": { "name": "Ready loop frame-index unit", "path": "packages/client/src/rendering/naviAnimation.test.ts" },
+      "integration": { "name": "NaviRenderer ready-state integration", "path": "packages/client/src/rendering/NaviRenderer.ts" },
+      "storybook": { "name": "BattleStageSprites ready frames", "path": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx" },
+      "e2e": { "name": "Battle loop smoke e2e", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "added 100ms loop assertions", "green": "implemented ready timer frame loop", "refactor": "reused generic getLoopFrameIndex helper" },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC3",
+      "ac_text": "Movement uses 3-frame animation at 100ms per frame: source-cell frame, in-transition frame, and landing frame on destination cell.",
+      "unit": { "name": "Move frame/position unit", "path": "packages/client/src/rendering/naviAnimation.test.ts" },
+      "integration": { "name": "NaviRenderer move interpolation integration", "path": "packages/client/src/rendering/NaviRenderer.ts" },
+      "storybook": { "name": "BattleStageSprites move frame sample", "path": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx" },
+      "e2e": { "name": "Movement smoke e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "added move phase assertions", "green": "implemented source-mid-target rendering", "refactor": "centralized move helpers in naviAnimation.ts" },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC4",
+      "ac_text": "Buster firing uses 4 frames at 100ms per frame (400ms total) for both player and simpleAI.",
+      "unit": { "name": "Buster frame index unit", "path": "packages/client/src/rendering/naviAnimation.test.ts" },
+      "integration": { "name": "Shared buster firing phase integration", "path": "packages/shared/src/battle/BattleEngine.ts" },
+      "storybook": { "name": "BattleStageSprites buster frame sample", "path": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx" },
+      "e2e": { "name": "Battle input smoke e2e", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "added buster frame clamp assertions", "green": "implemented firing phase timers", "refactor": "exported shared frame constants" },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC5",
+      "ac_text": "Buster damage lands exactly 100ms after frame 4 completes, and not earlier.",
+      "unit": { "name": "Delayed buster damage unit", "path": "packages/shared/src/battle/BattleEngine.test.ts" },
+      "integration": { "name": "Buster landing phase integration", "path": "packages/shared/src/battle/BattleEngine.ts" },
+      "storybook": { "name": "BattleStageSprites buster visual reference", "path": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx" },
+      "e2e": { "name": "Regression smoke e2e", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "wrote failing delayed-hit expectation", "green": "resolved damage during landing phase", "refactor": "unified phase ticker in tickBusterState" },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC6",
+      "ac_text": "After buster hit lands, a 200ms cooldown blocks the next buster start for that actor.",
+      "unit": { "name": "Buster cooldown gate unit", "path": "packages/shared/src/battle/BattleEngine.test.ts" },
+      "integration": { "name": "Cooldown phase integration", "path": "packages/shared/src/battle/BattleEngine.ts" },
+      "storybook": { "name": "BattleStageSprites cooldown reference", "path": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx" },
+      "e2e": { "name": "Regression smoke e2e", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "added immediate-refire failing test", "green": "implemented cooldown frames", "refactor": "synced busterCooldown with phase timer" },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC7",
+      "ac_text": "Holding `J` does not auto-fire; one new physical press is required per buster attempt.",
+      "unit": { "name": "Input one-press semantics unit", "path": "packages/client/src/input/InputHandler.test.ts" },
+      "integration": { "name": "InputHandler just-pressed integration", "path": "packages/client/src/input/InputHandler.ts" },
+      "storybook": { "name": "BattleStageSprites interaction reference", "path": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx" },
+      "e2e": { "name": "Input smoke e2e", "path": "tests/e2e/title-screen.spec.ts" },
+      "tdd_proof": { "red": "confirmed no hold-to-repeat regression in tests", "green": "kept keysJustPressed gated buster path", "refactor": "none" },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC8",
+      "ac_text": "Automated tests cover timing gates for fire/land/cooldown and confirm parity between player and simpleAI behavior.",
+      "unit": { "name": "Buster timing + parity unit", "path": "packages/shared/src/battle/BattleEngine.test.ts" },
+      "integration": { "name": "SimpleAI buster gating integration", "path": "packages/shared/src/battle/SimpleAI.ts" },
+      "storybook": { "name": "BattleStageSprites overview story", "path": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx" },
+      "e2e": { "name": "Suite smoke e2e", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "added delayed resolution tests", "green": "updated engine/AI phase checks", "refactor": "consolidated timing constants" },
+      "status": "pass"
+    },
+    {
+      "ac_id": "AC9",
+      "ac_text": "Visual/render tests (or deterministic renderer assertions) cover ready, movement, and buster frame progression for both actors.",
+      "unit": { "name": "Deterministic renderer helper tests", "path": "packages/client/src/rendering/naviAnimation.test.ts" },
+      "integration": { "name": "NaviRenderer frame selection integration", "path": "packages/client/src/rendering/NaviRenderer.ts" },
+      "storybook": { "name": "BattleStageSprites visual artifact", "path": "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx" },
+      "e2e": { "name": "Suite smoke e2e", "path": "tests/e2e/custom-gauge.spec.ts" },
+      "tdd_proof": { "red": "added deterministic frame progression tests", "green": "wired renderer to helpers", "refactor": "split animation math from renderer side effects" },
+      "status": "pass"
+    }
+  ],
+  "commands": [
+    { "cmd": "npm run lint", "exit_code": 0 },
+    { "cmd": "npm run type-check", "exit_code": 0 },
+    { "cmd": "npm run test:shared", "exit_code": 0 },
+    { "cmd": "npm run test:client", "exit_code": 0 },
+    { "cmd": "npm run test:e2e:card", "exit_code": 0 }
+  ],
+  "review_findings": [],
+  "review_proof": {
+    "findings_total": 0,
+    "critical_open": 0,
+    "major_open": 0,
+    "minor_open": 0
+  },
+  "architecture_gate": {
+    "statuses": [
+      { "category": "Determinism", "status": "GREEN" },
+      { "category": "State impact", "status": "GREEN" },
+      { "category": "Network/schema", "status": "GREEN" },
+      { "category": "Grid/panel", "status": "GREEN" },
+      { "category": "Chip system", "status": "GREEN" },
+      { "category": "Client rendering/UI", "status": "GREEN" },
+      { "category": "Reuse opportunities", "status": "GREEN" },
+      { "category": "Risk/order", "status": "GREEN" }
+    ],
+    "unresolved_red": []
+  },
+  "implementation_proof": {
+    "git_diff_present": true,
+    "files_changed_count": 10,
+    "changed_files": [
+      "packages/client/src/rendering/NaviRenderer.ts",
+      "packages/client/src/scenes/BattleScene.ts",
+      "packages/shared/src/battle/BattleEngine.test.ts",
+      "packages/shared/src/battle/BattleEngine.ts",
+      "packages/shared/src/battle/SimpleAI.ts",
+      "packages/shared/src/types/BattleState.ts",
+      "packages/client/src/rendering/naviAnimation.test.ts",
+      "packages/client/src/rendering/naviAnimation.ts",
+      "packages/client/src/rendering/naviSprites.ts",
+      "packages/client/src/ui/organisms/BattleStageSprites.stories.tsx"
+    ],
+    "key_file_overlap": [
+      "packages/client/src/rendering/NaviRenderer.ts",
+      "packages/client/src/scenes/BattleScene.ts",
+      "packages/shared/src/battle/BattleEngine.ts",
+      "packages/shared/src/types/BattleState.ts",
+      "packages/shared/src/battle/SimpleAI.ts"
+    ]
+  },
+  "retry_count": 0,
+  "blocked_reason": null,
+  "exit_code": 0,
+  "timestamps": {
+    "started_at": "2026-02-25T03:36:00Z",
+    "updated_at": "2026-02-25T03:41:00Z"
+  }
+}

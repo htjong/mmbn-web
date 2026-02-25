@@ -15,6 +15,10 @@ Milestone entries appear **above** the sprint entry that completed them.
 ## Sprint 8: Codex Skill Migration & Local Runtime Hardening
 **Date:** 2026-02-23 23:55 PST
 
+- 2026-02-24 19:49 PST: Implemented player/simpleAI sprite rendering pipeline in battle with ready/move/buster frame handling and shared texture manifests.
+- 2026-02-24 19:49 PST: Added shared buster phase timing flow (firing -> landing -> cooldown), delayed damage landing, and synchronized AI gating logic.
+- 2026-02-24 19:49 PST: Raised starting HP baseline from 500 to 1000 and updated engine tests.
+- 2026-02-24 19:49 PST: Generated orchestration artifacts for `player-ai-sprite-buster-animation` in `kanban/reports/`.
 - 2026-02-24 19:31 PST: Added battle sprite asset set for player (`MMBN3_MM_LEFT_FIELD_*`) and simpleAI (`MMBN3_FORTE_RIGHT_FIELD_*`) under `assets/` covering ready, move, and buster frames.
 - 2026-02-24 19:31 PST: Captured chosen direction in `kanban/ideas/player-ai-sprite-buster-animation.md` and formalized it into `kanban/backlog/player-ai-sprite-buster-animation.md` with T2/Full ACs and architecture review.
 - 2026-02-24 15:23 PST: Added backlog-orchestrator developer runbook (`docs/backlog-orchestrator-runbook.md`) and linked it from `README.md` Contributing section.
