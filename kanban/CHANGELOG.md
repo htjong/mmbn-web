@@ -15,6 +15,8 @@ Milestone entries appear **above** the sprint entry that completed them.
 ## Sprint 8: Codex Skill Migration & Local Runtime Hardening
 **Date:** 2026-02-23 23:55 PST
 
+- 2026-02-24 19:31 PST: Added battle sprite asset set for player (`MMBN3_MM_LEFT_FIELD_*`) and simpleAI (`MMBN3_FORTE_RIGHT_FIELD_*`) under `assets/` covering ready, move, and buster frames.
+- 2026-02-24 19:31 PST: Captured chosen direction in `kanban/ideas/player-ai-sprite-buster-animation.md` and formalized it into `kanban/backlog/player-ai-sprite-buster-animation.md` with T2/Full ACs and architecture review.
 - 2026-02-24 15:23 PST: Added backlog-orchestrator developer runbook (`docs/backlog-orchestrator-runbook.md`) and linked it from `README.md` Contributing section.
 - 2026-02-24 15:23 PST: Updated `.gitignore` to exclude Playwright artifacts (`test-results`, `playwright-report`) from accidental commits.
 - 2026-02-24 06:57 PST: Finalized Feature Workflow v3.2 in `docs/feature-workflow.md` with Codex command syntax (`$feature-explore`, `$feature-formalize`), strict prompt contract, tier rules, blocker rules, version retention, and validation guidance.
